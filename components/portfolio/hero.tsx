@@ -17,7 +17,6 @@ export function Hero() {
             {/* Navigation */}
             <nav className="space-y-3">
               {[
-                { label: "About", href: "#about" },
                 { label: "Education", href: "#education" },
                 { label: "Experience", href: "#experience" },
                 { label: "Projects", href: "#projects" },
