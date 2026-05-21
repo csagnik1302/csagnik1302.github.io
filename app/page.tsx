@@ -1,5 +1,6 @@
 import { Hero } from "@/components/portfolio/hero";
 import { Projects } from "@/components/portfolio/projects";
+import { Experience } from "@/components/portfolio/experience";
 import { Education } from "@/components/portfolio/education";
 import { Skills } from "@/components/portfolio/skills";
 import { Contact } from "@/components/portfolio/contact";
@@ -10,6 +11,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Hero />
       <Projects />
+      <Experience />
       <Education />
       <Skills />
       <Contact />
