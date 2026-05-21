@@ -21,8 +21,8 @@ const education: Education[] = [
   },
   {
     period: "2018 — 2020",
-    degree: "Higher Secondary (Science)",
-    institution: "High School",
+    degree: "Higher Secondary (CBSE)",
+    institution: "Kendriya Vidyalaya Cossipore",
   },
 ];
 

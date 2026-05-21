@@ -14,40 +14,13 @@ interface ExperienceItem {
 
 const experiences: ExperienceItem[] = [
   {
-    period: "Jan — May 2026",
+    period: "Oct 2024 — Jul 2025",
     role: "Data Science Intern",
-    company: "Analytics Corp",
+    company: "DeepThought CultureTech Ventures",
     companyUrl: "#",
     description:
       "Built predictive models for customer churn analysis achieving 87% accuracy. Developed automated ETL pipelines processing 2M+ records daily. Created interactive Tableau dashboards for executive reporting, reducing manual reporting time by 60%.",
-    skills: ["Python", "Scikit-learn", "SQL", "Tableau", "AWS S3"],
-  },
-  {
-    period: "May — Aug 2025",
-    role: "Machine Learning Intern",
-    company: "TechStart AI",
-    companyUrl: "#",
-    description:
-      "Developed NLP models for sentiment analysis on customer feedback data. Fine-tuned transformer models achieving 92% F1 score. Collaborated with the engineering team to deploy models using FastAPI and Docker containers.",
-    skills: ["TensorFlow", "Hugging Face", "NLP", "FastAPI", "Docker"],
-  },
-  {
-    period: "Dec 2024 — Feb 2025",
-    role: "Data Analyst Intern",
-    company: "FinServe Solutions",
-    companyUrl: "#",
-    description:
-      "Performed exploratory data analysis on financial datasets to identify fraud patterns. Built SQL queries and Python scripts for data extraction and cleaning. Presented weekly insights to stakeholders, influencing risk assessment strategies.",
-    skills: ["Python", "Pandas", "SQL", "Power BI", "Excel"],
-  },
-  {
-    period: "Summer 2024",
-    role: "Research Intern",
-    company: "University ML Lab",
-    companyUrl: "#",
-    description:
-      "Assisted in research on computer vision applications for medical imaging. Implemented data augmentation pipelines that improved model accuracy by 15%. Co-authored a paper submitted to an international conference.",
-    skills: ["PyTorch", "OpenCV", "Computer Vision", "Research"],
+    skills: ["Hubspot", "Zoho CRM", "Zoho Flow", "Google Sheets", "Python", "Gemini"],
   },
 ];
 

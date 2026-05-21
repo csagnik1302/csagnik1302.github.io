@@ -20,7 +20,7 @@ const projects: Project[] = [
     description:
       "Semi-automated pipeline to rewrite Bengali sentences in a target author's style without parallel corpora. Built a BiGRU encoder with Gradient Reversal Layer for author-invariant representations and a style-conditioned GRU decoder. GRL reduces discriminator accuracy from ~65% to near-chance (~20%), confirming style disentanglement.",
     image: "/projects/style-transfer.jpg",
-    liveUrl: "https://huggingface.co/datasets/sagnik1302/bengali-authors-corpus",
+    // liveUrl: "https://huggingface.co/datasets/sagnik1302/bengali-authors-corpus",
     githubUrl: "https://github.com/csagnik1302",
     skills: ["PyTorch", "BiGRU", "NLP", "Tesseract OCR", "pdfplumber"],
     featured: true,
