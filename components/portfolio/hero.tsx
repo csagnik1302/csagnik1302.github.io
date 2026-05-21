@@ -1,5 +1,3 @@
-"use client";
-
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -20,9 +18,9 @@ export function Hero() {
             <nav className="space-y-3">
               {[
                 { label: "About", href: "#about" },
-                { label: "Projects", href: "#projects" },
-                { label: "Experience", href: "#experience" },
                 { label: "Education", href: "#education" },
+                { label: "Experience", href: "#experience" },
+                { label: "Projects", href: "#projects" },
               ].map((item) => (
                 <a
                   key={item.label}
