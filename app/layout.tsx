@@ -10,9 +10,6 @@ export const metadata: Metadata = {
   title: 'Sagnik Chandra | Portfolio',
   description: 'M.Sc. Data Science student with expertise in Deep Learning, NLP, and Graph Analytics. Building intelligent solutions with Python, PyTorch, and distributed systems.',
   generator: 'v0.app',
-  icons: {
-    icon: '/favicon.png',
-  },
 }
 
 export default function RootLayout({
