@@ -1,0 +1,60 @@
+"use client";
+
+import { GraduationCap } from "lucide-react";
+
+interface Education {
+  period: string;
+  degree: string;
+  institution: string;
+}
+
+const education: Education[] = [
+  {
+    period: "2025 — present",
+    degree: "M.Sc. in Data Science and Artificial Intelligence",
+    institution: "Ramakrishna Mission Vivekananda Educational & Research Institute, Belur",
+  },
+  {
+    period: "2020 — 2023",
+    degree: "B.Sc. (Hons) in Mathematics",
+    institution: "University of Calcutta",
+  },
+  {
+    period: "2018 — 2020",
+    degree: "Higher Secondary (Science)",
+    institution: "High School",
+  },
+];
+
+export function Education() {
+  return (
+    <section id="education" className="py-20 px-6 lg:px-0">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+          Education
+        </h2>
+
+        <div className="space-y-8">
+          <div className="flex items-center gap-2 text-foreground mb-8">
+            <GraduationCap className="h-5 w-5 text-primary" />
+            <h3 className="font-medium">Academic Background</h3>
+          </div>
+
+          <div className="grid gap-8">
+            {education.map((edu, index) => (
+              <div key={index} className="space-y-2 border-l-2 border-border pl-6">
+                <p className="text-sm text-muted-foreground font-mono">
+                  {edu.period}
+                </p>
+                <div>
+                  <h4 className="text-foreground font-medium">{edu.degree}</h4>
+                  <p className="text-primary text-sm">{edu.institution}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
