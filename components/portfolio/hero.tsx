@@ -21,6 +21,7 @@ export function Hero() {
               {[
                 { label: "About", href: "#about" },
                 { label: "Projects", href: "#projects" },
+                { label: "Experience", href: "#experience" },
                 { label: "Education", href: "#education" },
               ].map((item) => (
                 <a
