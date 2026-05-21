@@ -17,7 +17,7 @@ const experiences: ExperienceItem[] = [
     period: "Oct 2024 — Jul 2025",
     role: "Data Science Intern",
     company: "DeepThought CultureTech Ventures",
-    companyUrl: "#",
+    companyUrl: "https://www.deepthought.education/",
     description:
       "Built predictive models for customer churn analysis achieving 87% accuracy. Developed automated ETL pipelines processing 2M+ records daily. Created interactive Tableau dashboards for executive reporting, reducing manual reporting time by 60%.",
     skills: ["Hubspot", "Zoho CRM", "Zoho Flow", "Google Sheets", "Python", "Gemini"],
