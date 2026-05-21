@@ -19,7 +19,7 @@ const experiences: ExperienceItem[] = [
     company: "DeepThought CultureTech Ventures",
     companyUrl: "https://www.deepthought.education/",
     description:
-      "Built predictive models for customer churn analysis achieving 87% accuracy. Developed automated ETL pipelines processing 2M+ records daily. Created interactive Tableau dashboards for executive reporting, reducing manual reporting time by 60%.",
+      "Led and contributed to 10+ cross-functional initiatives across AI workflow automation, CRM optimization, data operations, recruitment, UX research, and business growth. Built AI-powered workflows and internal AI wrappers that reduced manual effort by 1–4 hours daily, redesigned CRM and tracking systems that improved process efficiency by ~60%, increased team coordination by ~90%, and reduced operational turnaround time from 3 days to 1 day. Supported decision-making through centralized dashboards, KPI-based tracking, and process automation impacting 30+ internal stakeholders and 20+ external users/business contacts.",
     skills: ["Hubspot", "Zoho CRM", "Zoho Flow", "Google Sheets", "Python", "Gemini"],
   },
 ];
