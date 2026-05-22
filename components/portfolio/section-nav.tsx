@@ -46,7 +46,7 @@ export function TopSectionNav() {
       )}
     >
       <div className="mx-auto max-w-4xl">
-        <div className="flex min-h-16 flex-col justify-center gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
+        <div className="flex min-h-16 flex-col justify-center gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
           <a
             href="#top"
             className={cn(
@@ -57,15 +57,14 @@ export function TopSectionNav() {
             Sagnik Chandra
           </a>
           <div
-            className="w-full sm:w-auto flex gap-1 overflow-x-auto pb-1 sm:justify-end sm:pb-0 snap-x snap-mandatory"
+            className="flex flex-wrap gap-1 sm:justify-end sm:gap-2"
             aria-label="Portfolio sections"
-            style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
           >
             {sectionLinks.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="snap-start flex-shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+                className="flex-shrink-0 whitespace-nowrap rounded-md px-2 py-1 sm:px-3 sm:py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
               >
                 {item.label}
               </a>
