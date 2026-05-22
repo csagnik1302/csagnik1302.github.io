@@ -37,9 +37,9 @@ export function PortfolioBackground() {
       scaleMobile: 1,
       color: 0x70f1dc,
       backgroundColor: 0x091219,
-      points: 6,
-      maxDistance: 15,
-      spacing: 22,
+      points: 7,
+      maxDistance: 24,
+      spacing: 20,
       showDots: true,
     });
 
