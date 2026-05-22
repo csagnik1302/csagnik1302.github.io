@@ -56,14 +56,15 @@ export function TopSectionNav() {
           Sagnik Chandra
         </a>
         <div
-          className="flex gap-1 overflow-x-auto pb-1 sm:justify-end sm:pb-0"
+          className="flex gap-1 overflow-x-auto pb-1 sm:justify-end sm:pb-0 snap-x snap-mandatory scroll-smooth"
           aria-label="Portfolio sections"
+          style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
         >
           {sectionLinks.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+              className="snap-start flex-shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
             >
               {item.label}
             </a>
