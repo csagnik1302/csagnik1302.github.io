@@ -14,6 +14,7 @@ export const sectionLinks = [
 export function TopSectionNav() {
   const navRef = useRef<HTMLElement>(null);
   const [isFrozen, setIsFrozen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("top");
 
   useEffect(() => {
     const updateNav = () => {
@@ -23,6 +24,22 @@ export function TopSectionNav() {
       const heroRect = heroSection.getBoundingClientRect();
       
       setIsFrozen(heroRect.top <= 0);
+
+      // Determine the active section based on scroll position
+      const sectionIds = ["top", "education", "experience", "projects", "skills", "contact"];
+      let currentSection = "top";
+
+      for (const sectionId of sectionIds) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= 150) {
+            currentSection = sectionId;
+          }
+        }
+      }
+
+      setActiveSection(currentSection);
     };
 
     updateNav();
@@ -60,15 +77,24 @@ export function TopSectionNav() {
             className="flex gap-1 sm:gap-2 justify-center sm:justify-end min-w-0"
             aria-label="Portfolio sections"
           >
-            {sectionLinks.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="flex-shrink-0 whitespace-nowrap rounded-md px-1 py-0.5 sm:px-3 sm:py-2 text-[0.7rem] sm:text-xs font-medium uppercase tracking-wider sm:tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
-              >
-                {item.label}
-              </a>
-            ))}
+            {sectionLinks.map((item) => {
+              const sectionId = item.href.replace("#", "");
+              const isActive = activeSection === sectionId;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex-shrink-0 whitespace-nowrap rounded-md px-1 py-0.5 sm:px-3 sm:py-2 text-[0.7rem] sm:text-xs font-medium uppercase tracking-wider sm:tracking-widest transition-colors hover:bg-secondary/80 hover:text-foreground",
+                    isActive
+                      ? "font-bold text-foreground underline decoration-2 underline-offset-4"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
