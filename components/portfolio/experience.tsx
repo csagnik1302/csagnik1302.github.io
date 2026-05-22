@@ -2,6 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
 interface ExperienceItem {
   period: string;
@@ -28,16 +29,18 @@ export function Experience() {
   return (
     <section id="experience" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium animate-fade-in">
-          Experience
-        </h2>
+        <ScrollReveal>
+          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+            Experience
+          </h2>
+        </ScrollReveal>
 
         <div className="space-y-12">
           {experiences.map((exp, index) => (
-            <div
+            <ScrollReveal
               key={index}
-              className="group grid lg:grid-cols-[150px_1fr] gap-4 lg:gap-8 animate-slide-up"
-              style={{ animationDelay: `${index * 0.15}s`, animationFillMode: 'both' }}
+              className="group grid lg:grid-cols-[150px_1fr] gap-4 lg:gap-8"
+              delay={index * 150}
             >
               <div className="text-sm text-muted-foreground font-mono">
                 {exp.period}
@@ -79,7 +82,7 @@ export function Experience() {
                   ))}
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

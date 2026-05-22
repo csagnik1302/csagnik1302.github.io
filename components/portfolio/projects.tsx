@@ -3,7 +3,7 @@
 import { ExternalLink, Github } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { useScrollAnimate } from "@/hooks/use-scroll-animate";
+import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
 interface Project {
   title: string;
@@ -46,15 +46,10 @@ const projects: Project[] = [
 ];
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const { ref, isVisible } = useScrollAnimate();
-
   return (
-    <div
-      ref={ref}
-      className={`group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 ${
-        isVisible ? 'animate-scroll-reveal' : 'opacity-0'
-      }`}
-      style={isVisible ? { animationDelay: `${index * 0.1}s`, animationFillMode: 'both' } : { opacity: 0, transform: 'translateY(12px)' }}
+    <ScrollReveal
+      className="group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8"
+      delay={index * 100}
     >
       <div className="relative aspect-video lg:aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
         <Image
@@ -114,7 +109,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           ))}
         </div>
       </div>
-    </div>
+    </ScrollReveal>
   );
 }
 
@@ -122,9 +117,11 @@ export function Projects() {
   return (
     <section id="projects" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium animate-fade-in">
-          Projects
-        </h2>
+        <ScrollReveal>
+          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+            Projects
+          </h2>
+        </ScrollReveal>
 
         <div className="space-y-16">
           {projects.map((project, index) => (

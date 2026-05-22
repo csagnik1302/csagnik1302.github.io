@@ -1,6 +1,7 @@
 "use client";
 
 import { GraduationCap } from "lucide-react";
+import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
 interface Education {
   period: string;
@@ -30,19 +31,25 @@ export function Education() {
   return (
     <section id="education" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
-          Education
-        </h2>
+        <ScrollReveal>
+          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+            Education
+          </h2>
+        </ScrollReveal>
 
         <div className="space-y-8">
-          <div className="flex items-center gap-2 text-foreground mb-8">
+          <ScrollReveal className="flex items-center gap-2 text-foreground mb-8">
             <GraduationCap className="h-5 w-5 text-primary" />
             <h3 className="font-medium">Academic Background</h3>
-          </div>
+          </ScrollReveal>
 
           <div className="grid gap-8">
             {education.map((edu, index) => (
-              <div key={index} className="space-y-2 border-l-2 border-border pl-6">
+              <ScrollReveal
+                key={index}
+                className="space-y-2 border-l-2 border-border pl-6"
+                delay={index * 100}
+              >
                 <p className="text-sm text-muted-foreground font-mono">
                   {edu.period}
                 </p>
@@ -50,7 +57,7 @@ export function Education() {
                   <h4 className="text-foreground font-medium">{edu.degree}</h4>
                   <p className="text-primary text-sm">{edu.institution}</p>
                 </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>

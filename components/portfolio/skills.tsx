@@ -1,5 +1,7 @@
 "use client";
 
+import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
+
 interface SkillCategory {
   title: string;
   skills: string[];
@@ -32,13 +34,15 @@ export function Skills() {
   return (
     <section id="skills" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
-          Skills
-        </h2>
+        <ScrollReveal>
+          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+            Skills
+          </h2>
+        </ScrollReveal>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {skillCategories.map((category, index) => (
-            <div key={index} className="space-y-4">
+            <ScrollReveal key={index} className="space-y-4" delay={index * 80}>
               <h3 className="text-foreground font-medium">{category.title}</h3>
               <div className="flex flex-wrap gap-2">
                 {category.skills.map((skill) => (
@@ -50,7 +54,7 @@ export function Skills() {
                   </span>
                 ))}
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
