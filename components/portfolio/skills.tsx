@@ -1,6 +1,8 @@
 "use client";
 
+import { Wrench } from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
+import { SectionHeading } from "@/components/portfolio/section-heading";
 
 interface SkillCategory {
   title: string;
@@ -33,16 +35,12 @@ const skillCategories: SkillCategory[] = [
 export function Skills() {
   return (
     <section id="skills" className="py-20 px-6 lg:px-0">
-      <div className="max-w-4xl mx-auto">
-        <ScrollReveal>
-          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
-            Skills
-          </h2>
-        </ScrollReveal>
+      <ScrollReveal className="max-w-4xl mx-auto">
+        <SectionHeading icon={Wrench}>Skills</SectionHeading>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {skillCategories.map((category, index) => (
-            <ScrollReveal key={index} className="space-y-4" delay={index * 80}>
+            <div key={index} className="space-y-4">
               <h3 className="text-foreground font-medium">{category.title}</h3>
               <div className="flex flex-wrap gap-2">
                 {category.skills.map((skill) => (
@@ -54,10 +52,10 @@ export function Skills() {
                   </span>
                 ))}
               </div>
-            </ScrollReveal>
+            </div>
           ))}
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

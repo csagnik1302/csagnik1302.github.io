@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { BriefcaseBusiness, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
+import { SectionHeading } from "@/components/portfolio/section-heading";
 
 interface ExperienceItem {
   period: string;
@@ -28,19 +29,14 @@ const experiences: ExperienceItem[] = [
 export function Experience() {
   return (
     <section id="experience" className="py-20 px-6 lg:px-0">
-      <div className="max-w-4xl mx-auto">
-        <ScrollReveal>
-          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
-            Experience
-          </h2>
-        </ScrollReveal>
+      <ScrollReveal className="max-w-4xl mx-auto">
+        <SectionHeading icon={BriefcaseBusiness}>Experience</SectionHeading>
 
         <div className="space-y-12">
           {experiences.map((exp, index) => (
-            <ScrollReveal
+            <div
               key={index}
               className="group grid lg:grid-cols-[150px_1fr] gap-4 lg:gap-8"
-              delay={index * 150}
             >
               <div className="text-sm text-muted-foreground font-mono">
                 {exp.period}
@@ -82,10 +78,10 @@ export function Experience() {
                   ))}
                 </div>
               </div>
-            </ScrollReveal>
+            </div>
           ))}
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

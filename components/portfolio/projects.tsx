@@ -1,9 +1,10 @@
 "use client";
 
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, FolderKanban, Github } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
+import { SectionHeading } from "@/components/portfolio/section-heading";
 
 interface Project {
   title: string;
@@ -45,12 +46,9 @@ const projects: Project[] = [
   },
 ];
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project }: { project: Project }) {
   return (
-    <ScrollReveal
-      className="group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8"
-      delay={index * 100}
-    >
+    <div className="group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8">
       <div className="relative aspect-video lg:aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
         <Image
           src={project.image}
@@ -109,26 +107,22 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           ))}
         </div>
       </div>
-    </ScrollReveal>
+    </div>
   );
 }
 
 export function Projects() {
   return (
     <section id="projects" className="py-20 px-6 lg:px-0">
-      <div className="max-w-4xl mx-auto">
-        <ScrollReveal>
-          <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
-            Projects
-          </h2>
-        </ScrollReveal>
+      <ScrollReveal className="max-w-4xl mx-auto">
+        <SectionHeading icon={FolderKanban}>Projects</SectionHeading>
 
         <div className="space-y-16">
           {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} index={index} />
+            <ProjectCard key={index} project={project} />
           ))}
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }
