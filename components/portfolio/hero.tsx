@@ -1,11 +1,10 @@
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
-import { SectionLinks } from "@/components/portfolio/section-nav";
 
 export function Hero() {
   return (
-    <section className="min-h-screen flex flex-col justify-center px-6 py-20 lg:px-0">
+    <section id="top" className="flex min-h-[calc(100vh-4rem)] flex-col justify-center px-6 py-20 lg:px-0">
       <div className="max-w-4xl mx-auto w-full">
         <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           {/* Left Column - Name and Navigation */}
@@ -16,11 +15,8 @@ export function Hero() {
               </h1>
             </div>
 
-            {/* Navigation */}
-            <SectionLinks />
-
             {/* Social Links */}
-            <ScrollReveal className="flex items-center gap-4 pt-4" delay={300}>
+            <ScrollReveal className="flex items-center gap-4" delay={300}>
               <a
                 href="https://github.com/csagnik1302"
                 target="_blank"
