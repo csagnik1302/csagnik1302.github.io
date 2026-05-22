@@ -3,10 +3,10 @@
 import { useEffect, useRef } from "react";
 
 interface Point {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
+  phase: number;
+  speed: number;
+  amplitude: number;
+  offset: number;
 }
 
 export function PortfolioBackground() {
@@ -23,20 +23,20 @@ export function PortfolioBackground() {
       "(prefers-reduced-motion: reduce)"
     ).matches;
     const pointer = { x: 0, y: 0, active: false };
-    let points: Point[] = [];
+    let bands: Point[] = [];
     let animationFrame = 0;
     let width = 0;
     let height = 0;
+    let time = 0;
 
-    const createPoints = () => {
-      const density = width < 768 ? 9500 : 7200;
-      const count = Math.min(96, Math.max(34, Math.floor((width * height) / density)));
+    const createBands = () => {
+      const count = width < 768 ? 12 : 18;
 
-      points = Array.from({ length: count }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.22,
-        vy: (Math.random() - 0.5) * 0.22,
+      bands = Array.from({ length: count }, (_, index) => ({
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.004 + Math.random() * 0.004,
+        amplitude: 18 + Math.random() * 34,
+        offset: ((index + 0.5) / count) * height,
       }));
     };
 
@@ -49,61 +49,98 @@ export function PortfolioBackground() {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      createPoints();
+      createBands();
+    };
+
+    const getDisplacedY = (x: number, band: Point) => {
+      const wave =
+        Math.sin(x * 0.008 + band.phase + time * band.speed) * band.amplitude +
+        Math.sin(x * 0.003 + band.phase * 1.7 - time * band.speed * 0.7) *
+          band.amplitude *
+          0.46;
+
+      if (!pointer.active) return band.offset + wave;
+
+      const dx = x - pointer.x;
+      const distance = Math.abs(dx);
+      const influence = Math.max(0, 1 - distance / 260);
+      const verticalPull = (pointer.y - band.offset) * influence * 0.16;
+
+      return band.offset + wave + verticalPull;
     };
 
     const draw = () => {
       context.clearRect(0, 0, width, height);
+      time += prefersReducedMotion ? 0 : 1;
 
       const gradient = context.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, "rgba(112, 241, 220, 0.42)");
-      gradient.addColorStop(1, "rgba(130, 176, 255, 0.26)");
+      gradient.addColorStop(0, "rgba(112, 241, 220, 0.22)");
+      gradient.addColorStop(0.52, "rgba(132, 200, 255, 0.2)");
+      gradient.addColorStop(1, "rgba(112, 241, 220, 0.08)");
 
-      points.forEach((point) => {
-        if (!prefersReducedMotion) {
-          point.x += point.vx;
-          point.y += point.vy;
+      context.lineCap = "round";
+      context.lineJoin = "round";
+
+      bands.forEach((band, index) => {
+        context.beginPath();
+
+        for (let x = -80; x <= width + 80; x += 28) {
+          const y = getDisplacedY(x, band);
+
+          if (x === -80) {
+            context.moveTo(x, y);
+          } else {
+            context.lineTo(x, y);
+          }
         }
 
-        if (point.x < -20) point.x = width + 20;
-        if (point.x > width + 20) point.x = -20;
-        if (point.y < -20) point.y = height + 20;
-        if (point.y > height + 20) point.y = -20;
+        context.strokeStyle = gradient;
+        context.globalAlpha = 0.1 + (index % 4) * 0.035;
+        context.lineWidth = index % 5 === 0 ? 1.6 : 0.9;
+        context.stroke();
 
-        if (pointer.active) {
-          const dx = pointer.x - point.x;
-          const dy = pointer.y - point.y;
-          const distance = Math.hypot(dx, dy);
-
-          if (distance < 150 && distance > 0) {
-            point.x -= (dx / distance) * 0.22;
-            point.y -= (dy / distance) * 0.22;
-          }
+        if (index % 4 === 0) {
+          context.globalAlpha = 0.08;
+          context.lineWidth = 6;
+          context.stroke();
         }
       });
 
-      for (let index = 0; index < points.length; index += 1) {
-        const current = points[index];
+      const columns = width < 768 ? 34 : 52;
+      for (let index = 0; index < columns; index += 1) {
+        const x = (index / columns) * width;
+        const pulse = Math.sin(time * 0.018 + index * 0.8);
+        const barHeight = 18 + Math.max(0, pulse) * 74;
+        const y = height - 36 - ((index * 37) % Math.max(180, height * 0.52));
 
-        for (let nextIndex = index + 1; nextIndex < points.length; nextIndex += 1) {
-          const next = points[nextIndex];
-          const distance = Math.hypot(current.x - next.x, current.y - next.y);
+        context.globalAlpha = 0.045 + Math.max(0, pulse) * 0.055;
+        context.fillStyle = index % 3 === 0 ? "rgb(112 241 220)" : "rgb(132 200 255)";
+        context.fillRect(x, y, 1, barHeight);
+      }
 
-          if (distance < 142) {
-            context.strokeStyle = `rgba(112, 241, 220, ${(1 - distance / 142) * 0.18})`;
-            context.lineWidth = 1;
-            context.beginPath();
-            context.moveTo(current.x, current.y);
-            context.lineTo(next.x, next.y);
-            context.stroke();
-          }
-        }
+      if (pointer.active) {
+        const radius = 180 + Math.sin(time * 0.03) * 12;
+        const cursorGradient = context.createRadialGradient(
+          pointer.x,
+          pointer.y,
+          0,
+          pointer.x,
+          pointer.y,
+          radius
+        );
 
-        context.fillStyle = gradient;
+        cursorGradient.addColorStop(0, "rgba(112, 241, 220, 0.16)");
+        cursorGradient.addColorStop(0.5, "rgba(132, 200, 255, 0.08)");
+        cursorGradient.addColorStop(1, "rgba(112, 241, 220, 0)");
+
+        context.globalAlpha = 1;
+        context.fillStyle = cursorGradient;
         context.beginPath();
-        context.arc(current.x, current.y, 1.35, 0, Math.PI * 2);
+        context.arc(pointer.x, pointer.y, radius, 0, Math.PI * 2);
         context.fill();
       }
+
+      context.globalAlpha = 1;
 
       animationFrame = window.requestAnimationFrame(draw);
     };

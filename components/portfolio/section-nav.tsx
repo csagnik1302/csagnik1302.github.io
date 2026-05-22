@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+
 export const sectionLinks = [
   { label: "Education", href: "#education" },
   { label: "Experience", href: "#experience" },
@@ -7,8 +12,30 @@ export const sectionLinks = [
 ];
 
 export function TopSectionNav() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const updateNav = () => {
+      setIsScrolled(window.scrollY > 24);
+    };
+
+    updateNav();
+    window.addEventListener("scroll", updateNav, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateNav);
+    };
+  }, []);
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/70 bg-background/78 px-4 backdrop-blur-xl">
+    <nav
+      className={cn(
+        "sticky top-0 z-50 px-4",
+        isScrolled
+          ? "border-b border-border/70 bg-background/86 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
+      )}
+    >
       <div className="mx-auto flex min-h-16 max-w-4xl flex-col justify-center gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
         <a
           href="#top"
