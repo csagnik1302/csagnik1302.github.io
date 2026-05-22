@@ -51,10 +51,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <div
       ref={ref}
-      className={`group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 transition-all duration-500 ${
+      className={`group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 ${
         isVisible ? 'animate-scroll-reveal' : 'opacity-0'
       }`}
-      style={isVisible ? { animationDelay: `${index * 0.1}s` } : undefined}
+      style={isVisible ? { animationDelay: `${index * 0.1}s`, animationFillMode: 'both' } : { opacity: 0, transform: 'translateY(12px)' }}
     >
       <div className="relative aspect-video lg:aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
         <Image
