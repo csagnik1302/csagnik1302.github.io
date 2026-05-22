@@ -64,7 +64,7 @@ export function TopSectionNav() {
               <a
                 key={item.href}
                 href={item.href}
-                className="flex-shrink-0 whitespace-nowrap rounded-md px-1 py-0.5 sm:px-3 sm:py-2 text-xs sm:text-xs font-medium uppercase tracking-wide sm:tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+                className="flex-shrink-0 whitespace-nowrap rounded-md px-1 py-0.5 sm:px-3 sm:py-2 text-[0.7rem] sm:text-xs font-medium uppercase tracking-wider sm:tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
               >
                 {item.label}
               </a>
