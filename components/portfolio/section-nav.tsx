@@ -21,9 +21,8 @@ export function TopSectionNav() {
       if (!heroSection) return;
 
       const heroRect = heroSection.getBoundingClientRect();
-      const heroBottom = heroRect.bottom;
-
-      setIsFrozen(heroBottom < 0);
+      
+      setIsFrozen(heroRect.top <= 0);
     };
 
     updateNav();

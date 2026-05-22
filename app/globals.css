@@ -63,6 +63,10 @@ section p.text-muted-foreground,
 
 section[id] {
   scroll-margin-top: 5.5rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 html {
