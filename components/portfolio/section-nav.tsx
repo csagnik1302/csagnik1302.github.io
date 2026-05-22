@@ -49,7 +49,7 @@ export function TopSectionNav() {
         <a
           href="#top"
           className={cn(
-            "whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
+            "hidden sm:block whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
             isFrozen ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
