@@ -46,7 +46,7 @@ export function Hero() {
           </ScrollReveal>
 
           {/* Right Column - Bio */}
-          <ScrollReveal className="space-y-6 text-muted-foreground leading-relaxed" delay={150}>
+          <ScrollReveal className="readable-muted space-y-6 leading-relaxed" delay={150}>
             <p className="text-foreground font-medium">Hello</p>
             <p>
               I&apos;m Sagnik. I&apos;m interested in Machine Learning, NLP, and Mining various forms of Massive Datasets to extract relevant information.

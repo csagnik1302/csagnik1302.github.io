@@ -26,10 +26,11 @@
 }
 
 .portfolio-background canvas {
-  opacity: 0.2;
+  opacity: 0.22;
 }
 
-section p.text-muted-foreground {
+section p.text-muted-foreground,
+.readable-muted {
   color: color-mix(in oklch, var(--secondary-foreground) 88%, var(--muted-foreground));
   font-weight: 500;
 }
