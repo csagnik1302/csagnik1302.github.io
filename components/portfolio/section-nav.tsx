@@ -13,14 +13,17 @@ export const sectionLinks = [
 
 export function TopSectionNav() {
   const navRef = useRef<HTMLElement>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
 
   useEffect(() => {
     const updateNav = () => {
-      const navHeight = navRef.current?.offsetHeight ?? 64;
-      const threshold = Math.max(navHeight + 48, window.innerHeight * 0.18);
+      const heroSection = document.getElementById("top");
+      if (!heroSection) return;
 
-      setIsScrolled(window.scrollY > threshold);
+      const heroRect = heroSection.getBoundingClientRect();
+      const heroBottom = heroRect.bottom;
+
+      setIsFrozen(heroBottom < 0);
     };
 
     updateNav();
@@ -37,9 +40,9 @@ export function TopSectionNav() {
     <nav
       ref={navRef}
       className={cn(
-        "sticky top-0 z-50 px-4",
-        isScrolled
-          ? "border-b border-border/70 bg-background/86 backdrop-blur-xl"
+        "sticky top-0 z-50 px-4 transition-all duration-300",
+        isFrozen
+          ? "border-b border-border/70 bg-black/95 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       )}
     >
@@ -47,8 +50,8 @@ export function TopSectionNav() {
         <a
           href="#top"
           className={cn(
-            "whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary",
-            isScrolled ? "visible" : "invisible"
+            "whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
+            isFrozen ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
           Sagnik Chandra
