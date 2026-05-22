@@ -35,7 +35,7 @@ export function PortfolioBackground() {
       minWidth: 200,
       scale: 1,
       scaleMobile: 1,
-      color: 0x70f1dc,
+      color: 0x4c8a9a,
       backgroundColor: 0x091219,
       points: 7,
       maxDistance: 24,

@@ -21,12 +21,17 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(circle at center, transparent 0, rgb(9 18 25 / 0.18) 58%, rgb(9 18 25 / 0.42) 100%),
-    linear-gradient(90deg, rgb(9 18 25 / 0.34), transparent 18%, transparent 82%, rgb(9 18 25 / 0.34));
+    radial-gradient(circle at center, rgb(9 18 25 / 0.08) 0, rgb(9 18 25 / 0.32) 58%, rgb(9 18 25 / 0.58) 100%),
+    linear-gradient(90deg, rgb(9 18 25 / 0.48), transparent 20%, transparent 80%, rgb(9 18 25 / 0.48));
 }
 
 .portfolio-background canvas {
-  opacity: 0.2;
+  opacity: 0.16;
+}
+
+section p.text-muted-foreground {
+  color: color-mix(in oklch, var(--secondary-foreground) 88%, var(--muted-foreground));
+  font-weight: 500;
 }
 
 .scroll-reveal {

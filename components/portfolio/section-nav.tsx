@@ -46,7 +46,10 @@ export function TopSectionNav() {
       <div className="mx-auto flex min-h-16 max-w-4xl flex-col justify-center gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
         <a
           href="#top"
-          className="whitespace-nowrap text-sm font-semibold tracking-wide text-foreground transition-colors hover:text-primary"
+          className={cn(
+            "whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary",
+            isScrolled ? "visible" : "invisible"
+          )}
         >
           Sagnik Chandra
         </a>
