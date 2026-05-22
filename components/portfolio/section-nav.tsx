@@ -57,14 +57,14 @@ export function TopSectionNav() {
             Sagnik Chandra
           </a>
           <div
-            className="flex flex-wrap gap-1 sm:justify-end sm:gap-2"
+            className="flex gap-0.5 sm:gap-2 sm:justify-end"
             aria-label="Portfolio sections"
           >
             {sectionLinks.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="flex-shrink-0 whitespace-nowrap rounded-md px-2 py-1 sm:px-3 sm:py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+                className="flex-shrink-0 whitespace-nowrap rounded-md px-1.5 py-1 sm:px-3 sm:py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
               >
                 {item.label}
               </a>
