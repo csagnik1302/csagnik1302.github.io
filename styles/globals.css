@@ -1,8 +1,88 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './animations.css';
 
 @custom-variant dark (&:is(.dark *));
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out both !important;
+}
+
+.animate-slide-up-in {
+  animation: slideUpIn 0.6s ease-out both !important;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out both !important;
+}
+
+.animate-scroll-reveal {
+  animation: scrollReveal 0.6s ease-out forwards !important;
+}
+
+/* Stagger delays */
+.delay-100 {
+  animation-delay: 0.1s !important;
+}
+
+.delay-200 {
+  animation-delay: 0.2s !important;
+}
+
+.delay-300 {
+  animation-delay: 0.3s !important;
+}
+
+.delay-400 {
+  animation-delay: 0.4s !important;
+}
+
+.delay-500 {
+  animation-delay: 0.5s !important;
+}
 
 :root {
   --background: oklch(1 0 0);
