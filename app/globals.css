@@ -7,32 +7,15 @@
   position: fixed;
   inset: 0;
   z-index: -1;
-  pointer-events: none;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 12%, rgb(112 241 220 / 0.1), transparent 34%),
+    radial-gradient(circle at 18% 12%, rgb(112 241 220 / 0.08), transparent 34%),
     radial-gradient(circle at 84% 28%, rgb(130 176 255 / 0.08), transparent 36%),
-    linear-gradient(180deg, rgb(9 18 25 / 0.18), rgb(9 18 25 / 0.82)),
-    repeating-linear-gradient(
-      115deg,
-      transparent 0,
-      transparent 38px,
-      rgb(112 241 220 / 0.022) 39px,
-      transparent 40px
-    ),
-    repeating-linear-gradient(
-      25deg,
-      transparent 0,
-      transparent 72px,
-      rgb(130 176 255 / 0.018) 73px,
-      transparent 74px
-    );
+    linear-gradient(180deg, rgb(9 18 25), rgb(8 14 21));
 }
 
 .portfolio-background canvas {
-  position: absolute;
-  inset: 0;
-  opacity: 0.82;
+  opacity: 0.42;
 }
 
 .scroll-reveal {

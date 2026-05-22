@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const sectionLinks = [
@@ -12,23 +12,30 @@ export const sectionLinks = [
 ];
 
 export function TopSectionNav() {
+  const navRef = useRef<HTMLElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const updateNav = () => {
-      setIsScrolled(window.scrollY > 24);
+      const navHeight = navRef.current?.offsetHeight ?? 64;
+      const threshold = Math.max(navHeight + 48, window.innerHeight * 0.18);
+
+      setIsScrolled(window.scrollY > threshold);
     };
 
     updateNav();
     window.addEventListener("scroll", updateNav, { passive: true });
+    window.addEventListener("resize", updateNav);
 
     return () => {
       window.removeEventListener("scroll", updateNav);
+      window.removeEventListener("resize", updateNav);
     };
   }, []);
 
   return (
     <nav
+      ref={navRef}
       className={cn(
         "sticky top-0 z-50 px-4",
         isScrolled
