@@ -7,7 +7,7 @@ export function Hero() {
       <div className="max-w-4xl mx-auto w-full">
         <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           {/* Left Column - Name and Navigation */}
-          <div className="space-y-8">
+          <div className="space-y-8 animate-slide-up-in">
             <div>
               <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
                 Sagnik Chandra
@@ -20,11 +20,12 @@ export function Hero() {
                 { label: "Education", href: "#education" },
                 { label: "Experience", href: "#experience" },
                 { label: "Projects", href: "#projects" },
-              ].map((item) => (
+              ].map((item, index) => (
                 <a
                   key={item.label}
                   href={item.href}
-                  className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
+                  className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors animate-slide-up"
+                  style={{ animationDelay: `${(index + 1) * 0.1}s`, animationFillMode: 'both' }}
                 >
                   <span className="h-px w-8 bg-muted-foreground group-hover:w-16 group-hover:bg-foreground transition-all" />
                   <span className="text-sm uppercase tracking-widest font-medium">
@@ -35,7 +36,7 @@ export function Hero() {
             </nav>
 
             {/* Social Links */}
-            <div className="flex items-center gap-4 pt-4">
+            <div className="flex items-center gap-4 pt-4 animate-fade-in delay-300">
               <a
                 href="https://github.com/csagnik1302"
                 target="_blank"
@@ -65,7 +66,7 @@ export function Hero() {
           </div>
 
           {/* Right Column - Bio */}
-          <div className="space-y-6 text-muted-foreground leading-relaxed">
+          <div className="space-y-6 text-muted-foreground leading-relaxed animate-slide-up-in" style={{ animationDelay: '0.15s' }}>
             <p className="text-foreground font-medium">Hello</p>
             <p>
               I&apos;m Sagnik. I&apos;m interested in Machine Learning, NLP, and Mining various forms of Massive Datasets to extract relevant information.

@@ -3,6 +3,7 @@
 import { ExternalLink, Github } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { useScrollAnimate } from "@/hooks/use-scroll-animate";
 
 interface Project {
   title: string;
@@ -44,80 +45,90 @@ const projects: Project[] = [
   },
 ];
 
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const { ref, isVisible } = useScrollAnimate();
+
+  return (
+    <div
+      ref={ref}
+      className={`group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 transition-all duration-500 ${
+        isVisible ? 'animate-scroll-reveal' : 'opacity-0'
+      }`}
+      style={isVisible ? { animationDelay: `${index * 0.1}s` } : undefined}
+    >
+      <div className="relative aspect-video lg:aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
+        <Image
+          src={project.image}
+          alt={project.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/5 transition-colors" />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="text-foreground font-medium text-lg group-hover:text-primary transition-colors">
+            {project.title}
+          </h3>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="View on GitHub"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+            )}
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="View live site"
+              >
+                <ExternalLink className="h-5 w-5" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2 pt-2">
+          {project.skills.map((skill) => (
+            <Badge
+              key={skill}
+              variant="secondary"
+              className="bg-primary/10 text-primary hover:bg-primary/20 border-0 text-xs"
+            >
+              {skill}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Projects() {
   return (
     <section id="projects" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium animate-fade-in">
           Projects
         </h2>
 
         <div className="space-y-16">
           {projects.map((project, index) => (
-            <div
-              key={index}
-              className="group grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-8"
-            >
-              <div className="relative aspect-video lg:aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-primary/10 group-hover:bg-primary/5 transition-colors" />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="text-foreground font-medium text-lg group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-
-                  <div className="flex items-center gap-3 shrink-0">
-
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label="View on GitHub"
-                      >
-                        <Github className="h-5 w-5" />
-                      </a>
-                    )}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label="View live site"
-                      >
-                        <ExternalLink className="h-5 w-5" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {project.skills.map((skill) => (
-                    <Badge
-                      key={skill}
-                      variant="secondary"
-                      className="bg-primary/10 text-primary hover:bg-primary/20 border-0 text-xs"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <ProjectCard key={index} project={project} index={index} />
           ))}
         </div>
       </div>

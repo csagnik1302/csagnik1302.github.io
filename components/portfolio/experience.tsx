@@ -28,7 +28,7 @@ export function Experience() {
   return (
     <section id="experience" className="py-20 px-6 lg:px-0">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium">
+        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-12 font-medium animate-fade-in">
           Experience
         </h2>
 
@@ -36,7 +36,8 @@ export function Experience() {
           {experiences.map((exp, index) => (
             <div
               key={index}
-              className="group grid lg:grid-cols-[150px_1fr] gap-4 lg:gap-8"
+              className="group grid lg:grid-cols-[150px_1fr] gap-4 lg:gap-8 animate-slide-up"
+              style={{ animationDelay: `${index * 0.15}s`, animationFillMode: 'both' }}
             >
               <div className="text-sm text-muted-foreground font-mono">
                 {exp.period}
