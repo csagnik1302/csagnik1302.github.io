@@ -66,7 +66,7 @@ export function Hero() {
           </div>
 
           {/* Right Column - Bio */}
-          <div className="space-y-6 text-muted-foreground leading-relaxed animate-slide-up-in" style={{ animationDelay: '0.15s' }}>
+          <div className="space-y-6 text-muted-foreground leading-relaxed animate-slide-up-in" style={{ animationDelay: '0.15s', animationFillMode: 'both' }}>
             <p className="text-foreground font-medium">Hello</p>
             <p>
               I&apos;m Sagnik. I&apos;m interested in Machine Learning, NLP, and Mining various forms of Massive Datasets to extract relevant information.
