@@ -7,11 +7,13 @@ import { Contact } from "@/components/portfolio/contact";
 import { Footer } from "@/components/portfolio/footer";
 import { PortfolioBackground } from "@/components/portfolio/portfolio-background";
 import { TopSectionNav } from "@/components/portfolio/section-nav";
+import { KeyboardScrollHandler } from "@/components/portfolio/keyboard-scroll-handler";
 
 export default function Home() {
   return (
     <main className="relative z-10 min-h-screen">
       <PortfolioBackground />
+      <KeyboardScrollHandler />
       <TopSectionNav />
       <Hero />
       <Education />
