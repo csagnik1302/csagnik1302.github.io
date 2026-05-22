@@ -45,30 +45,32 @@ export function TopSectionNav() {
           : "border-b border-transparent bg-transparent"
       )}
     >
-      <div className="mx-auto flex min-h-16 max-w-4xl flex-col justify-center gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
-        <a
-          href="#top"
-          className={cn(
-            "hidden sm:block whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
-            isFrozen ? "opacity-100" : "opacity-0 pointer-events-none"
-          )}
-        >
-          Sagnik Chandra
-        </a>
-        <div
-          className="flex gap-1 overflow-x-auto pb-1 sm:justify-end sm:pb-0 snap-x snap-mandatory scroll-smooth"
-          aria-label="Portfolio sections"
-          style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
-        >
-          {sectionLinks.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="snap-start flex-shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
-            >
-              {item.label}
-            </a>
-          ))}
+      <div className="mx-auto max-w-4xl">
+        <div className="flex min-h-16 flex-col justify-center gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
+          <a
+            href="#top"
+            className={cn(
+              "hidden sm:block whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
+              isFrozen ? "opacity-100" : "opacity-0 pointer-events-none"
+            )}
+          >
+            Sagnik Chandra
+          </a>
+          <div
+            className="w-full sm:w-auto flex gap-1 overflow-x-auto pb-1 sm:justify-end sm:pb-0 snap-x snap-mandatory"
+            aria-label="Portfolio sections"
+            style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
+          >
+            {sectionLinks.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="snap-start flex-shrink-0 whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium uppercase tracking-widest text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </nav>
