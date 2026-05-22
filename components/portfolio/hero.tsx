@@ -1,6 +1,7 @@
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
+import { SectionLinks } from "@/components/portfolio/section-nav";
 
 export function Hero() {
   return (
@@ -16,29 +17,7 @@ export function Hero() {
             </div>
 
             {/* Navigation */}
-            <nav className="space-y-3">
-              {[
-                { label: "Education", href: "#education" },
-                { label: "Experience", href: "#experience" },
-                { label: "Projects", href: "#projects" },
-              ].map((item, index) => (
-                <ScrollReveal
-                  key={item.label}
-                  className="group"
-                  delay={(index + 1) * 100}
-                >
-                  <a
-                    href={item.href}
-                    className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <span className="h-px w-8 bg-muted-foreground group-hover:w-16 group-hover:bg-foreground transition-all" />
-                    <span className="text-sm uppercase tracking-widest font-medium">
-                      {item.label}
-                    </span>
-                  </a>
-                </ScrollReveal>
-              ))}
-            </nav>
+            <SectionLinks />
 
             {/* Social Links */}
             <ScrollReveal className="flex items-center gap-4 pt-4" delay={300}>

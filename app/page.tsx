@@ -5,10 +5,13 @@ import { Projects } from "@/components/portfolio/projects";
 import { Skills } from "@/components/portfolio/skills";
 import { Contact } from "@/components/portfolio/contact";
 import { Footer } from "@/components/portfolio/footer";
+import { FloatingSectionNav } from "@/components/portfolio/section-nav";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="relative z-10 min-h-screen">
+      <div className="portfolio-background" aria-hidden="true" />
+      <FloatingSectionNav />
       <Hero />
       <Education />
       <Experience />
