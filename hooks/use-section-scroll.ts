@@ -63,52 +63,12 @@ export function useSectionScroll() {
       navigateInDirection(direction);
     };
 
-    let touchStartY = 0;
-    let lastTouchTimestamp = 0;
-    let navigatedInCurrentTouchBurst = false;
-    const TOUCH_BURST_GAP_MS = 300;
-    const TOUCH_THRESHOLD_PX = 60;
-
-    const onTouchStart = (event: TouchEvent) => {
-      touchStartY = event.touches[0]?.clientY ?? 0;
-    };
-
-    const onTouchEnd = (event: TouchEvent) => {
-      const touch = event.changedTouches[0];
-      if (!touch) return;
-
-      const deltaY = touchStartY - touch.clientY;
-      if (Math.abs(deltaY) < TOUCH_THRESHOLD_PX) return;
-
-      const now = Date.now();
-      const isNewBurst = now - lastTouchTimestamp > TOUCH_BURST_GAP_MS;
-      lastTouchTimestamp = now;
-
-      if (isNewBurst) {
-        navigatedInCurrentTouchBurst = false;
-      }
-
-      const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
-      if (!canNavigateInDirection(direction)) return;
-
-      if (navigatedInCurrentTouchBurst) {
-        return;
-      }
-
-      navigatedInCurrentTouchBurst = true;
-      navigateInDirection(direction);
-    };
-
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
 
     return () => {
       detachWheel();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchend", onTouchEnd);
       resizeObserver?.disconnect();
     };
   }, []);
