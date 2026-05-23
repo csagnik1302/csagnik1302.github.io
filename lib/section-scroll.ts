@@ -17,7 +17,7 @@ const NAV_SELECTOR = "[data-section-nav]";
  * Different values for trackpad vs mouse wheel.
  */
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
-const WHEEL_BURST_GAP_MS_TRACKPAD = 120;
+const WHEEL_BURST_GAP_MS_TRACKPAD = 60;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
@@ -226,16 +226,19 @@ function onDocumentWheel(event: WheelEvent): void {
   const delta = normalizeWheelDelta(event);
   if (delta === 0) return;
 
-  // Detect trackpad vs mouse wheel based on deltaMode
-  // Trackpads typically use DOM_DELTA_PIXEL (0), mouse wheels use DOM_DELTA_LINE (1)
-  const isTrackpad = event.deltaMode === WheelEvent.DOM_DELTA_PIXEL;
+  // Detect trackpad vs mouse wheel based on deltaMode and delta magnitude
+  // Trackpads typically use DOM_DELTA_PIXEL (0) and have smaller deltas
+  // Mouse wheels typically use DOM_DELTA_LINE (1) and have larger deltas
+  const isTrackpadMode = event.deltaMode === WheelEvent.DOM_DELTA_PIXEL;
+  const isSmallDelta = Math.abs(delta) < 15;
+  const isTrackpad = isTrackpadMode || isSmallDelta;
 
   // Apply different thresholds for trackpad vs mouse
   const burstGapMs = isTrackpad ? WHEEL_BURST_GAP_MS_TRACKPAD : WHEEL_BURST_GAP_MS_MOUSE;
-  const minDelta = isTrackpad ? 2 : 10; // Lower threshold for trackpad
+  const minDelta = isTrackpad ? 0 : 10; // No threshold for trackpad to ensure responsiveness
 
-  // Filter out very small movements
-  if (Math.abs(delta) < minDelta) return;
+  // Filter out very small movements (only for mouse)
+  if (!isTrackpad && Math.abs(delta) < minDelta) return;
 
   const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
   const now = Date.now();
@@ -252,6 +255,12 @@ function onDocumentWheel(event: WheelEvent): void {
   }
 
   event.preventDefault();
+
+  // For trackpad, skip burst detection to ensure responsiveness in problematic sections
+  if (isTrackpad) {
+    navigateInDirection(direction);
+    return;
+  }
 
   if (navigatedInCurrentBurst) {
     return;
