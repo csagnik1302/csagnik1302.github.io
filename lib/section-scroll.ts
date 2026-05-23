@@ -17,18 +17,11 @@ const NAV_SELECTOR = "[data-section-nav]";
  * Different values for trackpad vs mouse wheel.
  */
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
-const WHEEL_BURST_GAP_MS_TRACKPAD = 50;
-
-/**
- * Simple debounce time for trackpad - ignore all events for this duration after navigation
- * Increased to 800ms to ensure even large swipes only trigger one section change
- */
-const TRACKPAD_DEBOUNCE_MS = 1500;
+const WHEEL_BURST_GAP_MS_TRACKPAD = 80;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
 let navigatedInCurrentBurst = false;
-let lastTrackpadNavTimestamp = 0;
 
 export function getCurrentSectionIndex(): number {
   return currentSectionIndex;
@@ -240,23 +233,34 @@ function onDocumentWheel(event: WheelEvent): void {
   const isSmallDelta = Math.abs(delta) < 15;
   const isTrackpad = isTrackpadMode || isSmallDelta;
 
-  // For trackpad, use simple debounce-only approach
+  // Trackpad logic with burst detection (similar to mouse wheel but shorter gap)
   if (isTrackpad) {
-    const now = Date.now();
-    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
+    const burstGapMs = WHEEL_BURST_GAP_MS_TRACKPAD;
+    const minDelta = 2;
 
-    if (timeSinceLastNav < TRACKPAD_DEBOUNCE_MS) {
-      return;
-    }
+    if (Math.abs(delta) < minDelta) return;
 
     const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+    const now = Date.now();
+    const isNewBurst = now - lastWheelTimestamp > burstGapMs;
+
+    lastWheelTimestamp = now;
+
+    if (isNewBurst) {
+      resetWheelBurst();
+    }
 
     if (!canNavigateInDirection(direction)) {
       return;
     }
 
     event.preventDefault();
-    lastTrackpadNavTimestamp = now;
+
+    if (navigatedInCurrentBurst) {
+      return;
+    }
+
+    navigatedInCurrentBurst = true;
     navigateInDirection(direction);
     return;
   }
