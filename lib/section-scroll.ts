@@ -21,9 +21,9 @@ const WHEEL_BURST_GAP_MS_TRACKPAD = 50;
 
 /**
  * Simple debounce time for trackpad - ignore all events for this duration after navigation
- * This prevents both skipping on large swipes and getting stuck on quick successive swipes
+ * Increased to 800ms to ensure even large swipes only trigger one section change
  */
-const TRACKPAD_DEBOUNCE_MS = 350;
+const TRACKPAD_DEBOUNCE_MS = 800;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
