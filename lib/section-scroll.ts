@@ -17,11 +17,17 @@ const NAV_SELECTOR = "[data-section-nav]";
  * Different values for trackpad vs mouse wheel.
  */
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
-const WHEEL_BURST_GAP_MS_TRACKPAD = 90;
+const WHEEL_BURST_GAP_MS_TRACKPAD = 50;
+
+/**
+ * Minimum time between navigations for trackpad to prevent rapid-fire section skipping
+ */
+const TRACKPAD_NAV_COOLDOWN_MS = 200;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
 let navigatedInCurrentBurst = false;
+let lastTrackpadNavTimestamp = 0;
 
 export function getCurrentSectionIndex(): number {
   return currentSectionIndex;
@@ -255,6 +261,15 @@ function onDocumentWheel(event: WheelEvent): void {
   }
 
   event.preventDefault();
+
+  // For trackpad, check cooldown to prevent rapid-fire navigation
+  if (isTrackpad) {
+    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
+    if (timeSinceLastNav < TRACKPAD_NAV_COOLDOWN_MS) {
+      return;
+    }
+    lastTrackpadNavTimestamp = now;
+  }
 
   if (navigatedInCurrentBurst) {
     return;
