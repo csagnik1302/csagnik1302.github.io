@@ -16,6 +16,9 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
   return (PORTFOLIO_SECTION_IDS as readonly string[]).includes(id);
 }
 
+/** After the last wheel tick in a burst, wait before accepting a new section jump. */
+const WHEEL_BURST_IDLE_MS = 650;
+
 export function useSectionScroll() {
   useEffect(() => {
     syncNavHeightCssVar();
@@ -45,18 +48,28 @@ export function useSectionScroll() {
     requestAnimationFrame(() => rebuildSectionScrollPositions());
     window.addEventListener("load", rebuildSectionScrollPositions);
 
-    let snapLocked = false;
+    let burstLocked = false;
+    let burstIdleTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const goToSection = (direction: "next" | "prev"): void => {
-      if (snapLocked) return;
+    const releaseBurstLock = () => {
+      burstLocked = false;
+      burstIdleTimer = undefined;
+    };
 
+    const extendBurstLock = () => {
+      clearTimeout(burstIdleTimer);
+      burstIdleTimer = setTimeout(releaseBurstLock, WHEEL_BURST_IDLE_MS);
+    };
+
+    const startBurstLock = () => {
+      burstLocked = true;
+      extendBurstLock();
+    };
+
+    const navigateOnce = (direction: "next" | "prev"): void => {
       const target = getTargetSectionForDirection(direction);
       if (!target) return;
-
-      snapLocked = true;
-      scrollToSection(target, () => {
-        snapLocked = false;
-      });
+      scrollToSection(target);
     };
 
     const onWheel = (event: WheelEvent) => {
@@ -65,13 +78,17 @@ export function useSectionScroll() {
 
       const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
 
+      if (burstLocked) {
+        event.preventDefault();
+        extendBurstLock();
+        return;
+      }
+
       if (!getTargetSectionForDirection(direction)) return;
 
       event.preventDefault();
-
-      if (snapLocked) return;
-
-      goToSection(direction);
+      startBurstLock();
+      navigateOnce(direction);
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -85,13 +102,12 @@ export function useSectionScroll() {
           ? "next"
           : "prev";
 
+      if (burstLocked) return;
       if (!getTargetSectionForDirection(direction)) return;
 
       event.preventDefault();
-
-      if (snapLocked) return;
-
-      goToSection(direction);
+      startBurstLock();
+      navigateOnce(direction);
     };
 
     let touchStartY = 0;
@@ -101,7 +117,7 @@ export function useSectionScroll() {
     };
 
     const onTouchEnd = (event: TouchEvent) => {
-      if (snapLocked) return;
+      if (burstLocked) return;
 
       const touch = event.changedTouches[0];
       if (!touch) return;
@@ -112,7 +128,8 @@ export function useSectionScroll() {
       const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
       if (!getTargetSectionForDirection(direction)) return;
 
-      goToSection(direction);
+      startBurstLock();
+      navigateOnce(direction);
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
@@ -128,6 +145,7 @@ export function useSectionScroll() {
       window.removeEventListener("touchend", onTouchEnd);
       resizeObserver?.disconnect();
       window.removeEventListener("load", rebuildSectionScrollPositions);
+      clearTimeout(burstIdleTimer);
     };
   }, []);
 }

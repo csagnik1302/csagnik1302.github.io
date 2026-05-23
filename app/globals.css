@@ -69,10 +69,6 @@ section[id] {
   justify-content: center;
 }
 
-section#top {
-  justify-content: flex-start;
-}
-
 html {
   scroll-behavior: auto;
   scroll-padding-top: var(--nav-height, 6.5rem);
