@@ -17,7 +17,7 @@ const NAV_SELECTOR = "[data-section-nav]";
  * Different values for trackpad vs mouse wheel.
  */
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
-const WHEEL_BURST_GAP_MS_TRACKPAD = 60;
+const WHEEL_BURST_GAP_MS_TRACKPAD = 90;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
@@ -255,12 +255,6 @@ function onDocumentWheel(event: WheelEvent): void {
   }
 
   event.preventDefault();
-
-  // For trackpad, skip burst detection to ensure responsiveness in problematic sections
-  if (isTrackpad) {
-    navigateInDirection(direction);
-    return;
-  }
 
   if (navigatedInCurrentBurst) {
     return;
