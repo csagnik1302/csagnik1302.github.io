@@ -7,7 +7,6 @@ import {
   initCurrentSection,
   navigateInDirection,
   PORTFOLIO_SECTION_IDS,
-  runOncePerWheelBurst,
   scrollToSection,
   syncNavHeightCssVar,
   type PortfolioSectionId,
@@ -46,6 +45,8 @@ export function useSectionScroll() {
     window.addEventListener("resize", onResize);
 
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+
       const scrollKeys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "];
       if (!scrollKeys.includes(event.key)) return;
 
@@ -59,9 +60,7 @@ export function useSectionScroll() {
       if (!canNavigateInDirection(direction)) return;
 
       event.preventDefault();
-      runOncePerWheelBurst(() => {
-        navigateInDirection(direction);
-      });
+      navigateInDirection(direction);
     };
 
     let touchStartY = 0;
@@ -80,9 +79,7 @@ export function useSectionScroll() {
       const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
       if (!canNavigateInDirection(direction)) return;
 
-      runOncePerWheelBurst(() => {
-        navigateInDirection(direction);
-      });
+      navigateInDirection(direction);
     };
 
     window.addEventListener("keydown", onKeyDown);

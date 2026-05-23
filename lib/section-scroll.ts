@@ -11,12 +11,15 @@ export type PortfolioSectionId = (typeof PORTFOLIO_SECTION_IDS)[number];
 
 const NAV_SELECTOR = "[data-section-nav]";
 
-/** One physical wheel gesture = at most one section change. */
-const WHEEL_BURST_IDLE_MS = 1400;
+/**
+ * Wheel events closer than this are one physical gesture (one section change).
+ * A pause longer than this allows the next gesture immediately.
+ */
+const WHEEL_BURST_GAP_MS = 120;
 
 let currentSectionIndex = 0;
-let wheelBurstActive = false;
-let wheelBurstTimer: ReturnType<typeof setTimeout> | null = null;
+let lastWheelTimestamp = 0;
+let navigatedInCurrentBurst = false;
 
 export function getCurrentSectionIndex(): number {
   return currentSectionIndex;
@@ -43,7 +46,6 @@ export function getNavOffset(): number {
   return nav?.getBoundingClientRect().height ?? 104;
 }
 
-/** Update nav height CSS variable only (safe to call on scroll). */
 export function syncNavHeightCssVar(): void {
   document.documentElement.style.setProperty(
     "--nav-height",
@@ -61,7 +63,6 @@ export function getSectionIndex(id: PortfolioSectionId): number {
   return PORTFOLIO_SECTION_IDS.indexOf(id);
 }
 
-/** Live scroll position for a section (always read from current layout). */
 export function getTargetScrollTop(id: PortfolioSectionId): number {
   if (id === "top") {
     return 0;
@@ -127,23 +128,10 @@ export function scrollToSection(
   });
 }
 
-/** Fixed-duration lock — do not extend on every wheel tick (trackpad momentum never ends). */
-function startWheelBurstLock(): void {
-  if (wheelBurstTimer) {
-    clearTimeout(wheelBurstTimer);
-  }
-
-  wheelBurstActive = true;
-
-  wheelBurstTimer = setTimeout(() => {
-    wheelBurstActive = false;
-    wheelBurstTimer = null;
-  }, WHEEL_BURST_IDLE_MS);
+function resetWheelBurst(): void {
+  navigatedInCurrentBurst = false;
 }
 
-/**
- * Section that occupies the most space in the viewport (for nav + navigation).
- */
 export function getActiveSectionId(): PortfolioSectionId {
   const navOffset = getNavOffset();
   const viewportBottom = window.innerHeight;
@@ -202,15 +190,6 @@ export function navigateInDirection(direction: "next" | "prev"): boolean {
   return true;
 }
 
-export function runOncePerWheelBurst(action: () => void): void {
-  if (wheelBurstActive) {
-    return;
-  }
-
-  startWheelBurstLock();
-  action();
-}
-
 export function initCurrentSection(preferred?: PortfolioSectionId): void {
   if (preferred) {
     setCurrentSectionId(preferred);
@@ -225,7 +204,8 @@ export function navigateToSection(
   event?: { preventDefault: () => void },
 ): void {
   event?.preventDefault();
-  startWheelBurstLock();
+  resetWheelBurst();
+  lastWheelTimestamp = Date.now();
   setCurrentSectionId(id);
   scrollToSection(id);
 }
@@ -245,10 +225,13 @@ function onDocumentWheel(event: WheelEvent): void {
   if (delta === 0) return;
 
   const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+  const now = Date.now();
+  const isNewBurst = now - lastWheelTimestamp > WHEEL_BURST_GAP_MS;
 
-  if (wheelBurstActive) {
-    event.preventDefault();
-    return;
+  lastWheelTimestamp = now;
+
+  if (isNewBurst) {
+    resetWheelBurst();
   }
 
   if (!canNavigateInDirection(direction)) {
@@ -257,9 +240,12 @@ function onDocumentWheel(event: WheelEvent): void {
 
   event.preventDefault();
 
-  runOncePerWheelBurst(() => {
-    navigateInDirection(direction);
-  });
+  if (navigatedInCurrentBurst) {
+    return;
+  }
+
+  navigatedInCurrentBurst = true;
+  navigateInDirection(direction);
 }
 
 export function attachSectionWheelHandler(): () => void {
@@ -274,10 +260,7 @@ export function attachSectionWheelHandler(): () => void {
 
   return () => {
     window.removeEventListener("wheel", onDocumentWheel, { capture: true });
-    if (wheelBurstTimer) {
-      clearTimeout(wheelBurstTimer);
-      wheelBurstTimer = null;
-    }
-    wheelBurstActive = false;
+    resetWheelBurst();
+    lastWheelTimestamp = 0;
   };
 }
