@@ -45,6 +45,18 @@ export function getSectionScrollTop(section: HTMLElement): number {
   return Math.max(0, top - getNavOffset());
 }
 
+/** Scroll position that aligns a section at the top (under the nav). */
+export function getTargetScrollTop(id: PortfolioSectionId): number {
+  if (id === "top") {
+    return 0;
+  }
+
+  const section = getSectionElement(id);
+  if (!section) return 0;
+
+  return getSectionScrollTop(section);
+}
+
 function updateSectionHash(
   id: PortfolioSectionId,
   behavior: ScrollBehavior,
@@ -61,48 +73,42 @@ function updateSectionHash(
 export function scrollToSection(
   id: PortfolioSectionId,
   behavior: ScrollBehavior = "smooth",
+  onComplete?: () => void,
 ): void {
-  const section = getSectionElement(id);
-  if (!section) return;
+  const scrollTop = getTargetScrollTop(id);
 
   window.scrollTo({
-    top: getSectionScrollTop(section),
+    top: scrollTop,
     behavior,
   });
 
-  setScrollAnchor(id);
-  updateSectionHash(id, behavior);
+  const finish = () => {
+    setScrollAnchor(id);
+    updateSectionHash(id, behavior);
+    onComplete?.();
+  };
+
+  if (behavior === "auto") {
+    finish();
+    return;
+  }
+
+  let completed = false;
+  const completeOnce = () => {
+    if (completed) return;
+    completed = true;
+    finish();
+  };
+
+  if (typeof window !== "undefined" && "onscrollend" in window) {
+    window.addEventListener("scrollend", completeOnce, { once: true });
+  }
+
+  window.setTimeout(completeOnce, 1200);
 }
 
 export function getSectionIndex(id: PortfolioSectionId): number {
   return PORTFOLIO_SECTION_IDS.indexOf(id);
-}
-
-/**
- * Fallback when no anchor is set — biased by scroll direction so
- * education → introduction is detected reliably when scrolling up.
- */
-export function detectSectionForDirection(
-  direction: "next" | "prev",
-): PortfolioSectionId {
-  const navOffset = getNavOffset();
-  const contentHeight = window.innerHeight - navOffset;
-  const bias = direction === "prev" ? 0.12 : 0.45;
-  const referenceLine = window.scrollY + navOffset + contentHeight * bias;
-
-  let index = 0;
-
-  for (let i = 0; i < PORTFOLIO_SECTION_IDS.length; i++) {
-    const id = PORTFOLIO_SECTION_IDS[i];
-    const section = getSectionElement(id);
-    if (!section) continue;
-
-    if (getSectionScrollTop(section) <= referenceLine + 6) {
-      index = i;
-    }
-  }
-
-  return PORTFOLIO_SECTION_IDS[index];
 }
 
 /** Section that occupies the most space in the viewport (for nav highlighting). */
@@ -150,18 +156,6 @@ export function getAdjacentSectionId(
   }
 
   return PORTFOLIO_SECTION_IDS[index - 1] ?? null;
-}
-
-export function scrollToAdjacentSection(
-  direction: "next" | "prev",
-  behavior: ScrollBehavior = "smooth",
-  fromSection: PortfolioSectionId = scrollAnchor,
-): boolean {
-  const target = getAdjacentSectionId(direction, fromSection);
-  if (!target) return false;
-
-  scrollToSection(target, behavior);
-  return true;
 }
 
 export function initScrollAnchor(preferred?: PortfolioSectionId): void {

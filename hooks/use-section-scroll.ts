@@ -16,9 +16,6 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
   return (PORTFOLIO_SECTION_IDS as readonly string[]).includes(id);
 }
 
-/** One scroll burst (single or many wheel ticks) = one section change. */
-const SNAP_LOCK_MS = 900;
-
 export function useSectionScroll() {
   useEffect(() => {
     syncNavHeightCssVar();
@@ -54,14 +51,9 @@ export function useSectionScroll() {
       : "smooth";
 
     let snapLocked = false;
-    let snapUnlockTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const lockSnap = () => {
-      snapLocked = true;
-      clearTimeout(snapUnlockTimer);
-      snapUnlockTimer = setTimeout(() => {
-        snapLocked = false;
-      }, SNAP_LOCK_MS);
+    const unlockSnap = () => {
+      snapLocked = false;
     };
 
     const goToSection = (direction: "next" | "prev"): void => {
@@ -71,8 +63,8 @@ export function useSectionScroll() {
       const target = getAdjacentSectionId(direction, from);
       if (!target) return;
 
-      lockSnap();
-      scrollToSection(target, scrollBehavior);
+      snapLocked = true;
+      scrollToSection(target, scrollBehavior, unlockSnap);
     };
 
     const onWheel = (event: WheelEvent) => {
@@ -82,14 +74,16 @@ export function useSectionScroll() {
       if (delta === 0) return;
 
       const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
-      const target = getAdjacentSectionId(direction, getScrollAnchor());
 
+      if (snapLocked) {
+        event.preventDefault();
+        return;
+      }
+
+      const target = getAdjacentSectionId(direction, getScrollAnchor());
       if (!target) return;
 
       event.preventDefault();
-
-      if (snapLocked) return;
-
       goToSection(direction);
     };
 
@@ -104,6 +98,7 @@ export function useSectionScroll() {
           ? "next"
           : "prev";
 
+      if (snapLocked) return;
       if (!getAdjacentSectionId(direction, getScrollAnchor())) return;
 
       event.preventDefault();
@@ -143,7 +138,6 @@ export function useSectionScroll() {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       resizeObserver?.disconnect();
-      clearTimeout(snapUnlockTimer);
     };
   }, []);
 }
