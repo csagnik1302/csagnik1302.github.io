@@ -62,16 +62,33 @@ export function scrollToSection(
   updateSectionHash(id, behavior);
 }
 
-/** Section whose start is closest to the current scroll position (under the nav). */
+/** Section that occupies the most space in the viewport below the nav. */
 export function getActiveSectionId(): PortfolioSectionId {
-  const scrollLine = window.scrollY + getNavOffset() + 1;
+  const navOffset = getNavOffset();
+  const viewportBottom = window.innerHeight;
+
   let active: PortfolioSectionId = PORTFOLIO_SECTION_IDS[0];
+  let largestVisibleArea = -1;
 
   for (const id of PORTFOLIO_SECTION_IDS) {
     const section = getSectionElement(id);
     if (!section) continue;
 
-    if (getSectionScrollTop(section) <= scrollLine) {
+    const rect = section.getBoundingClientRect();
+    const visibleTop = Math.max(rect.top, navOffset);
+    const visibleBottom = Math.min(rect.bottom, viewportBottom);
+    const visibleArea = Math.max(0, visibleBottom - visibleTop);
+
+    const index = getSectionIndex(id);
+    const activeIndex = getSectionIndex(active);
+
+    if (
+      visibleArea > largestVisibleArea ||
+      (visibleArea === largestVisibleArea &&
+        visibleArea > 0 &&
+        index > activeIndex)
+    ) {
+      largestVisibleArea = visibleArea;
       active = id;
     }
   }
