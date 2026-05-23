@@ -21,8 +21,9 @@ const WHEEL_BURST_GAP_MS_TRACKPAD = 50;
 
 /**
  * Minimum time between navigations for trackpad to prevent rapid-fire section skipping
+ * Increased to 600ms to ensure only one section change per swipe regardless of swipe size
  */
-const TRACKPAD_NAV_COOLDOWN_MS = 200;
+const TRACKPAD_NAV_COOLDOWN_MS = 600;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
