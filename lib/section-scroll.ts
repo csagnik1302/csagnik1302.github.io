@@ -14,8 +14,9 @@ const NAV_SELECTOR = "[data-section-nav]";
 /**
  * Wheel events closer than this are one physical gesture (one section change).
  * A pause longer than this allows the next gesture immediately.
+ * Increased to 250ms to better handle trackpad momentum scrolling.
  */
-const WHEEL_BURST_GAP_MS = 120;
+const WHEEL_BURST_GAP_MS = 250;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
@@ -223,6 +224,9 @@ export function normalizeWheelDelta(event: WheelEvent): number {
 function onDocumentWheel(event: WheelEvent): void {
   const delta = normalizeWheelDelta(event);
   if (delta === 0) return;
+
+  // Filter out very small trackpad movements (less than 10px)
+  if (Math.abs(delta) < 10) return;
 
   const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
   const now = Date.now();
