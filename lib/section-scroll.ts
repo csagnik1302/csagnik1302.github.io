@@ -10,6 +10,7 @@ export const PORTFOLIO_SECTION_IDS = [
 export type PortfolioSectionId = (typeof PORTFOLIO_SECTION_IDS)[number];
 
 const NAV_SELECTOR = "[data-section-nav]";
+const BOUNDARY_THRESHOLD_PX = 16;
 
 export function getNavOffset(): number {
   const nav = document.querySelector<HTMLElement>(NAV_SELECTOR);
@@ -41,31 +42,56 @@ export function getSectionScrollBottom(section: HTMLElement): number {
   return Math.max(top, maxScroll);
 }
 
-const BOUNDARY_THRESHOLD_PX = 4;
-
-export function isAtSectionTop(
+export function isSectionTopAligned(
   section: HTMLElement,
   threshold = BOUNDARY_THRESHOLD_PX,
 ): boolean {
-  return window.scrollY <= getSectionScrollTop(section) + threshold;
+  const navOffset = getNavOffset();
+  const { top } = section.getBoundingClientRect();
+  return top >= navOffset - threshold && top <= navOffset + threshold;
 }
 
-export function isAtSectionBottom(
+export function isSectionBottomAligned(
   section: HTMLElement,
   threshold = BOUNDARY_THRESHOLD_PX,
 ): boolean {
-  return window.scrollY >= getSectionScrollBottom(section) - threshold;
+  const { bottom } = section.getBoundingClientRect();
+  const viewportBottom = window.innerHeight;
+  return (
+    bottom >= viewportBottom - threshold &&
+    bottom <= viewportBottom + threshold
+  );
+}
+
+/** Section whose top/bottom edge is aligned with the viewport snap line. */
+export function getSectionAtBoundary(
+  direction: "next" | "prev",
+): PortfolioSectionId | null {
+  for (const id of PORTFOLIO_SECTION_IDS) {
+    const section = getSectionElement(id);
+    if (!section) continue;
+
+    const aligned =
+      direction === "next"
+        ? isSectionBottomAligned(section)
+        : isSectionTopAligned(section);
+
+    if (aligned) return id;
+  }
+
+  return null;
 }
 
 export function canSnapToAdjacentSection(
   direction: "next" | "prev",
 ): boolean {
-  const section = getSectionElement(getActiveSectionId());
-  if (!section) return false;
+  const atBoundary = getSectionAtBoundary(direction);
+  if (!atBoundary) return false;
 
+  const index = getSectionIndex(atBoundary);
   return direction === "next"
-    ? isAtSectionBottom(section)
-    : isAtSectionTop(section);
+    ? index < PORTFOLIO_SECTION_IDS.length - 1
+    : index > 0;
 }
 
 function updateSectionHash(
@@ -115,7 +141,12 @@ export function scrollToAdjacentSection(
   direction: "next" | "prev",
   behavior: ScrollBehavior = "smooth",
 ): boolean {
-  const target = getAdjacentSectionId(direction);
+  const fromSection = getSectionAtBoundary(direction);
+  if (!fromSection) return false;
+
+  const fromIndex = getSectionIndex(fromSection);
+  const targetIndex = direction === "next" ? fromIndex + 1 : fromIndex - 1;
+  const target = PORTFOLIO_SECTION_IDS[targetIndex];
   if (!target) return false;
 
   if (direction === "next") {
@@ -171,4 +202,14 @@ export function navigateToSection(
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   scrollToSection(id, prefersReducedMotion ? "auto" : "smooth");
+}
+
+export function normalizeWheelDelta(event: WheelEvent): number {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    return event.deltaY * 16;
+  }
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    return event.deltaY * window.innerHeight;
+  }
+  return event.deltaY;
 }

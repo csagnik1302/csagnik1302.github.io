@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import {
   canSnapToAdjacentSection,
+  normalizeWheelDelta,
   PORTFOLIO_SECTION_IDS,
   scrollToAdjacentSection,
   scrollToSection,
@@ -14,9 +15,11 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
   return (PORTFOLIO_SECTION_IDS as readonly string[]).includes(id);
 }
 
-const SNAP_COOLDOWN_MS = 800;
-const WHEEL_DELTA_THRESHOLD = 20;
+const SNAP_COOLDOWN_MS = 1000;
+const WHEEL_SNAP_ACCUM_THRESHOLD = 36;
+const WHEEL_SNAP_INSTANT_DELTA = 48;
 const TOUCH_SNAP_THRESHOLD_PX = 45;
+const WHEEL_ACCUM_RESET_MS = 140;
 
 export function useSectionScroll() {
   useEffect(() => {
@@ -61,19 +64,58 @@ export function useSectionScroll() {
 
     const trySnap = (direction: "next" | "prev"): boolean => {
       if (snapLocked || !canSnapToAdjacentSection(direction)) return false;
-      lockSnap();
-      return scrollToAdjacentSection(direction, scrollBehavior);
+      const didSnap = scrollToAdjacentSection(direction, scrollBehavior);
+      if (didSnap) lockSnap();
+      return didSnap;
+    };
+
+    let wheelAccum = 0;
+    let wheelAccumDirection: "next" | "prev" | null = null;
+    let wheelAccumResetTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const resetWheelAccum = () => {
+      wheelAccum = 0;
+      wheelAccumDirection = null;
+      clearTimeout(wheelAccumResetTimer);
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (prefersReducedMotion || snapLocked) return;
-      if (Math.abs(event.deltaY) < WHEEL_DELTA_THRESHOLD) return;
+      if (prefersReducedMotion) return;
 
-      const direction = event.deltaY > 0 ? "next" : "prev";
-      if (!canSnapToAdjacentSection(direction)) return;
+      if (snapLocked) {
+        event.preventDefault();
+        return;
+      }
+
+      const delta = normalizeWheelDelta(event);
+      if (delta === 0) return;
+
+      const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+
+      if (!canSnapToAdjacentSection(direction)) {
+        resetWheelAccum();
+        return;
+      }
 
       event.preventDefault();
-      trySnap(direction);
+
+      if (wheelAccumDirection !== direction) {
+        wheelAccumDirection = direction;
+        wheelAccum = 0;
+      }
+
+      wheelAccum += delta;
+
+      clearTimeout(wheelAccumResetTimer);
+      wheelAccumResetTimer = setTimeout(resetWheelAccum, WHEEL_ACCUM_RESET_MS);
+
+      const shouldSnap =
+        Math.abs(wheelAccum) >= WHEEL_SNAP_ACCUM_THRESHOLD ||
+        Math.abs(delta) >= WHEEL_SNAP_INSTANT_DELTA;
+
+      if (shouldSnap && trySnap(direction)) {
+        resetWheelAccum();
+      }
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -108,9 +150,13 @@ export function useSectionScroll() {
     };
 
     const onTouchMove = (event: TouchEvent) => {
+      if (snapLocked) {
+        event.preventDefault();
+        return;
+      }
+
       if (
         prefersReducedMotion ||
-        snapLocked ||
         event.touches.length !== 1 ||
         lastTouchY === null
       ) {
@@ -139,9 +185,10 @@ export function useSectionScroll() {
 
       if (Math.abs(touchBoundaryDelta) >= TOUCH_SNAP_THRESHOLD_PX) {
         event.preventDefault();
-        trySnap(direction);
-        resetTouchSnap();
-      } else if (Math.abs(touchBoundaryDelta) > 10) {
+        if (trySnap(direction)) {
+          resetTouchSnap();
+        }
+      } else if (Math.abs(touchBoundaryDelta) > 8) {
         event.preventDefault();
       }
     };
@@ -168,6 +215,7 @@ export function useSectionScroll() {
       window.removeEventListener("touchcancel", onTouchEnd);
       resizeObserver?.disconnect();
       clearTimeout(snapUnlockTimer);
+      clearTimeout(wheelAccumResetTimer);
     };
   }, []);
 }
