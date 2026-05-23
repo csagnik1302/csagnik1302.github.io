@@ -11,6 +11,17 @@ export type PortfolioSectionId = (typeof PORTFOLIO_SECTION_IDS)[number];
 
 const NAV_SELECTOR = "[data-section-nav]";
 
+/** Section used as the origin for wheel / keyboard section jumps. */
+let scrollAnchor: PortfolioSectionId = "top";
+
+export function getScrollAnchor(): PortfolioSectionId {
+  return scrollAnchor;
+}
+
+export function setScrollAnchor(id: PortfolioSectionId): void {
+  scrollAnchor = id;
+}
+
 export function getNavOffset(): number {
   const nav = document.querySelector<HTMLElement>(NAV_SELECTOR);
   return nav?.getBoundingClientRect().height ?? 104;
@@ -59,10 +70,42 @@ export function scrollToSection(
     behavior,
   });
 
+  setScrollAnchor(id);
   updateSectionHash(id, behavior);
 }
 
-/** Section that occupies the most space in the viewport below the nav. */
+export function getSectionIndex(id: PortfolioSectionId): number {
+  return PORTFOLIO_SECTION_IDS.indexOf(id);
+}
+
+/**
+ * Fallback when no anchor is set — biased by scroll direction so
+ * education → introduction is detected reliably when scrolling up.
+ */
+export function detectSectionForDirection(
+  direction: "next" | "prev",
+): PortfolioSectionId {
+  const navOffset = getNavOffset();
+  const contentHeight = window.innerHeight - navOffset;
+  const bias = direction === "prev" ? 0.12 : 0.45;
+  const referenceLine = window.scrollY + navOffset + contentHeight * bias;
+
+  let index = 0;
+
+  for (let i = 0; i < PORTFOLIO_SECTION_IDS.length; i++) {
+    const id = PORTFOLIO_SECTION_IDS[i];
+    const section = getSectionElement(id);
+    if (!section) continue;
+
+    if (getSectionScrollTop(section) <= referenceLine + 6) {
+      index = i;
+    }
+  }
+
+  return PORTFOLIO_SECTION_IDS[index];
+}
+
+/** Section that occupies the most space in the viewport (for nav highlighting). */
 export function getActiveSectionId(): PortfolioSectionId {
   const navOffset = getNavOffset();
   const viewportBottom = window.innerHeight;
@@ -96,14 +139,11 @@ export function getActiveSectionId(): PortfolioSectionId {
   return active;
 }
 
-export function getSectionIndex(id: PortfolioSectionId): number {
-  return PORTFOLIO_SECTION_IDS.indexOf(id);
-}
-
 export function getAdjacentSectionId(
   direction: "next" | "prev",
+  fromSection: PortfolioSectionId = scrollAnchor,
 ): PortfolioSectionId | null {
-  const index = getSectionIndex(getActiveSectionId());
+  const index = getSectionIndex(fromSection);
 
   if (direction === "next") {
     return PORTFOLIO_SECTION_IDS[index + 1] ?? null;
@@ -115,12 +155,22 @@ export function getAdjacentSectionId(
 export function scrollToAdjacentSection(
   direction: "next" | "prev",
   behavior: ScrollBehavior = "smooth",
+  fromSection: PortfolioSectionId = scrollAnchor,
 ): boolean {
-  const target = getAdjacentSectionId(direction);
+  const target = getAdjacentSectionId(direction, fromSection);
   if (!target) return false;
 
   scrollToSection(target, behavior);
   return true;
+}
+
+export function initScrollAnchor(preferred?: PortfolioSectionId): void {
+  if (preferred) {
+    setScrollAnchor(preferred);
+    return;
+  }
+
+  setScrollAnchor(getActiveSectionId());
 }
 
 export function navigateToSection(

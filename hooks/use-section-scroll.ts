@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import {
   getAdjacentSectionId,
+  getScrollAnchor,
+  initScrollAnchor,
   normalizeWheelDelta,
   PORTFOLIO_SECTION_IDS,
-  scrollToAdjacentSection,
   scrollToSection,
   syncNavHeightCssVar,
   type PortfolioSectionId,
@@ -16,15 +17,19 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
 }
 
 /** One scroll burst (single or many wheel ticks) = one section change. */
-const SNAP_LOCK_MS = 850;
+const SNAP_LOCK_MS = 900;
 
 export function useSectionScroll() {
   useEffect(() => {
     syncNavHeightCssVar();
 
     const hash = window.location.hash.replace("#", "");
-    if (isPortfolioSectionId(hash)) {
-      requestAnimationFrame(() => scrollToSection(hash, "auto"));
+    const hashSection = isPortfolioSectionId(hash) ? hash : undefined;
+
+    initScrollAnchor(hashSection);
+
+    if (hashSection) {
+      requestAnimationFrame(() => scrollToSection(hashSection, "auto"));
     }
 
     const resizeObserver =
@@ -61,10 +66,13 @@ export function useSectionScroll() {
 
     const goToSection = (direction: "next" | "prev"): void => {
       if (snapLocked) return;
-      if (!getAdjacentSectionId(direction)) return;
+
+      const from = getScrollAnchor();
+      const target = getAdjacentSectionId(direction, from);
+      if (!target) return;
 
       lockSnap();
-      scrollToAdjacentSection(direction, scrollBehavior);
+      scrollToSection(target, scrollBehavior);
     };
 
     const onWheel = (event: WheelEvent) => {
@@ -74,8 +82,9 @@ export function useSectionScroll() {
       if (delta === 0) return;
 
       const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+      const target = getAdjacentSectionId(direction, getScrollAnchor());
 
-      if (!getAdjacentSectionId(direction)) return;
+      if (!target) return;
 
       event.preventDefault();
 
@@ -95,7 +104,7 @@ export function useSectionScroll() {
           ? "next"
           : "prev";
 
-      if (!getAdjacentSectionId(direction)) return;
+      if (!getAdjacentSectionId(direction, getScrollAnchor())) return;
 
       event.preventDefault();
       goToSection(direction);
@@ -117,7 +126,7 @@ export function useSectionScroll() {
       if (Math.abs(deltaY) < 40) return;
 
       const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
-      if (!getAdjacentSectionId(direction)) return;
+      if (!getAdjacentSectionId(direction, getScrollAnchor())) return;
 
       goToSection(direction);
     };
