@@ -11,15 +11,26 @@ export type PortfolioSectionId = (typeof PORTFOLIO_SECTION_IDS)[number];
 
 const NAV_SELECTOR = "[data-section-nav]";
 
-/** Section used as the origin for wheel / keyboard section jumps. */
-let scrollAnchor: PortfolioSectionId = "top";
+let currentSectionIndex = 0;
 
-export function getScrollAnchor(): PortfolioSectionId {
-  return scrollAnchor;
+export function getCurrentSectionIndex(): number {
+  return currentSectionIndex;
 }
 
-export function setScrollAnchor(id: PortfolioSectionId): void {
-  scrollAnchor = id;
+export function getCurrentSectionId(): PortfolioSectionId {
+  return PORTFOLIO_SECTION_IDS[currentSectionIndex];
+}
+
+export function setCurrentSectionIndex(index: number): void {
+  const clamped = Math.max(
+    0,
+    Math.min(index, PORTFOLIO_SECTION_IDS.length - 1),
+  );
+  currentSectionIndex = clamped;
+}
+
+export function setCurrentSectionId(id: PortfolioSectionId): void {
+  setCurrentSectionIndex(PORTFOLIO_SECTION_IDS.indexOf(id));
 }
 
 export function getNavOffset(): number {
@@ -32,6 +43,7 @@ export function syncNavHeightCssVar(): void {
     "--nav-height",
     `${getNavOffset()}px`,
   );
+  rebuildSectionScrollPositions();
 }
 
 export function getSectionElement(
@@ -40,75 +52,104 @@ export function getSectionElement(
   return document.getElementById(id);
 }
 
-export function getSectionScrollTop(section: HTMLElement): number {
-  const top = window.scrollY + section.getBoundingClientRect().top;
-  return Math.max(0, top - getNavOffset());
+export function getSectionIndex(id: PortfolioSectionId): number {
+  return PORTFOLIO_SECTION_IDS.indexOf(id);
 }
 
-/** Scroll position that aligns a section at the top (under the nav). */
+let cachedSectionTops: Partial<Record<PortfolioSectionId, number>> | null =
+  null;
+
+export function rebuildSectionScrollPositions(): void {
+  const navOffset = getNavOffset();
+  const tops: Partial<Record<PortfolioSectionId, number>> = { top: 0 };
+
+  for (const id of PORTFOLIO_SECTION_IDS) {
+    if (id === "top") continue;
+
+    const section = getSectionElement(id);
+    if (!section) continue;
+
+    tops[id] = Math.max(
+      0,
+      section.getBoundingClientRect().top + window.scrollY - navOffset,
+    );
+  }
+
+  cachedSectionTops = tops;
+}
+
+/** Stable document scroll position for a section. */
 export function getTargetScrollTop(id: PortfolioSectionId): number {
-  if (id === "top") {
-    return 0;
+  if (!cachedSectionTops) {
+    rebuildSectionScrollPositions();
   }
 
-  const section = getSectionElement(id);
-  if (!section) return 0;
-
-  return getSectionScrollTop(section);
+  return cachedSectionTops?.[id] ?? 0;
 }
 
-function updateSectionHash(
-  id: PortfolioSectionId,
-  behavior: ScrollBehavior,
+function updateSectionHash(id: PortfolioSectionId): void {
+  history.replaceState(null, "", `#${id}`);
+}
+
+function applyScrollPosition(top: number): void {
+  window.scrollTo({ top, left: 0, behavior: "auto" });
+  document.documentElement.scrollTop = top;
+  document.body.scrollTop = top;
+}
+
+function waitUntilScrollSettles(
+  targetTop: number,
+  onSettled: () => void,
 ): void {
-  if (behavior === "auto") {
-    history.replaceState(null, "", `#${id}`);
-  } else {
-    window.setTimeout(() => {
-      history.replaceState(null, "", `#${id}`);
-    }, 400);
-  }
+  const deadline = Date.now() + 1800;
+
+  const tick = () => {
+    const delta = Math.abs(window.scrollY - targetTop);
+
+    if (delta <= 2 || Date.now() >= deadline) {
+      if (delta > 2) {
+        applyScrollPosition(targetTop);
+      }
+      onSettled();
+      return;
+    }
+
+    requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
 }
 
 export function scrollToSection(
   id: PortfolioSectionId,
-  behavior: ScrollBehavior = "smooth",
   onComplete?: () => void,
 ): void {
-  const scrollTop = getTargetScrollTop(id);
+  const index = getSectionIndex(id);
+  const targetTop = getTargetScrollTop(id);
 
-  window.scrollTo({
-    top: scrollTop,
-    behavior,
-  });
+  applyScrollPosition(targetTop);
 
-  const finish = () => {
-    setScrollAnchor(id);
-    updateSectionHash(id, behavior);
+  waitUntilScrollSettles(targetTop, () => {
+    applyScrollPosition(targetTop);
+    setCurrentSectionIndex(index);
+    updateSectionHash(id);
     onComplete?.();
-  };
-
-  if (behavior === "auto") {
-    finish();
-    return;
-  }
-
-  let completed = false;
-  const completeOnce = () => {
-    if (completed) return;
-    completed = true;
-    finish();
-  };
-
-  if (typeof window !== "undefined" && "onscrollend" in window) {
-    window.addEventListener("scrollend", completeOnce, { once: true });
-  }
-
-  window.setTimeout(completeOnce, 1200);
+  });
 }
 
-export function getSectionIndex(id: PortfolioSectionId): number {
-  return PORTFOLIO_SECTION_IDS.indexOf(id);
+export function getTargetSectionForDirection(
+  direction: "next" | "prev",
+): PortfolioSectionId | null {
+  const nextIndex =
+    direction === "next"
+      ? currentSectionIndex + 1
+      : currentSectionIndex - 1;
+
+  if (nextIndex < 0 || nextIndex >= PORTFOLIO_SECTION_IDS.length) {
+    return null;
+  }
+
+  return PORTFOLIO_SECTION_IDS[nextIndex];
 }
 
 /** Section that occupies the most space in the viewport (for nav highlighting). */
@@ -145,26 +186,13 @@ export function getActiveSectionId(): PortfolioSectionId {
   return active;
 }
 
-export function getAdjacentSectionId(
-  direction: "next" | "prev",
-  fromSection: PortfolioSectionId = scrollAnchor,
-): PortfolioSectionId | null {
-  const index = getSectionIndex(fromSection);
-
-  if (direction === "next") {
-    return PORTFOLIO_SECTION_IDS[index + 1] ?? null;
-  }
-
-  return PORTFOLIO_SECTION_IDS[index - 1] ?? null;
-}
-
-export function initScrollAnchor(preferred?: PortfolioSectionId): void {
+export function initCurrentSection(preferred?: PortfolioSectionId): void {
   if (preferred) {
-    setScrollAnchor(preferred);
+    setCurrentSectionId(preferred);
     return;
   }
 
-  setScrollAnchor(getActiveSectionId());
+  setCurrentSectionId(getActiveSectionId());
 }
 
 export function navigateToSection(
@@ -172,10 +200,7 @@ export function navigateToSection(
   event?: { preventDefault: () => void },
 ): void {
   event?.preventDefault();
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  scrollToSection(id, prefersReducedMotion ? "auto" : "smooth");
+  scrollToSection(id);
 }
 
 export function normalizeWheelDelta(event: WheelEvent): number {

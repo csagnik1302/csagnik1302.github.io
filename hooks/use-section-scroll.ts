@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import {
-  getAdjacentSectionId,
-  getScrollAnchor,
-  initScrollAnchor,
+  getTargetSectionForDirection,
+  initCurrentSection,
   normalizeWheelDelta,
   PORTFOLIO_SECTION_IDS,
+  rebuildSectionScrollPositions,
   scrollToSection,
   syncNavHeightCssVar,
   type PortfolioSectionId,
@@ -23,10 +23,10 @@ export function useSectionScroll() {
     const hash = window.location.hash.replace("#", "");
     const hashSection = isPortfolioSectionId(hash) ? hash : undefined;
 
-    initScrollAnchor(hashSection);
+    initCurrentSection(hashSection);
 
     if (hashSection) {
-      requestAnimationFrame(() => scrollToSection(hashSection, "auto"));
+      requestAnimationFrame(() => scrollToSection(hashSection));
     }
 
     const resizeObserver =
@@ -42,48 +42,35 @@ export function useSectionScroll() {
     const onResize = () => syncNavHeightCssVar();
     window.addEventListener("resize", onResize);
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    const scrollBehavior: ScrollBehavior = prefersReducedMotion
-      ? "auto"
-      : "smooth";
+    requestAnimationFrame(() => rebuildSectionScrollPositions());
+    window.addEventListener("load", rebuildSectionScrollPositions);
 
     let snapLocked = false;
-
-    const unlockSnap = () => {
-      snapLocked = false;
-    };
 
     const goToSection = (direction: "next" | "prev"): void => {
       if (snapLocked) return;
 
-      const from = getScrollAnchor();
-      const target = getAdjacentSectionId(direction, from);
+      const target = getTargetSectionForDirection(direction);
       if (!target) return;
 
       snapLocked = true;
-      scrollToSection(target, scrollBehavior, unlockSnap);
+      scrollToSection(target, () => {
+        snapLocked = false;
+      });
     };
 
     const onWheel = (event: WheelEvent) => {
-      if (prefersReducedMotion) return;
-
       const delta = normalizeWheelDelta(event);
       if (delta === 0) return;
 
       const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
 
-      if (snapLocked) {
-        event.preventDefault();
-        return;
-      }
-
-      const target = getAdjacentSectionId(direction, getScrollAnchor());
-      if (!target) return;
+      if (!getTargetSectionForDirection(direction)) return;
 
       event.preventDefault();
+
+      if (snapLocked) return;
+
       goToSection(direction);
     };
 
@@ -98,10 +85,12 @@ export function useSectionScroll() {
           ? "next"
           : "prev";
 
-      if (snapLocked) return;
-      if (!getAdjacentSectionId(direction, getScrollAnchor())) return;
+      if (!getTargetSectionForDirection(direction)) return;
 
       event.preventDefault();
+
+      if (snapLocked) return;
+
       goToSection(direction);
     };
 
@@ -112,7 +101,7 @@ export function useSectionScroll() {
     };
 
     const onTouchEnd = (event: TouchEvent) => {
-      if (prefersReducedMotion || snapLocked) return;
+      if (snapLocked) return;
 
       const touch = event.changedTouches[0];
       if (!touch) return;
@@ -121,7 +110,7 @@ export function useSectionScroll() {
       if (Math.abs(deltaY) < 40) return;
 
       const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
-      if (!getAdjacentSectionId(direction, getScrollAnchor())) return;
+      if (!getTargetSectionForDirection(direction)) return;
 
       goToSection(direction);
     };
@@ -138,6 +127,7 @@ export function useSectionScroll() {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       resizeObserver?.disconnect();
+      window.removeEventListener("load", rebuildSectionScrollPositions);
     };
   }, []);
 }
