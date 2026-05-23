@@ -19,15 +19,18 @@ const NAV_SELECTOR = "[data-section-nav]";
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
 
 /**
- * Cooldown after trackpad navigation before allowing next navigation
- * Long enough to cover inertial/kinetic scrolling momentum (can last 1-2 seconds)
+ * Gap to detect when a trackpad gesture has ended (pause between gestures)
  */
-const TRACKPAD_COOLDOWN_MS = 1200;
+const TRACKPAD_GESTURE_END_MS = 150;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
 let navigatedInCurrentBurst = false;
-let lastTrackpadNavTimestamp = 0;
+
+// Trackpad gesture tracking
+let trackpadGestureActive = false;
+let trackpadGestureDirection: "next" | "prev" | null = null;
+let trackpadLastEventTime = 0;
 
 export function getCurrentSectionIndex(): number {
   return currentSectionIndex;
@@ -239,28 +242,39 @@ function onDocumentWheel(event: WheelEvent): void {
   const isSmallDelta = Math.abs(delta) < 15;
   const isTrackpad = isTrackpadMode || isSmallDelta;
 
-  // Trackpad logic with cooldown (simpler, more reliable for gestures)
+  // Trackpad logic with gesture tracking (handles both normal and kinetic scrolling)
   if (isTrackpad) {
     const minDelta = 5;
 
     if (Math.abs(delta) < minDelta) return;
 
     const now = Date.now();
-    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
+    const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+    const timeSinceLastEvent = now - trackpadLastEventTime;
 
-    // If still in cooldown, ignore the event
-    if (timeSinceLastNav < TRACKPAD_COOLDOWN_MS) {
+    // Check if gesture has ended (pause between gestures)
+    if (timeSinceLastEvent > TRACKPAD_GESTURE_END_MS) {
+      // New gesture starting
+      trackpadGestureActive = false;
+      trackpadGestureDirection = null;
+    }
+
+    trackpadLastEventTime = now;
+
+    // If gesture already active and navigated, ignore all subsequent events (including kinetic)
+    if (trackpadGestureActive) {
+      event.preventDefault();
       return;
     }
 
-    const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
-
+    // Start new gesture and navigate
     if (!canNavigateInDirection(direction)) {
       return;
     }
 
     event.preventDefault();
-    lastTrackpadNavTimestamp = now;
+    trackpadGestureActive = true;
+    trackpadGestureDirection = direction;
     navigateInDirection(direction);
     return;
   }
