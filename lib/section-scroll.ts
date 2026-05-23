@@ -20,10 +20,10 @@ const WHEEL_BURST_GAP_MS_MOUSE = 120;
 const WHEEL_BURST_GAP_MS_TRACKPAD = 50;
 
 /**
- * Minimum time between navigations for trackpad to prevent rapid-fire section skipping
- * Increased to 600ms to ensure only one section change per swipe regardless of swipe size
+ * Simple debounce time for trackpad - ignore all events for this duration after navigation
+ * This prevents both skipping on large swipes and getting stuck on quick successive swipes
  */
-const TRACKPAD_NAV_COOLDOWN_MS = 600;
+const TRACKPAD_DEBOUNCE_MS = 350;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
@@ -240,12 +240,32 @@ function onDocumentWheel(event: WheelEvent): void {
   const isSmallDelta = Math.abs(delta) < 15;
   const isTrackpad = isTrackpadMode || isSmallDelta;
 
-  // Apply different thresholds for trackpad vs mouse
-  const burstGapMs = isTrackpad ? WHEEL_BURST_GAP_MS_TRACKPAD : WHEEL_BURST_GAP_MS_MOUSE;
-  const minDelta = isTrackpad ? 0 : 10; // No threshold for trackpad to ensure responsiveness
+  // For trackpad, use simple debounce-only approach
+  if (isTrackpad) {
+    const now = Date.now();
+    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
 
-  // Filter out very small movements (only for mouse)
-  if (!isTrackpad && Math.abs(delta) < minDelta) return;
+    if (timeSinceLastNav < TRACKPAD_DEBOUNCE_MS) {
+      return;
+    }
+
+    const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
+
+    if (!canNavigateInDirection(direction)) {
+      return;
+    }
+
+    event.preventDefault();
+    lastTrackpadNavTimestamp = now;
+    navigateInDirection(direction);
+    return;
+  }
+
+  // Mouse wheel logic with burst detection
+  const burstGapMs = WHEEL_BURST_GAP_MS_MOUSE;
+  const minDelta = 10;
+
+  if (Math.abs(delta) < minDelta) return;
 
   const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
   const now = Date.now();
@@ -262,15 +282,6 @@ function onDocumentWheel(event: WheelEvent): void {
   }
 
   event.preventDefault();
-
-  // For trackpad, check cooldown to prevent rapid-fire navigation
-  if (isTrackpad) {
-    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
-    if (timeSinceLastNav < TRACKPAD_NAV_COOLDOWN_MS) {
-      return;
-    }
-    lastTrackpadNavTimestamp = now;
-  }
 
   if (navigatedInCurrentBurst) {
     return;
