@@ -23,10 +23,13 @@ export function useSectionScroll() {
     const hash = window.location.hash.replace("#", "");
     const hashSection = isPortfolioSectionId(hash) ? hash : undefined;
 
-    initCurrentSection(hashSection);
-
+    // Always scroll to top on page load, unless there's an explicit hash
     if (hashSection) {
+      initCurrentSection(hashSection);
       requestAnimationFrame(() => scrollToSection(hashSection));
+    } else {
+      initCurrentSection("top");
+      requestAnimationFrame(() => scrollToSection("top"));
     }
 
     const detachWheel = attachSectionWheelHandler();
