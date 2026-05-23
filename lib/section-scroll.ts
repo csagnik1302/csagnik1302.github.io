@@ -127,10 +127,13 @@ export function scrollToSection(
   });
 }
 
-function extendWheelBurst(): void {
+/** Fixed-duration lock — do not extend on every wheel tick (trackpad momentum never ends). */
+function startWheelBurstLock(): void {
   if (wheelBurstTimer) {
     clearTimeout(wheelBurstTimer);
   }
+
+  wheelBurstActive = true;
 
   wheelBurstTimer = setTimeout(() => {
     wheelBurstActive = false;
@@ -174,23 +177,20 @@ export function getActiveSectionId(): PortfolioSectionId {
   return active;
 }
 
-/** Use what is on screen, not a stale stored index. */
-export function getNavigationSectionIndex(): number {
-  return getSectionIndex(getActiveSectionId());
-}
-
 export function canNavigateInDirection(direction: "next" | "prev"): boolean {
-  const viewIndex = getNavigationSectionIndex();
   const nextIndex =
-    direction === "next" ? viewIndex + 1 : viewIndex - 1;
+    direction === "next"
+      ? currentSectionIndex + 1
+      : currentSectionIndex - 1;
 
   return nextIndex >= 0 && nextIndex < PORTFOLIO_SECTION_IDS.length;
 }
 
 export function navigateInDirection(direction: "next" | "prev"): boolean {
-  const viewIndex = getNavigationSectionIndex();
   const nextIndex =
-    direction === "next" ? viewIndex + 1 : viewIndex - 1;
+    direction === "next"
+      ? currentSectionIndex + 1
+      : currentSectionIndex - 1;
 
   if (nextIndex < 0 || nextIndex >= PORTFOLIO_SECTION_IDS.length) {
     return false;
@@ -204,12 +204,10 @@ export function navigateInDirection(direction: "next" | "prev"): boolean {
 
 export function runOncePerWheelBurst(action: () => void): void {
   if (wheelBurstActive) {
-    extendWheelBurst();
     return;
   }
 
-  wheelBurstActive = true;
-  extendWheelBurst();
+  startWheelBurstLock();
   action();
 }
 
@@ -227,8 +225,7 @@ export function navigateToSection(
   event?: { preventDefault: () => void },
 ): void {
   event?.preventDefault();
-  wheelBurstActive = true;
-  extendWheelBurst();
+  startWheelBurstLock();
   setCurrentSectionId(id);
   scrollToSection(id);
 }
@@ -251,7 +248,6 @@ function onDocumentWheel(event: WheelEvent): void {
 
   if (wheelBurstActive) {
     event.preventDefault();
-    extendWheelBurst();
     return;
   }
 
