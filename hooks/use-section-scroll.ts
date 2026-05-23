@@ -7,7 +7,6 @@ import {
   initCurrentSection,
   navigateInDirection,
   PORTFOLIO_SECTION_IDS,
-  rebuildSectionScrollPositions,
   runOncePerWheelBurst,
   scrollToSection,
   syncNavHeightCssVar,
@@ -45,9 +44,6 @@ export function useSectionScroll() {
 
     const onResize = () => syncNavHeightCssVar();
     window.addEventListener("resize", onResize);
-
-    requestAnimationFrame(() => rebuildSectionScrollPositions());
-    window.addEventListener("load", rebuildSectionScrollPositions);
 
     const onKeyDown = (event: KeyboardEvent) => {
       const scrollKeys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "];
@@ -100,7 +96,6 @@ export function useSectionScroll() {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       resizeObserver?.disconnect();
-      window.removeEventListener("load", rebuildSectionScrollPositions);
     };
   }, []);
 }

@@ -11,7 +11,7 @@ export type PortfolioSectionId = (typeof PORTFOLIO_SECTION_IDS)[number];
 
 const NAV_SELECTOR = "[data-section-nav]";
 
-/** One physical wheel gesture = at most one section change (survives React effect re-runs). */
+/** One physical wheel gesture = at most one section change. */
 const WHEEL_BURST_IDLE_MS = 1400;
 
 let currentSectionIndex = 0;
@@ -43,12 +43,12 @@ export function getNavOffset(): number {
   return nav?.getBoundingClientRect().height ?? 104;
 }
 
+/** Update nav height CSS variable only (safe to call on scroll). */
 export function syncNavHeightCssVar(): void {
   document.documentElement.style.setProperty(
     "--nav-height",
     `${getNavOffset()}px`,
   );
-  rebuildSectionScrollPositions();
 }
 
 export function getSectionElement(
@@ -61,34 +61,20 @@ export function getSectionIndex(id: PortfolioSectionId): number {
   return PORTFOLIO_SECTION_IDS.indexOf(id);
 }
 
-let cachedSectionTops: Partial<Record<PortfolioSectionId, number>> | null =
-  null;
-
-export function rebuildSectionScrollPositions(): void {
-  const navOffset = getNavOffset();
-  const tops: Partial<Record<PortfolioSectionId, number>> = { top: 0 };
-
-  for (const id of PORTFOLIO_SECTION_IDS) {
-    if (id === "top") continue;
-
-    const section = getSectionElement(id);
-    if (!section) continue;
-
-    tops[id] = Math.max(
-      0,
-      section.getBoundingClientRect().top + window.scrollY - navOffset,
-    );
-  }
-
-  cachedSectionTops = tops;
-}
-
+/** Live scroll position for a section (always read from current layout). */
 export function getTargetScrollTop(id: PortfolioSectionId): number {
-  if (!cachedSectionTops) {
-    rebuildSectionScrollPositions();
+  if (id === "top") {
+    return 0;
   }
 
-  return cachedSectionTops?.[id] ?? 0;
+  const section = getSectionElement(id);
+  if (!section) return 0;
+
+  const navOffset = getNavOffset();
+  return Math.max(
+    0,
+    section.getBoundingClientRect().top + window.scrollY - navOffset,
+  );
 }
 
 function updateSectionHash(id: PortfolioSectionId): void {
@@ -153,45 +139,8 @@ function extendWheelBurst(): void {
 }
 
 /**
- * Runs the action only once per wheel burst; further wheel ticks in the same
- * gesture extend the lock but do not change sections again.
+ * Section that occupies the most space in the viewport (for nav + navigation).
  */
-export function runOncePerWheelBurst(action: () => void): void {
-  if (wheelBurstActive) {
-    extendWheelBurst();
-    return;
-  }
-
-  wheelBurstActive = true;
-  extendWheelBurst();
-  action();
-}
-
-export function navigateInDirection(direction: "next" | "prev"): boolean {
-  const nextIndex =
-    direction === "next"
-      ? currentSectionIndex + 1
-      : currentSectionIndex - 1;
-
-  if (nextIndex < 0 || nextIndex >= PORTFOLIO_SECTION_IDS.length) {
-    return false;
-  }
-
-  const targetId = PORTFOLIO_SECTION_IDS[nextIndex];
-  setCurrentSectionIndex(nextIndex);
-  scrollToSection(targetId);
-  return true;
-}
-
-export function canNavigateInDirection(direction: "next" | "prev"): boolean {
-  const nextIndex =
-    direction === "next"
-      ? currentSectionIndex + 1
-      : currentSectionIndex - 1;
-
-  return nextIndex >= 0 && nextIndex < PORTFOLIO_SECTION_IDS.length;
-}
-
 export function getActiveSectionId(): PortfolioSectionId {
   const navOffset = getNavOffset();
   const viewportBottom = window.innerHeight;
@@ -223,6 +172,45 @@ export function getActiveSectionId(): PortfolioSectionId {
   }
 
   return active;
+}
+
+/** Use what is on screen, not a stale stored index. */
+export function getNavigationSectionIndex(): number {
+  return getSectionIndex(getActiveSectionId());
+}
+
+export function canNavigateInDirection(direction: "next" | "prev"): boolean {
+  const viewIndex = getNavigationSectionIndex();
+  const nextIndex =
+    direction === "next" ? viewIndex + 1 : viewIndex - 1;
+
+  return nextIndex >= 0 && nextIndex < PORTFOLIO_SECTION_IDS.length;
+}
+
+export function navigateInDirection(direction: "next" | "prev"): boolean {
+  const viewIndex = getNavigationSectionIndex();
+  const nextIndex =
+    direction === "next" ? viewIndex + 1 : viewIndex - 1;
+
+  if (nextIndex < 0 || nextIndex >= PORTFOLIO_SECTION_IDS.length) {
+    return false;
+  }
+
+  const targetId = PORTFOLIO_SECTION_IDS[nextIndex];
+  setCurrentSectionIndex(nextIndex);
+  scrollToSection(targetId);
+  return true;
+}
+
+export function runOncePerWheelBurst(action: () => void): void {
+  if (wheelBurstActive) {
+    extendWheelBurst();
+    return;
+  }
+
+  wheelBurstActive = true;
+  extendWheelBurst();
+  action();
 }
 
 export function initCurrentSection(preferred?: PortfolioSectionId): void {
@@ -267,7 +255,9 @@ function onDocumentWheel(event: WheelEvent): void {
     return;
   }
 
-  if (!canNavigateInDirection(direction)) return;
+  if (!canNavigateInDirection(direction)) {
+    return;
+  }
 
   event.preventDefault();
 
@@ -276,7 +266,6 @@ function onDocumentWheel(event: WheelEvent): void {
   });
 }
 
-/** Global wheel listener — one section per burst, module-level state. */
 export function attachSectionWheelHandler(): () => void {
   if (typeof window === "undefined") {
     return () => undefined;
