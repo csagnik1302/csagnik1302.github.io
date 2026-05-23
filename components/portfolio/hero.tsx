@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
 export function Hero() {
   return (
-    <section id="top" className="px-6 py-20 lg:px-0">
+    <section id="top" className="flex flex-col justify-center px-6 lg:px-0">
       <div className="max-w-4xl mx-auto w-full">
         <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20">
           {/* Left Column - Name and Navigation */}

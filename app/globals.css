@@ -69,6 +69,12 @@ section[id] {
   justify-content: center;
 }
 
+/* Fill only the viewport below the nav so intro content centers in the visible area */
+section#top {
+  min-height: calc(100vh - var(--nav-height, 6.5rem));
+  justify-content: center;
+}
+
 html {
   scroll-behavior: auto;
   scroll-padding-top: var(--nav-height, 6.5rem);
