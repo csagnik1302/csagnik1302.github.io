@@ -34,6 +34,53 @@ export function getSectionScrollTop(section: HTMLElement): number {
   return Math.max(0, top - getNavOffset());
 }
 
+/** Maximum scrollY while keeping the section top aligned under the nav. */
+export function getSectionScrollBottom(section: HTMLElement): number {
+  const top = getSectionScrollTop(section);
+  const maxScroll = top + section.offsetHeight - window.innerHeight;
+  return Math.max(top, maxScroll);
+}
+
+const BOUNDARY_THRESHOLD_PX = 4;
+
+export function isAtSectionTop(
+  section: HTMLElement,
+  threshold = BOUNDARY_THRESHOLD_PX,
+): boolean {
+  return window.scrollY <= getSectionScrollTop(section) + threshold;
+}
+
+export function isAtSectionBottom(
+  section: HTMLElement,
+  threshold = BOUNDARY_THRESHOLD_PX,
+): boolean {
+  return window.scrollY >= getSectionScrollBottom(section) - threshold;
+}
+
+export function canSnapToAdjacentSection(
+  direction: "next" | "prev",
+): boolean {
+  const section = getSectionElement(getActiveSectionId());
+  if (!section) return false;
+
+  return direction === "next"
+    ? isAtSectionBottom(section)
+    : isAtSectionTop(section);
+}
+
+function updateSectionHash(
+  id: PortfolioSectionId,
+  behavior: ScrollBehavior,
+): void {
+  if (behavior === "auto") {
+    history.replaceState(null, "", `#${id}`);
+  } else {
+    window.setTimeout(() => {
+      history.replaceState(null, "", `#${id}`);
+    }, 400);
+  }
+}
+
 export function scrollToSection(
   id: PortfolioSectionId,
   behavior: ScrollBehavior = "smooth",
@@ -46,13 +93,38 @@ export function scrollToSection(
     behavior,
   });
 
-  if (behavior === "auto") {
-    history.replaceState(null, "", `#${id}`);
+  updateSectionHash(id, behavior);
+}
+
+export function scrollToSectionBottom(
+  id: PortfolioSectionId,
+  behavior: ScrollBehavior = "smooth",
+): void {
+  const section = getSectionElement(id);
+  if (!section) return;
+
+  window.scrollTo({
+    top: getSectionScrollBottom(section),
+    behavior,
+  });
+
+  updateSectionHash(id, behavior);
+}
+
+export function scrollToAdjacentSection(
+  direction: "next" | "prev",
+  behavior: ScrollBehavior = "smooth",
+): boolean {
+  const target = getAdjacentSectionId(direction);
+  if (!target) return false;
+
+  if (direction === "next") {
+    scrollToSection(target, behavior);
   } else {
-    window.setTimeout(() => {
-      history.replaceState(null, "", `#${id}`);
-    }, 400);
+    scrollToSectionBottom(target, behavior);
   }
+
+  return true;
 }
 
 export function getActiveSectionId(): PortfolioSectionId {
