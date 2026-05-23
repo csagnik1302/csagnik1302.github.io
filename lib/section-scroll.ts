@@ -14,9 +14,10 @@ const NAV_SELECTOR = "[data-section-nav]";
 /**
  * Wheel events closer than this are one physical gesture (one section change).
  * A pause longer than this allows the next gesture immediately.
- * Increased to 250ms to better handle trackpad momentum scrolling.
+ * Different values for trackpad vs mouse wheel.
  */
-const WHEEL_BURST_GAP_MS = 250;
+const WHEEL_BURST_GAP_MS_MOUSE = 120;
+const WHEEL_BURST_GAP_MS_TRACKPAD = 120;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
@@ -225,12 +226,20 @@ function onDocumentWheel(event: WheelEvent): void {
   const delta = normalizeWheelDelta(event);
   if (delta === 0) return;
 
-  // Filter out very small trackpad movements (less than 10px)
-  if (Math.abs(delta) < 10) return;
+  // Detect trackpad vs mouse wheel based on deltaMode
+  // Trackpads typically use DOM_DELTA_PIXEL (0), mouse wheels use DOM_DELTA_LINE (1)
+  const isTrackpad = event.deltaMode === WheelEvent.DOM_DELTA_PIXEL;
+
+  // Apply different thresholds for trackpad vs mouse
+  const burstGapMs = isTrackpad ? WHEEL_BURST_GAP_MS_TRACKPAD : WHEEL_BURST_GAP_MS_MOUSE;
+  const minDelta = isTrackpad ? 2 : 10; // Lower threshold for trackpad
+
+  // Filter out very small movements
+  if (Math.abs(delta) < minDelta) return;
 
   const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
   const now = Date.now();
-  const isNewBurst = now - lastWheelTimestamp > WHEEL_BURST_GAP_MS;
+  const isNewBurst = now - lastWheelTimestamp > burstGapMs;
 
   lastWheelTimestamp = now;
 
