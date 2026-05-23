@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import {
-  canSnapToAdjacentSection,
+  getAdjacentSectionId,
   normalizeWheelDelta,
   PORTFOLIO_SECTION_IDS,
   scrollToAdjacentSection,
@@ -15,11 +15,8 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
   return (PORTFOLIO_SECTION_IDS as readonly string[]).includes(id);
 }
 
-const SNAP_COOLDOWN_MS = 1000;
-const WHEEL_SNAP_ACCUM_THRESHOLD = 36;
-const WHEEL_SNAP_INSTANT_DELTA = 48;
-const TOUCH_SNAP_THRESHOLD_PX = 45;
-const WHEEL_ACCUM_RESET_MS = 140;
+/** One scroll burst (single or many wheel ticks) = one section change. */
+const SNAP_LOCK_MS = 850;
 
 export function useSectionScroll() {
   useEffect(() => {
@@ -59,63 +56,32 @@ export function useSectionScroll() {
       clearTimeout(snapUnlockTimer);
       snapUnlockTimer = setTimeout(() => {
         snapLocked = false;
-      }, SNAP_COOLDOWN_MS);
+      }, SNAP_LOCK_MS);
     };
 
-    const trySnap = (direction: "next" | "prev"): boolean => {
-      if (snapLocked || !canSnapToAdjacentSection(direction)) return false;
-      const didSnap = scrollToAdjacentSection(direction, scrollBehavior);
-      if (didSnap) lockSnap();
-      return didSnap;
-    };
+    const goToSection = (direction: "next" | "prev"): void => {
+      if (snapLocked) return;
+      if (!getAdjacentSectionId(direction)) return;
 
-    let wheelAccum = 0;
-    let wheelAccumDirection: "next" | "prev" | null = null;
-    let wheelAccumResetTimer: ReturnType<typeof setTimeout> | undefined;
-
-    const resetWheelAccum = () => {
-      wheelAccum = 0;
-      wheelAccumDirection = null;
-      clearTimeout(wheelAccumResetTimer);
+      lockSnap();
+      scrollToAdjacentSection(direction, scrollBehavior);
     };
 
     const onWheel = (event: WheelEvent) => {
       if (prefersReducedMotion) return;
-
-      if (snapLocked) {
-        event.preventDefault();
-        return;
-      }
 
       const delta = normalizeWheelDelta(event);
       if (delta === 0) return;
 
       const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
 
-      if (!canSnapToAdjacentSection(direction)) {
-        resetWheelAccum();
-        return;
-      }
+      if (!getAdjacentSectionId(direction)) return;
 
       event.preventDefault();
 
-      if (wheelAccumDirection !== direction) {
-        wheelAccumDirection = direction;
-        wheelAccum = 0;
-      }
+      if (snapLocked) return;
 
-      wheelAccum += delta;
-
-      clearTimeout(wheelAccumResetTimer);
-      wheelAccumResetTimer = setTimeout(resetWheelAccum, WHEEL_ACCUM_RESET_MS);
-
-      const shouldSnap =
-        Math.abs(wheelAccum) >= WHEEL_SNAP_ACCUM_THRESHOLD ||
-        Math.abs(delta) >= WHEEL_SNAP_INSTANT_DELTA;
-
-      if (shouldSnap && trySnap(direction)) {
-        resetWheelAccum();
-      }
+      goToSection(direction);
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -129,93 +95,46 @@ export function useSectionScroll() {
           ? "next"
           : "prev";
 
-      if (!canSnapToAdjacentSection(direction)) return;
+      if (!getAdjacentSectionId(direction)) return;
 
       event.preventDefault();
-      trySnap(direction);
+      goToSection(direction);
     };
 
-    let touchBoundaryDelta = 0;
-    let touchDirection: "next" | "prev" | null = null;
-    let lastTouchY: number | null = null;
-
-    const resetTouchSnap = () => {
-      touchBoundaryDelta = 0;
-      touchDirection = null;
-    };
+    let touchStartY = 0;
 
     const onTouchStart = (event: TouchEvent) => {
-      resetTouchSnap();
-      lastTouchY = event.touches[0]?.clientY ?? null;
+      touchStartY = event.touches[0]?.clientY ?? 0;
     };
 
-    const onTouchMove = (event: TouchEvent) => {
-      if (snapLocked) {
-        event.preventDefault();
-        return;
-      }
+    const onTouchEnd = (event: TouchEvent) => {
+      if (prefersReducedMotion || snapLocked) return;
 
-      if (
-        prefersReducedMotion ||
-        event.touches.length !== 1 ||
-        lastTouchY === null
-      ) {
-        return;
-      }
+      const touch = event.changedTouches[0];
+      if (!touch) return;
 
-      const touchY = event.touches[0].clientY;
-      const deltaY = lastTouchY - touchY;
-      lastTouchY = touchY;
-
-      if (Math.abs(deltaY) < 1) return;
+      const deltaY = touchStartY - touch.clientY;
+      if (Math.abs(deltaY) < 40) return;
 
       const direction: "next" | "prev" = deltaY > 0 ? "next" : "prev";
+      if (!getAdjacentSectionId(direction)) return;
 
-      if (!canSnapToAdjacentSection(direction)) {
-        resetTouchSnap();
-        return;
-      }
-
-      if (touchDirection !== direction) {
-        touchDirection = direction;
-        touchBoundaryDelta = 0;
-      }
-
-      touchBoundaryDelta += deltaY;
-
-      if (Math.abs(touchBoundaryDelta) >= TOUCH_SNAP_THRESHOLD_PX) {
-        event.preventDefault();
-        if (trySnap(direction)) {
-          resetTouchSnap();
-        }
-      } else if (Math.abs(touchBoundaryDelta) > 8) {
-        event.preventDefault();
-      }
-    };
-
-    const onTouchEnd = () => {
-      lastTouchY = null;
-      resetTouchSnap();
+      goToSection(direction);
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchEnd);
       resizeObserver?.disconnect();
       clearTimeout(snapUnlockTimer);
-      clearTimeout(wheelAccumResetTimer);
     };
   }, []);
 }
