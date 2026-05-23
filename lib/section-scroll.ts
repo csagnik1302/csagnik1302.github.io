@@ -17,11 +17,17 @@ const NAV_SELECTOR = "[data-section-nav]";
  * Different values for trackpad vs mouse wheel.
  */
 const WHEEL_BURST_GAP_MS_MOUSE = 120;
-const WHEEL_BURST_GAP_MS_TRACKPAD = 80;
+
+/**
+ * Cooldown after trackpad navigation before allowing next navigation
+ * Short enough to allow quick successive swipes, long enough to prevent multiple sections per swipe
+ */
+const TRACKPAD_COOLDOWN_MS = 400;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
 let navigatedInCurrentBurst = false;
+let lastTrackpadNavTimestamp = 0;
 
 export function getCurrentSectionIndex(): number {
   return currentSectionIndex;
@@ -233,34 +239,28 @@ function onDocumentWheel(event: WheelEvent): void {
   const isSmallDelta = Math.abs(delta) < 15;
   const isTrackpad = isTrackpadMode || isSmallDelta;
 
-  // Trackpad logic with burst detection (similar to mouse wheel but shorter gap)
+  // Trackpad logic with cooldown (simpler, more reliable for gestures)
   if (isTrackpad) {
-    const burstGapMs = WHEEL_BURST_GAP_MS_TRACKPAD;
-    const minDelta = 2;
+    const minDelta = 5;
 
     if (Math.abs(delta) < minDelta) return;
 
-    const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
     const now = Date.now();
-    const isNewBurst = now - lastWheelTimestamp > burstGapMs;
+    const timeSinceLastNav = now - lastTrackpadNavTimestamp;
 
-    lastWheelTimestamp = now;
-
-    if (isNewBurst) {
-      resetWheelBurst();
+    // If still in cooldown, ignore the event
+    if (timeSinceLastNav < TRACKPAD_COOLDOWN_MS) {
+      return;
     }
+
+    const direction: "next" | "prev" = delta > 0 ? "next" : "prev";
 
     if (!canNavigateInDirection(direction)) {
       return;
     }
 
     event.preventDefault();
-
-    if (navigatedInCurrentBurst) {
-      return;
-    }
-
-    navigatedInCurrentBurst = true;
+    lastTrackpadNavTimestamp = now;
     navigateInDirection(direction);
     return;
   }
