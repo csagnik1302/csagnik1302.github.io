@@ -1,8 +1,8 @@
 'use client';
 
-import { useKeyboardSnapScroll } from '@/hooks/use-keyboard-snap-scroll';
+import { useSectionScroll } from '@/hooks/use-section-scroll';
 
 export function KeyboardScrollHandler() {
-  useKeyboardSnapScroll();
+  useSectionScroll();
   return null;
 }

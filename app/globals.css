@@ -62,7 +62,7 @@ section p.text-muted-foreground,
 }
 
 section[id] {
-  scroll-margin-top: 6.5rem;
+  scroll-margin-top: var(--nav-height, 6.5rem);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -70,14 +70,8 @@ section[id] {
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
-  scroll-padding-top: 6.5rem;
-}
-
-section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  scroll-behavior: auto;
+  scroll-padding-top: var(--nav-height, 6.5rem);
 }
 
 :root {
