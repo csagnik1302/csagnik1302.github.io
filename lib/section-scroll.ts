@@ -20,9 +20,9 @@ const WHEEL_BURST_GAP_MS_MOUSE = 120;
 
 /**
  * Cooldown after trackpad navigation before allowing next navigation
- * Short enough to allow quick successive swipes, long enough to prevent multiple sections per swipe
+ * Long enough to cover inertial/kinetic scrolling momentum (can last 1-2 seconds)
  */
-const TRACKPAD_COOLDOWN_MS = 400;
+const TRACKPAD_COOLDOWN_MS = 1200;
 
 let currentSectionIndex = 0;
 let lastWheelTimestamp = 0;
