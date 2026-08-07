@@ -1,7 +1,23 @@
 "use client";
 
 import React from "react";
-import { X, ExternalLink, Download, Github, Linkedin, Mail, ArrowUpRight, Sparkles, BookOpen, Layers, GraduationCap } from "lucide-react";
+import {
+  X,
+  ExternalLink,
+  Download,
+  Github,
+  Linkedin,
+  Mail,
+  ArrowUpRight,
+  Sparkles,
+  BookOpen,
+  Layers,
+  GraduationCap,
+  Brain,
+  Code2,
+  Users,
+  MessageSquare,
+} from "lucide-react";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
 
@@ -22,22 +38,22 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       <div
         className="relative w-full max-w-2xl max-h-[85vh] bg-[#12151E] border border-white/10 rounded-3xl p-6 sm:p-8 overflow-y-auto shadow-2xl space-y-6 text-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white tracking-tight">{content.title}</h3>
-              <p className="text-xs text-[#9CA3AF]">Sagnik Chandra's Portfolio Intelligence</p>
+              <p className="text-xs text-[#9CA3AF]">Sagnik Chandra's AI Twin Response</p>
             </div>
           </div>
 
@@ -52,30 +68,87 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
         {/* Content Body Based on Category */}
         <div className="space-y-6 text-sm">
           {content.type === "me" && (
-            <div className="space-y-4">
-              <p className="text-base text-white leading-relaxed">
-                👋 Hey! I'm <strong>Sagnik Chandra</strong>, an Aspiring Machine Learning Engineer & Researcher pursuing my M.Sc. in Data Science & AI at RKMVERI Belur.
-              </p>
-
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                  <BookOpen className="w-4 h-4" />
-                  <span>Current Research Focus</span>
-                </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                  Investigating the <strong>"Lost in the Middle"</strong> phenomenon in Large Language Model (LLM) retrieval and RAG pipelines. Analyzing context position attention degradation.
+            <div className="space-y-6">
+              {/* Intro Chat Bubble */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                <h4 className="text-base font-semibold text-white leading-relaxed">
+                  👋 Hey there! I'm Sagnik Chandra — an Aspiring Machine Learning Engineer & AI Researcher.
+                </h4>
+                <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
+                  I specialize in Machine Learning, RAG pipelines, and Data Mining. I have a strong mathematical foundation and a passion for turning complex AI research concepts into reliable, production-ready systems.
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 pt-2">
+              {/* Research & Academic Highlights */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Academic Status */}
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-mono font-semibold text-blue-400 uppercase">
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Education</span>
+                  </div>
+                  <div className="text-sm font-bold text-white">M.Sc. in Data Science & AI</div>
+                  <p className="text-xs text-[#9CA3AF]">
+                    RKMVERI Belur (2025–Present)
+                    <br />
+                    B.Sc. (Hons) Math @ University of Calcutta (2020–2023)
+                  </p>
+                </div>
+
+                {/* Research Focus */}
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#A855F7] uppercase">
+                    <BookOpen className="w-4 h-4" />
+                    <span>Research Focus</span>
+                  </div>
+                  <div className="text-sm font-bold text-white">Lost in the Middle LLM Phenomenon</div>
+                  <p className="text-xs text-[#9CA3AF]">
+                    Analyzing context positioning & attention degradation in RAG & LLM retrieval pipelines.
+                  </p>
+                </div>
+              </div>
+
+              {/* What I'm Learning & Looking to Collaborate On */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs">
+                <div className="flex items-center gap-2 font-mono font-bold text-slate-300 uppercase">
+                  <Code2 className="w-4 h-4 text-emerald-400" />
+                  <span>Current Activities & Interests</span>
+                </div>
+
+                <ul className="space-y-2 text-[#9CA3AF]">
+                  <li className="flex items-start gap-2">
+                    <span className="text-white font-bold">🌱 Learning:</span>
+                    <span>LangChain, SQL, and advanced transformer architectures.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-white font-bold">🤝 Collaborating on:</span>
+                    <span>Building and managing custom LLM pipelines and retrieval systems.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-white font-bold">💬 Ask me about:</span>
+                    <span>Machine Learning, RAG pipelines, Data Mining, and PySpark/Neo4j graph systems.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <a
                   href={RESUME_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-blue-600/20"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>View Official Resume</span>
+                  <Download className="w-4 h-4" />
+                  <span>View Resume / Experience PDF</span>
+                </a>
+
+                <a
+                  href="mailto:sagnikchandra@gmail.com"
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4 text-[#9CA3AF]" />
+                  <span>Send Email</span>
                 </a>
               </div>
             </div>
@@ -207,7 +280,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           {content.type === "contact" && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                <div className="text-xs font-semibold text-[#9CA3AF] uppercase">Direct Email</div>
+                <div className="text-xs font-semibold text-[#9CA3AF] uppercase font-mono">Direct Email</div>
                 <div className="text-sm font-mono text-white">sagnikchandra@gmail.com</div>
               </div>
 
