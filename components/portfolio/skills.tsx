@@ -1,62 +1,101 @@
 "use client";
 
-import { Wrench } from "lucide-react";
+import { Wrench, Cpu, Database, Network, Terminal, Code2, Layers, Server, Box } from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 import { SectionHeading } from "@/components/portfolio/section-heading";
 
-interface SkillCategory {
-  title: string;
-  skills: string[];
+interface ToolItem {
+  name: string;
+  category: string;
+  icon: any;
+  accent?: string;
 }
 
-const skillCategories: SkillCategory[] = [
+const tools: ToolItem[] = [
   {
-    title: "Primary Areas",
-    skills: ["Deep Learning & NLP", "Machine Learning", "Graph Analytics", "Distributed Computing"],
+    name: "PyTorch",
+    category: "Deep Learning & NLP",
+    icon: Cpu,
+    accent: "#C5FF41",
   },
   {
-    title: "Languages",
-    skills: ["Python", "C", "Java", "SQL"],
+    name: "PySpark",
+    category: "Distributed Big Data Engine",
+    icon: Database,
+    accent: "#F46C38",
   },
   {
-    title: "ML Frameworks",
-    skills: ["PyTorch", "Scikit-learn", "NumPy", "Pandas"],
+    name: "Neo4j",
+    category: "Graph Analytics Database",
+    icon: Network,
+    accent: "#C5FF41",
   },
   {
-    title: "Big Data & Databases",
-    skills: ["PySpark", "Neo4j", "Graph Databases", "ETL Pipelines"],
+    name: "Python",
+    category: "Primary ML & Data Language",
+    icon: Code2,
+    accent: "#F46C38",
   },
   {
-    title: "Tools & Environments",
-    skills: ["Git", "Jupyter", "Linux", "Docker"],
+    name: "Docker",
+    category: "Containerization & Deployment",
+    icon: Box,
+    accent: "#C5FF41",
+  },
+  {
+    name: "Git & Linux",
+    category: "Version Control & OS Systems",
+    icon: Terminal,
+    accent: "#F46C38",
   },
 ];
 
 export function Skills() {
   return (
-    <section id="skills" className="py-16 sm:py-20 px-6 lg:px-0 max-w-4xl mx-auto">
+    <section id="skills" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
       <ScrollReveal className="space-y-8">
-        <SectionHeading icon={Wrench}>Skills</SectionHeading>
+        <div className="space-y-1">
+          <span className="text-xs font-extrabold text-[#C5FF41] uppercase tracking-widest">
+            TECHNICAL STACK
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white uppercase tracking-tight">
+            PREMIUM TOOLS
+          </h2>
+        </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {skillCategories.map((category, index) => (
-            <div key={index} className="space-y-3 p-5 rounded-xl bg-[#1C1A19] border border-[#262422]">
-              <h3 className="text-white font-bold text-sm">{category.title}</h3>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {category.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2.5 py-1 text-xs font-semibold text-[#D1CCCC] bg-[#22201E] rounded-md border border-[#2B2826] hover:text-white transition-colors"
-                  >
-                    {skill}
-                  </span>
-                ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tools.map((tool, index) => {
+            const Icon = tool.icon;
+            return (
+              <div
+                key={index}
+                className="sawad-card p-6 flex items-center gap-4 hover:border-[#C5FF41]/50 transition-all group"
+              >
+                <div
+                  className="h-12 w-12 rounded-xl flex items-center justify-center border border-[#262422] group-hover:scale-110 transition-transform"
+                  style={{
+                    backgroundColor: tool.accent === '#C5FF41' ? 'rgba(197, 255, 65, 0.1)' : 'rgba(244, 108, 56, 0.1)',
+                    color: tool.accent || '#C5FF41',
+                  }}
+                >
+                  <Icon className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold text-white group-hover:text-[#C5FF41] transition-colors">
+                    {tool.name}
+                  </h3>
+                  <p className="text-xs text-[#998F8F] font-medium mt-0.5">
+                    {tool.category}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ScrollReveal>
     </section>
   );
 }
+
 

@@ -8,12 +8,14 @@ import {
   syncNavHeightCssVar,
   type PortfolioSectionId,
 } from "@/lib/section-scroll";
+import { ArrowUpRight, FileText } from "lucide-react";
 
 export const sectionLinks = [
-  { label: "Education", href: "#education", id: "education" as const },
-  { label: "Experience", href: "#experience", id: "experience" as const },
+  { label: "Home", href: "#top", id: "top" as const },
   { label: "Projects", href: "#projects", id: "projects" as const },
-  { label: "Skills", href: "#skills", id: "skills" as const },
+  { label: "Experience", href: "#experience", id: "experience" as const },
+  { label: "Tools", href: "#skills", id: "skills" as const },
+  { label: "Education", href: "#education", id: "education" as const },
   { label: "Contact", href: "#contact", id: "contact" as const },
 ];
 
@@ -59,22 +61,24 @@ export function TopSectionNav() {
       ref={navRef}
       data-section-nav
       className={cn(
-        "sticky top-0 z-50 px-6 lg:px-0 transition-all duration-300",
+        "sticky top-0 z-50 px-4 sm:px-8 transition-all duration-300",
         isScrolled
-          ? "border-b border-[#262422] bg-[#151312]/95 backdrop-blur-md shadow-lg shadow-black/40"
+          ? "border-b border-[#262422] bg-[#151312]/90 backdrop-blur-xl shadow-xl shadow-black/50"
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto max-w-4xl flex h-16 items-center justify-between">
+      <div className="mx-auto max-w-5xl flex h-20 items-center justify-between gap-4">
+        {/* Logo */}
         <a
           href="#top"
           onClick={(event) => handleSectionClick(event, "top")}
-          className="text-base font-bold tracking-tight text-white hover:text-[#C5FF41] transition-colors"
+          className="text-lg font-extrabold tracking-tight text-white hover:text-[#C5FF41] transition-colors shrink-0"
         >
           Sagnik Chandra
         </a>
 
-        <nav aria-label="Portfolio sections" className="flex items-center gap-1 sm:gap-2">
+        {/* Links */}
+        <nav aria-label="Portfolio sections" className="hidden md:flex items-center gap-1 sm:gap-2">
           {sectionLinks.map((item) => {
             const isActive = activeSection === item.id;
             return (
@@ -83,10 +87,10 @@ export function TopSectionNav() {
                 href={item.href}
                 onClick={(event) => handleSectionClick(event, item.id)}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors rounded-md",
+                  "px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all rounded-full",
                   isActive
-                    ? "text-[#C5FF41] font-bold"
-                    : "text-[#998F8F] hover:text-white",
+                    ? "text-[#C5FF41] bg-[#C5FF41]/10 font-bold"
+                    : "text-[#998F8F] hover:text-white hover:bg-white/5",
                 )}
               >
                 {item.label}
@@ -94,8 +98,22 @@ export function TopSectionNav() {
             );
           })}
         </nav>
+
+        {/* Action Button */}
+        <div className="flex items-center gap-3">
+          <a
+            href="https://drive.google.com/file/d/1WQbgbyJrzaFKWTBsYNEjE1d6Af7Wl4kO/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#C5FF41] text-[#151312] font-bold text-xs hover:bg-[#d6ff66] transition-all shadow-[0_0_15px_rgba(197,255,65,0.25)]"
+          >
+            <span>Resume</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </div>
     </header>
   );
 }
+
 
