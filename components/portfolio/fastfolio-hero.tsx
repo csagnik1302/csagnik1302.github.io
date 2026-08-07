@@ -96,12 +96,12 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
       </a>
 
       {/* Hero Intro Header */}
-      <div className="z-10 flex flex-col items-center text-center space-y-2 mb-8 md:mb-10">
+      <div className="z-10 flex flex-col items-center text-center space-y-4 mb-8 md:mb-10">
         <h2 className="text-lg sm:text-2xl font-medium text-slate-300">
           Hey, I'm Sagnik 👋
         </h2>
 
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white pt-1">
           Aspiring ML Engineer
         </h1>
       </div>
