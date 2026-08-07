@@ -1,9 +1,9 @@
 export const PORTFOLIO_SECTION_IDS = [
   "top",
-  "education",
-  "experience",
   "projects",
+  "experience",
   "skills",
+  "education",
   "contact",
 ] as const;
 

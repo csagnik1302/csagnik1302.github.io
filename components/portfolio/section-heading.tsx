@@ -7,9 +7,13 @@ interface SectionHeadingProps {
 
 export function SectionHeading({ icon: Icon, children }: SectionHeadingProps) {
   return (
-    <h2 className="mb-12 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
-      <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
-      {children}
-    </h2>
+    <div className="mb-10 flex items-center gap-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#C5FF41]/10 border border-[#C5FF41]/30 text-[#C5FF41] shadow-[0_0_12px_rgba(197,255,65,0.2)]">
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </div>
+      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+        {children}
+      </h2>
+    </div>
   );
 }

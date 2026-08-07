@@ -16,10 +16,10 @@ export default function Home() {
       <KeyboardScrollHandler />
       <TopSectionNav />
       <Hero />
-      <Education />
-      <Experience />
       <Projects />
+      <Experience />
       <Skills />
+      <Education />
       <Contact />
       <Footer />
     </main>

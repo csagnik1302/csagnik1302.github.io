@@ -8,28 +8,24 @@ import {
   syncNavHeightCssVar,
   type PortfolioSectionId,
 } from "@/lib/section-scroll";
+import { Sparkles } from "lucide-react";
 
 export const sectionLinks = [
-  { label: "Education", href: "#education", id: "education" as const },
-  { label: "Experience", href: "#experience", id: "experience" as const },
+  { label: "About", href: "#top", id: "top" as const },
   { label: "Projects", href: "#projects", id: "projects" as const },
+  { label: "Experience", href: "#experience", id: "experience" as const },
   { label: "Skills", href: "#skills", id: "skills" as const },
+  { label: "Education", href: "#education", id: "education" as const },
   { label: "Contact", href: "#contact", id: "contact" as const },
 ];
 
 export function TopSectionNav() {
   const navRef = useRef<HTMLElement>(null);
-  const [isFrozen, setIsFrozen] = useState(false);
-  const [activeSection, setActiveSection] =
-    useState<PortfolioSectionId>("top");
+  const [activeSection, setActiveSection] = useState<PortfolioSectionId>("top");
 
   useEffect(() => {
     const updateNav = () => {
-      const heroSection = document.getElementById("top");
-      if (!heroSection) return;
-
       syncNavHeightCssVar();
-      setIsFrozen(heroSection.getBoundingClientRect().top <= 0);
       setActiveSection(getActiveSectionId());
     };
 
@@ -59,53 +55,51 @@ export function TopSectionNav() {
   };
 
   return (
-    <nav
-      ref={navRef}
-      data-section-nav
-      className={cn(
-        "sticky top-0 z-50 px-4 transition-all duration-300",
-        isFrozen
-          ? "border-b border-border/70 bg-black/95 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent",
-      )}
-    >
-      <div className="mx-auto max-w-4xl">
-        <div className="flex min-h-16 flex-col justify-center gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-0">
-          <a
-            href="#top"
-            onClick={(event) => handleSectionClick(event, "top")}
-            className={cn(
-              "hidden sm:block whitespace-nowrap text-sm font-semibold tracking-wide text-foreground hover:text-primary transition-opacity duration-300",
-              isFrozen ? "opacity-100" : "opacity-0 pointer-events-none",
-            )}
-          >
-            Sagnik Chandra
-          </a>
-          <div
-            className="flex gap-1 sm:gap-2 justify-center sm:justify-end min-w-0"
-            aria-label="Portfolio sections"
-          >
-            {sectionLinks.map((item) => {
-              const isActive = activeSection === item.id;
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(event) => handleSectionClick(event, item.id)}
-                  className={cn(
-                    "flex-shrink-0 whitespace-nowrap rounded-md px-1 py-0.5 sm:px-3 sm:py-2 text-[0.7rem] sm:text-xs font-medium uppercase tracking-wider sm:tracking-widest transition-colors hover:bg-secondary/80 hover:text-foreground",
-                    isActive
-                      ? "font-bold text-foreground underline decoration-2 underline-offset-4"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
-          </div>
+    <header className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      <nav
+        ref={navRef}
+        data-section-nav
+        className="pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 rounded-full bg-[#151414]/85 backdrop-blur-xl border border-white/10 px-4 py-2 sm:px-6 sm:py-2.5 shadow-2xl shadow-black/80 max-w-4xl w-full"
+      >
+        {/* Brand/Logo */}
+        <a
+          href="#top"
+          onClick={(event) => handleSectionClick(event, "top")}
+          className="flex items-center gap-2 group text-sm font-extrabold tracking-tight text-white shrink-0"
+        >
+          <span className="h-2.5 w-2.5 rounded-full bg-[#C5FF41] animate-pulse shadow-[0_0_10px_#C5FF41]" />
+          <span className="hidden sm:inline group-hover:text-[#C5FF41] transition-colors">Sagnik Chandra</span>
+          <span className="sm:hidden group-hover:text-[#C5FF41] transition-colors">Sagnik</span>
+        </a>
+
+        {/* Links */}
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-0.5" aria-label="Portfolio sections">
+          {sectionLinks.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={(event) => handleSectionClick(event, item.id)}
+                className={cn(
+                  "shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300",
+                  isActive
+                    ? "bg-[#C5FF41] text-[#0E0D0D] shadow-[0_0_15px_rgba(197,255,65,0.4)] font-bold scale-105"
+                    : "text-[#A09D9A] hover:text-white hover:bg-white/5",
+                )}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </div>
-      </div>
-    </nav>
+
+        {/* Status Tag */}
+        <div className="hidden md:flex items-center gap-1.5 shrink-0 text-[11px] font-semibold text-[#C5FF41] bg-[#C5FF41]/10 border border-[#C5FF41]/20 rounded-full px-3 py-1">
+          <Sparkles className="w-3 h-3 text-[#C5FF41]" />
+          <span>Open to Roles</span>
+        </div>
+      </nav>
+    </header>
   );
 }

@@ -26,22 +26,26 @@ export function PortfolioBackground() {
       return;
     }
 
-    effectRef.current = vantaWindow.VANTA.NET({
-      el: "#portfolio-vanta-background",
-      mouseControls: false,
-      touchControls: false,
-      gyroControls: false,
-      minHeight: 200,
-      minWidth: 200,
-      scale: 1,
-      scaleMobile: 1,
-      color: 0x4c8a9a,
-      backgroundColor: 0x091219,
-      points: 7,
-      maxDistance: 24,
-      spacing: 20,
-      showDots: true,
-    });
+    try {
+      effectRef.current = vantaWindow.VANTA.NET({
+        el: "#portfolio-vanta-background",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200,
+        minWidth: 200,
+        scale: 1,
+        scaleMobile: 1,
+        color: 0xc5ff41,
+        backgroundColor: 0x0e0d0d,
+        points: 8,
+        maxDistance: 22,
+        spacing: 18,
+        showDots: true,
+      });
+    } catch {
+      // Fallback to ambient background styling if Vanta fails
+    }
 
     return () => {
       effectRef.current?.destroy();
@@ -51,7 +55,7 @@ export function PortfolioBackground() {
 
   return (
     <>
-      <div id="portfolio-vanta-background" className="portfolio-background" aria-hidden="true" />
+      <div id="portfolio-vanta-background" className="portfolio-background pointer-events-none" aria-hidden="true" />
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
         strategy="afterInteractive"

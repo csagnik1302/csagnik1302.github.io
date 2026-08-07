@@ -1,15 +1,22 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const fontSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const fontMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
-  title: 'Sagnik Chandra | Portfolio',
-  description: 'M.Sc. Data Science student with expertise in Deep Learning, NLP, and Graph Analytics. Building intelligent solutions with Python, PyTorch, and distributed systems.',
-  generator: 'v0.app',
+  title: 'Sagnik Chandra — ML & AI Researcher | Portfolio',
+  description: 'Portfolio of Sagnik Chandra. M.Sc. Data Science & AI student focusing on Deep Learning, NLP, and Massive Graph Analytics.',
 }
 
 export default function RootLayout({
@@ -18,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-background">
-      <body className="font-sans antialiased bg-background text-foreground">
+    <html lang="en" className={`dark ${fontSans.variable} ${fontMono.variable} scroll-smooth`}>
+      <body className="font-sans antialiased bg-[#0E0D0D] text-[#E5E5E5] selection:bg-[#C5FF41] selection:text-[#0E0D0D]">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

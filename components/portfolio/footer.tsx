@@ -1,30 +1,13 @@
 "use client";
 
-import { Github, Linkedin } from "lucide-react";
+import { Github, Linkedin, Mail, Heart } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="py-12 px-6 lg:px-0 border-t border-border">
-      <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          Built with{" "}
-          <a
-            href="https://nextjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            Next.js
-          </a>{" "}
-          and{" "}
-          <a
-            href="https://tailwindcss.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            Tailwind CSS
-          </a>
+    <footer className="py-10 px-4 sm:px-6 lg:px-8 border-t border-white/10 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="text-xs font-semibold text-[#A09D9A]">
+          © {new Date().getFullYear()} Sagnik Chandra. Designed with <span className="text-[#C5FF41]">Sawad</span> aesthetics.
         </p>
 
         <div className="flex items-center gap-4">
@@ -32,22 +15,30 @@ export function Footer() {
             href="https://github.com/csagnik1302"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-[#A09D9A] hover:text-[#C5FF41] transition-colors"
             aria-label="GitHub"
           >
-            <Github className="h-5 w-5" />
+            <Github className="h-4 w-4" />
           </a>
           <a
             href="https://linkedin.com/in/sagnik-chandra"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-[#A09D9A] hover:text-[#C5FF41] transition-colors"
             aria-label="LinkedIn"
           >
-            <Linkedin className="h-5 w-5" />
+            <Linkedin className="h-4 w-4" />
+          </a>
+          <a
+            href="mailto:sagnikchandra@gmail.com"
+            className="text-[#A09D9A] hover:text-[#C5FF41] transition-colors"
+            aria-label="Email"
+          >
+            <Mail className="h-4 w-4" />
           </a>
         </div>
       </div>
     </footer>
   );
 }
+
