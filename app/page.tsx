@@ -1,25 +1,18 @@
-import { Hero } from "@/components/portfolio/hero";
-import { Experience } from "@/components/portfolio/experience";
-import { Projects } from "@/components/portfolio/projects";
-import { Skills } from "@/components/portfolio/skills";
-import { Contact } from "@/components/portfolio/contact";
-import { Footer } from "@/components/portfolio/footer";
-import { PortfolioBackground } from "@/components/portfolio/portfolio-background";
-import { TopSectionNav } from "@/components/portfolio/section-nav";
-import { AIChatDrawer } from "@/components/portfolio/ai-chat-drawer";
+"use client";
+
+import { useState } from "react";
+import { FluidBackground } from "@/components/portfolio/fluid-background";
+import { FastfolioHero } from "@/components/portfolio/fastfolio-hero";
+import { AIResponseModal, ModalContent } from "@/components/portfolio/ai-response-modal";
 
 export default function Home() {
+  const [modalContent, setModalContent] = useState<ModalContent | null>(null);
+
   return (
-    <main className="relative z-10 min-h-screen">
-      <PortfolioBackground />
-      <TopSectionNav />
-      <Hero />
-      <Projects />
-      <Experience />
-      <Skills />
-      <Contact />
-      <Footer />
-      <AIChatDrawer />
+    <main className="relative min-h-screen bg-[#0B0D12] overflow-hidden">
+      <FluidBackground />
+      <FastfolioHero onOpenModal={(content) => setModalContent(content)} />
+      <AIResponseModal content={modalContent} onClose={() => setModalContent(null)} />
     </main>
   );
 }

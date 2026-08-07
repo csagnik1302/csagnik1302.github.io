@@ -4,26 +4,15 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --bg-main: #0E0F12;
-  --bg-card: #15171C;
-  --bg-card-hover: #1C1E24;
-  --accent-primary: #3B82F6;
-  --text-primary: #F3F4F6;
-  --text-muted: #9CA3AF;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-
-  --background: #0E0F12;
-  --foreground: #F3F4F6;
-  --card: #15171C;
-  --card-foreground: #F3F4F6;
-  --primary: #3B82F6;
-  --primary-foreground: #FFFFFF;
-  --border: rgba(255, 255, 255, 0.08);
-  --radius: 0.75rem;
+  --bg-main: #0B0D12;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --accent-blue: #0171E3;
 }
 
 body {
-  background-color: #0E0F12;
+  background-color: #0B0D12;
   color: #F3F4F6;
   font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -36,72 +25,47 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0E0F12;
+  background: #0B0D12;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262930;
+  background: #1F2430;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B82F6;
+  background: #0171E3;
 }
 
-.portfolio-background {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-color: #0E0F12;
-  background-image: 
-    radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 60%);
+.glass-pill {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.framer-card {
-  background: #15171C;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 1rem;
-  transition: all 0.25s ease-in-out;
+.glass-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
 }
 
-.framer-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  background: #191B21;
-}
-
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-
-.scroll-reveal[data-visible='true'] {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-section[id] {
-  scroll-margin-top: 5rem;
+.glass-pill:active {
+  transform: scale(0.97);
 }
 
 @theme inline {
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --color-background: #0E0F12;
+  --color-background: #0B0D12;
   --color-foreground: #F3F4F6;
-  --color-card: #15171C;
-  --color-card-foreground: #F3F4F6;
-  --color-primary: #3B82F6;
-  --color-border: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
   * {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
   }
   body {
-    background-color: #0E0F12;
+    background-color: #0B0D12;
     color: #F3F4F6;
   }
 }
+
