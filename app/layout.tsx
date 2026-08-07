@@ -16,7 +16,7 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Sagnik Chandra — Machine Learning & AI Researcher',
-  description: 'Portfolio of Sagnik Chandra. M.Sc. Data Science & AI student focusing on Deep Learning, NLP, and Massive Graph Analytics.',
+  description: 'Portfolio of Sagnik Chandra. M.Sc. Data Science & AI student @ RKMVERI focusing on LLM Retrieval ("Lost in the Middle"), Graph Analytics, and Unsupervised ML.',
 }
 
 export default function RootLayout({
@@ -26,11 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`dark ${fontSans.variable} ${fontMono.variable} scroll-smooth`}>
-      <body className="font-sans antialiased bg-[#151312] text-[#FFFFFF] selection:bg-[#C5FF41] selection:text-[#151312]">
+      <body className="font-sans antialiased bg-[#0B0F17] text-[#F8FAFC] selection:bg-[#C5FF41] selection:text-[#0B0F17]">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
 }
-

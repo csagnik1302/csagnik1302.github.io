@@ -1,93 +1,116 @@
 "use client";
 
-import { Wrench, Cpu, Database, Network, Terminal, Code2, Layers, Server, Box } from "lucide-react";
+import {
+  Cpu,
+  Database,
+  Network,
+  Terminal,
+  Code2,
+  Box,
+  Brain,
+  Sparkles,
+  Flame,
+  Wrench,
+  Layers,
+  Search,
+} from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
-import { SectionHeading } from "@/components/portfolio/section-heading";
 
-interface ToolItem {
-  name: string;
-  category: string;
+interface SkillCategory {
+  title: string;
+  subtitle: string;
   icon: any;
-  accent?: string;
+  color: string;
+  skills: string[];
 }
 
-const tools: ToolItem[] = [
+const categories: SkillCategory[] = [
   {
-    name: "PyTorch",
-    category: "Deep Learning & NLP",
-    icon: Cpu,
-    accent: "#C5FF41",
+    title: "Deep Learning & GenAI",
+    subtitle: "Neural Architectures & LLM Pipelines",
+    icon: Brain,
+    color: "#C5FF41",
+    skills: ["PyTorch", "TensorFlow", "Keras", "LangChain", "Ollama", "HuggingFace", "RAG Pipelines"],
   },
   {
-    name: "PySpark",
-    category: "Distributed Big Data Engine",
-    icon: Database,
-    accent: "#F46C38",
-  },
-  {
-    name: "Neo4j",
-    category: "Graph Analytics Database",
+    title: "Graph & Big Data Systems",
+    subtitle: "Distributed ETL & Graph Mining",
     icon: Network,
-    accent: "#C5FF41",
+    color: "#38BDF8",
+    skills: ["PySpark", "Neo4j", "MySQL", "Pandas", "NumPy", "Scikit-Learn"],
   },
   {
-    name: "Python",
-    category: "Primary ML & Data Language",
+    title: "Core Languages & Foundations",
+    subtitle: "Algorithms, Linear Algebra & Math",
     icon: Code2,
-    accent: "#F46C38",
+    color: "#A855F7",
+    skills: ["Python", "C", "SQL", "Matrix Analysis", "Probability & Statistics", "Optimization"],
   },
   {
-    name: "Docker",
-    category: "Containerization & Deployment",
-    icon: Box,
-    accent: "#C5FF41",
-  },
-  {
-    name: "Git & Linux",
-    category: "Version Control & OS Systems",
+    title: "Tools, OS & Workflows",
+    subtitle: "Development & MLOps Environment",
     icon: Terminal,
-    accent: "#F46C38",
+    color: "#F46C38",
+    skills: ["Docker", "Git", "Linux", "Jupyter", "Anaconda", "Zoho & HubSpot Automation"],
   },
 ];
 
 export function Skills() {
   return (
-    <section id="skills" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <ScrollReveal className="space-y-8">
-        <div className="space-y-1">
-          <span className="text-xs font-extrabold text-[#C5FF41] uppercase tracking-widest">
-            TECHNICAL STACK
+    <section id="skills" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <ScrollReveal className="space-y-10">
+        {/* Section Header */}
+        <div className="space-y-2 border-b border-white/10 pb-6">
+          <span className="text-xs font-mono font-bold text-[#C5FF41] uppercase tracking-widest">
+            TECHNICAL MATRIX
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white uppercase tracking-tight">
-            PREMIUM TOOLS
+          <h2 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tight leading-none">
+            STACK &{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C5FF41] via-[#38BDF8] to-[#A855F7]">
+              COMPETENCIES
+            </span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tools.map((tool, index) => {
-            const Icon = tool.icon;
+        {/* Categorized Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {categories.map((cat, idx) => {
+            const Icon = cat.icon;
             return (
               <div
-                key={index}
-                className="sawad-card p-6 flex items-center gap-4 hover:border-[#C5FF41]/50 transition-all group"
+                key={idx}
+                className="bento-card p-6 flex flex-col justify-between space-y-6 hover:border-white/20 transition-all group"
               >
-                <div
-                  className="h-12 w-12 rounded-xl flex items-center justify-center border border-[#262422] group-hover:scale-110 transition-transform"
-                  style={{
-                    backgroundColor: tool.accent === '#C5FF41' ? 'rgba(197, 255, 65, 0.1)' : 'rgba(244, 108, 56, 0.1)',
-                    color: tool.accent || '#C5FF41',
-                  }}
-                >
-                  <Icon className="h-6 w-6" />
-                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform"
+                      style={{
+                        backgroundColor: `${cat.color}15`,
+                        color: cat.color,
+                        borderColor: `${cat.color}40`,
+                      }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-white group-hover:text-[#C5FF41] transition-colors">
+                        {cat.title}
+                      </h3>
+                      <p className="text-xs text-[#94A3B8] font-mono">{cat.subtitle}</p>
+                    </div>
+                  </div>
 
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-[#C5FF41] transition-colors">
-                    {tool.name}
-                  </h3>
-                  <p className="text-xs text-[#998F8F] font-medium mt-0.5">
-                    {tool.category}
-                  </p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {cat.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-3 py-1.5 rounded-xl bg-[#0B0F17] border border-white/10 text-xs font-mono font-bold text-slate-200 hover:border-[#C5FF41]/40 hover:text-[#C5FF41] transition-colors"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
@@ -97,5 +120,3 @@ export function Skills() {
     </section>
   );
 }
-
-
