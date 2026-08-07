@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Poppins, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const fontSans = Poppins({
@@ -28,7 +27,6 @@ export default function RootLayout({
     <html lang="en" className={`dark ${fontSans.variable} ${fontMono.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-[#0B0F17] text-[#F8FAFC] selection:bg-[#C5FF41] selection:text-[#0B0F17]">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
