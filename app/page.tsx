@@ -6,7 +6,6 @@ import { Contact } from "@/components/portfolio/contact";
 import { Footer } from "@/components/portfolio/footer";
 import { PortfolioBackground } from "@/components/portfolio/portfolio-background";
 import { TopSectionNav } from "@/components/portfolio/section-nav";
-import { InteractiveTerminal } from "@/components/portfolio/interactive-terminal";
 import { AIChatDrawer } from "@/components/portfolio/ai-chat-drawer";
 
 export default function Home() {
@@ -18,7 +17,6 @@ export default function Home() {
       <Projects />
       <Experience />
       <Skills />
-      <InteractiveTerminal />
       <Contact />
       <Footer />
       <AIChatDrawer />
