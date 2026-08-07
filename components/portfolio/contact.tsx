@@ -1,62 +1,66 @@
 "use client";
 
-import { Mail, MapPin, Send, ArrowUpRight, Sparkles, CheckCircle2, Globe2 } from "lucide-react";
+import { Mail, MapPin, Send } from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 import { SectionHeading } from "@/components/portfolio/section-heading";
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-      <ScrollReveal className="space-y-12">
-        <SectionHeading icon={Mail}>Get In Touch</SectionHeading>
+    <section id="contact" className="py-16 sm:py-20 px-6 lg:px-0 max-w-4xl mx-auto">
+      <ScrollReveal className="space-y-8">
+        <SectionHeading icon={Mail}>Contact</SectionHeading>
 
-        {/* Hero CTA Box */}
-        <div className="sawad-card p-8 sm:p-12 relative overflow-hidden space-y-8 bg-gradient-to-br from-[#161515] via-[#1A1818] to-[#121111]">
-          {/* Subtle Ambient Glow Effect */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5FF41]/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#F46C38]/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
-
-          <div className="relative z-10 space-y-6 max-w-2xl">
-            <div className="sawad-pill">
-              <Sparkles className="w-3 h-3 text-[#C5FF41]" />
-              <span>Let&apos;s Connect</span>
-            </div>
-
-            <h3 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              Let&apos;s build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C5FF41] to-[#F46C38]">extraordinary</span> together.
-            </h3>
-
-            <p className="text-base sm:text-lg text-[#A09D9A] leading-relaxed">
-              If you have an exciting research project, full-time ML engineering opportunity, or simply want to connect, feel free to reach out anytime!
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
+          <div className="space-y-6">
+            <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">
+              If you would like to discuss a project or just say hi, I&apos;m always down to chat.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3 text-[#998F8F] text-sm">
+                <Mail className="h-4 w-4 text-[#C5FF41]" />
+                <a
+                  href="mailto:sagnikchandra@gmail.com"
+                  className="hover:text-white transition-colors"
+                >
+                  sagnikchandra@gmail.com
+                </a>
+              </div>
+              <div className="flex items-center gap-3 text-[#998F8F] text-sm">
+                <MapPin className="h-4 w-4 text-[#C5FF41]" />
+                <span>Kolkata, India</span>
+              </div>
+            </div>
+
+            <div className="pt-2">
               <a
                 href="mailto:sagnikchandra@gmail.com"
-                className="sawad-btn-lime group text-base px-6 py-3.5"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#C5FF41] text-[#151312] font-bold text-sm hover:bg-[#d6ff66] transition-colors shadow-md"
               >
-                <Mail className="w-5 h-5" />
-                <span>sagnikchandra@gmail.com</span>
-                <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <Send className="h-4 w-4" />
+                <span>Get in Touch</span>
               </a>
             </div>
           </div>
 
-          {/* Status & Availability Strip */}
-          <div className="relative z-10 pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <div className="h-2.5 w-2.5 rounded-full bg-[#C5FF41] animate-pulse shadow-[0_0_10px_#C5FF41]" />
-              <div className="text-xs font-semibold text-white">Full-time ML & Data Roles</div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <Globe2 className="w-4 h-4 text-[#F46C38]" />
-              <div className="text-xs font-semibold text-white">Open to Relocation</div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-              <MapPin className="w-4 h-4 text-[#38BDF8]" />
-              <div className="text-xs font-semibold text-white">Kolkata, India (Remote-Ready)</div>
+          <div className="p-6 rounded-xl bg-[#1C1A19] border border-[#262422] space-y-4">
+            <h3 className="text-white font-bold text-base">Open for Opportunities</h3>
+            <p className="text-[#998F8F] text-sm leading-relaxed">
+              I&apos;m actively looking for full-time roles in ML engineering, data engineering, or applied AI research.
+            </p>
+            <div className="pt-2 space-y-2 text-xs font-semibold text-[#998F8F]">
+              <p className="flex items-center gap-2 text-white">
+                <span className="h-2 w-2 rounded-full bg-[#C5FF41] animate-pulse" />
+                Available for full-time roles
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#C5FF41]" />
+                Open to relocation
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#C5FF41]" />
+                Remote-friendly
+              </p>
             </div>
           </div>
         </div>
@@ -64,3 +68,4 @@ export function Contact() {
     </section>
   );
 }
+
