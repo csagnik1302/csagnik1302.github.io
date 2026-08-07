@@ -97,16 +97,13 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
       {/* Hero Intro Header */}
       <div className="z-10 flex flex-col items-center text-center space-y-2 mb-8 md:mb-10">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-slate-300 backdrop-blur-md">
-          <span>Hey, I'm Sagnik Chandra 👋</span>
-        </div>
+        <h2 className="text-lg sm:text-2xl font-medium text-slate-300">
+          Hey, I'm Sagnik 👋
+        </h2>
 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
           Aspiring ML Engineer
         </h1>
-        <p className="text-sm sm:text-base text-[#9CA3AF] max-w-lg font-normal pt-1">
-          M.Sc. Data Science & AI @ RKMVERI. Exploring RAG retrieval phenomena and currently learning LangChain, RAG, and MCP.
-        </p>
       </div>
 
       {/* Interactive AI Question Input Bar */}
@@ -148,7 +145,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
             className="glass-pill aspect-square w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Briefcase className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-semibold text-white">Projects</span>
+            <span className="text-xs font-semibold text-[#F3F4F6]">Projects</span>
           </button>
 
           {/* Card 3: Skills */}
