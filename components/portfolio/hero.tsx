@@ -9,8 +9,6 @@ import {
   Download,
   BookOpen,
   Code2,
-  Brain,
-  Search,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
@@ -112,21 +110,18 @@ export function Hero() {
           </h3>
 
           <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
-            Investigating context position bias in RAG pipelines and transformer attention weights. Learning LangChain & SQL, and building custom LLM pipelines.
+            Investigating context position bias in RAG pipelines and transformer attention weights. Currently learning LangChain, RAG architectures, and Model Context Protocol (MCP).
           </p>
 
           <div className="flex flex-wrap gap-2 pt-2">
             <span className="px-2.5 py-1 rounded-md bg-[#1C1E24] border border-white/10 text-[11px] font-mono text-slate-300">
-              RAG Pipelines
-            </span>
-            <span className="px-2.5 py-1 rounded-md bg-[#1C1E24] border border-white/10 text-[11px] font-mono text-slate-300">
-              LLM Retrieval
-            </span>
-            <span className="px-2.5 py-1 rounded-md bg-[#1C1E24] border border-white/10 text-[11px] font-mono text-slate-300">
               LangChain
             </span>
             <span className="px-2.5 py-1 rounded-md bg-[#1C1E24] border border-white/10 text-[11px] font-mono text-slate-300">
-              Data Mining
+              RAG
+            </span>
+            <span className="px-2.5 py-1 rounded-md bg-[#1C1E24] border border-white/10 text-[11px] font-mono text-slate-300">
+              MCP
             </span>
           </div>
         </div>

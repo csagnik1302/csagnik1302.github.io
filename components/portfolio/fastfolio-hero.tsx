@@ -19,9 +19,9 @@ const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmL
 
 const KNOWLEDGE_RESPONSES = [
   {
-    keywords: ["lost in the middle", "llm", "rag", "retrieval", "research", "currently working"],
-    title: "Research on Lost in the Middle LLM Retrieval",
-    text: "Sagnik is currently conducting research on the 'Lost in the Middle' phenomenon in Large Language Model (LLM) retrieval and RAG pipelines, analyzing context position attention weights.",
+    keywords: ["lost in the middle", "llm", "rag", "retrieval", "research", "currently working", "mcp", "langchain"],
+    title: "Research & Learning Focus",
+    text: "Sagnik is currently conducting research on the 'Lost in the Middle' phenomenon in Large Language Model (LLM) retrieval and RAG pipelines, and currently learning LangChain, RAG, and MCP (Model Context Protocol).",
   },
   {
     keywords: ["resume", "cv", "experience", "document", "download"],
@@ -34,14 +34,14 @@ const KNOWLEDGE_RESPONSES = [
     text: "Sagnik's key projects:\n• Neural Literary Style Transfer (BiGRU + GRL Discriminator)\n• AcademicLens (10M+ Research Papers Intelligence Graph in Neo4j/PySpark)\n• Drone Delivery Route Optimization (TSP & Hill Climbing)",
   },
   {
-    keywords: ["education", "rkmveri", "degree", "university", "math", "msc", "bsc", "calcutta"],
+    keywords: ["education", "rkmveri", "degree", "university", "math", "msc"],
     title: "Academic Background",
-    text: "Sagnik's Academic Record:\n🎓 M.Sc. in Data Science & AI @ RKMVERI Belur (2025–Present)\n🎓 B.Sc. (Hons) in Mathematics @ University of Calcutta (2020–2023)",
+    text: "Sagnik's Academic Record:\n🎓 M.Sc. in Data Science & AI @ RKMVERI Belur (2025–Present)",
   },
   {
-    keywords: ["skills", "python", "pytorch", "pyspark", "tools", "stack", "neo4j", "langchain", "ollama", "sql"],
+    keywords: ["skills", "python", "pytorch", "pyspark", "tools", "stack", "neo4j", "langchain", "ollama", "sql", "mcp"],
     title: "Technical Stack & Frameworks",
-    text: "Sagnik's Technical Stack:\n• Languages & Frameworks: Python, PyTorch, TensorFlow, Keras, LangChain, C, SQL\n• Data & Graph Systems: PySpark, Neo4j, MySQL, Pandas, NumPy, Scikit-Learn\n• Tools: Docker, Git, Linux, Jupyter, Anaconda",
+    text: "Sagnik's Technical Stack:\n• Languages & Frameworks: Python, PyTorch, TensorFlow, Keras, LangChain, C, SQL\n• AI & Data Science: Ollama, Hugging Face, NumPy, Pandas, Scikit-Learn\n• Tools & Systems: PySpark, Neo4j, MySQL, Git, Docker, Linux, Jupyter, Anaconda, MCP",
   },
   {
     keywords: ["contact", "email", "hire", "job", "reach", "linkedin", "github"],
@@ -63,7 +63,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
     const q = query.toLowerCase();
     let matchedAnswer =
-      "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and Graph Mining.";
+      "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and is currently learning LangChain, RAG, and MCP.";
 
     for (const item of KNOWLEDGE_RESPONSES) {
       if (item.keywords.some((kw) => q.includes(kw))) {
@@ -112,7 +112,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
           Aspiring ML Engineer
         </h1>
         <p className="text-sm sm:text-base text-[#9CA3AF] max-w-lg font-normal pt-1">
-          M.Sc. Data Science & AI @ RKMVERI. Building custom LLM pipelines, exploring RAG retrieval, and designing graph algorithms.
+          M.Sc. Data Science & AI @ RKMVERI. Exploring RAG retrieval phenomena and currently learning LangChain, RAG, and MCP.
         </p>
       </div>
 

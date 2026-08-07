@@ -1,6 +1,6 @@
 "use client";
 
-import { GraduationCap, ArrowUpRight, BookOpen, Layers } from "lucide-react";
+import { GraduationCap, ArrowUpRight } from "lucide-react";
 import { ScrollReveal } from "@/components/portfolio/scroll-reveal";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
@@ -19,13 +19,6 @@ const educationList: EducationItem[] = [
     institution: "RKMVERI, Belur",
     details:
       "Focusing on Deep Learning, Natural Language Processing, LLM Retrieval, RAG Pipelines, and Data Mining.",
-  },
-  {
-    period: "2020 — 2023",
-    degree: "B.Sc. (Hons) in Mathematics",
-    institution: "University of Calcutta",
-    details:
-      "Rigorous foundation in Linear Algebra, Real Analysis, Probability Theory, Optimization, and Numerical Methods.",
   },
 ];
 

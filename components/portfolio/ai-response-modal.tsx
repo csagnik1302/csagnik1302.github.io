@@ -3,7 +3,6 @@
 import React from "react";
 import {
   X,
-  ExternalLink,
   Download,
   Github,
   Linkedin,
@@ -11,12 +10,8 @@ import {
   ArrowUpRight,
   Sparkles,
   BookOpen,
-  Layers,
   GraduationCap,
-  Brain,
   Code2,
-  Users,
-  MessageSquare,
 } from "lucide-react";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
@@ -75,60 +70,40 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                   👋 Hey there! I'm Sagnik Chandra — an Aspiring Machine Learning Engineer & AI Researcher.
                 </h4>
                 <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
-                  I specialize in Machine Learning, RAG pipelines, and Data Mining. I have a strong mathematical foundation and a passion for turning complex AI research concepts into reliable, production-ready systems.
+                  I specialize in Machine Learning, RAG pipelines, and Data Mining. I have a passion for turning complex AI research concepts into reliable, production-ready systems.
                 </p>
               </div>
 
-              {/* Research & Academic Highlights */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Academic Status */}
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-semibold text-blue-400 uppercase">
-                    <GraduationCap className="w-4 h-4" />
-                    <span>Education</span>
-                  </div>
-                  <div className="text-sm font-bold text-white">M.Sc. in Data Science & AI</div>
-                  <p className="text-xs text-[#9CA3AF]">
-                    RKMVERI Belur (2025–Present)
-                    <br />
-                    B.Sc. (Hons) Math @ University of Calcutta (2020–2023)
-                  </p>
+              {/* Research Focus */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#A855F7] uppercase">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Current Research Focus</span>
                 </div>
-
-                {/* Research Focus */}
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#A855F7] uppercase">
-                    <BookOpen className="w-4 h-4" />
-                    <span>Research Focus</span>
-                  </div>
-                  <div className="text-sm font-bold text-white">Lost in the Middle LLM Phenomenon</div>
-                  <p className="text-xs text-[#9CA3AF]">
-                    Analyzing context positioning & attention degradation in RAG & LLM retrieval pipelines.
-                  </p>
-                </div>
+                <div className="text-sm font-bold text-white">Lost in the Middle LLM Phenomenon</div>
+                <p className="text-xs text-[#9CA3AF]">
+                  Analyzing context positioning & attention degradation in RAG & LLM retrieval pipelines.
+                </p>
               </div>
 
-              {/* What I'm Learning & Looking to Collaborate On */}
+              {/* Currently Learning Section */}
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs">
                 <div className="flex items-center gap-2 font-mono font-bold text-slate-300 uppercase">
                   <Code2 className="w-4 h-4 text-emerald-400" />
-                  <span>Current Activities & Interests</span>
+                  <span>Currently Learning</span>
                 </div>
 
-                <ul className="space-y-2 text-[#9CA3AF]">
-                  <li className="flex items-start gap-2">
-                    <span className="text-white font-bold">🌱 Learning:</span>
-                    <span>LangChain, SQL, and advanced transformer architectures.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white font-bold">🤝 Collaborating on:</span>
-                    <span>Building and managing custom LLM pipelines and retrieval systems.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-white font-bold">💬 Ask me about:</span>
-                    <span>Machine Learning, RAG pipelines, Data Mining, and PySpark/Neo4j graph systems.</span>
-                  </li>
-                </ul>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    LangChain
+                  </span>
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    RAG
+                  </span>
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    MCP (Model Context Protocol)
+                  </span>
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -239,7 +214,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
                 <h4 className="font-bold text-white text-xs font-mono uppercase">Tools & Systems</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {["PySpark", "Neo4j", "MySQL", "Git", "Docker", "Linux", "Jupyter", "Anaconda"].map((s) => (
+                  {["PySpark", "Neo4j", "MySQL", "Git", "Docker", "Linux", "Jupyter", "Anaconda", "MCP"].map((s) => (
                     <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
                       {s}
                     </span>
@@ -260,18 +235,6 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                 <p className="text-xs text-[#9CA3AF]">RKMVERI, Belur</p>
                 <p className="text-xs text-[#9CA3AF] pt-1">
                   Focusing on Deep Learning, NLP, LLM Retrieval, RAG Pipelines, and Data Mining.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
-                  <span>2020 — 2023</span>
-                  <span>Bachelor's Degree</span>
-                </div>
-                <h4 className="font-bold text-white text-base">B.Sc. (Hons) in Mathematics</h4>
-                <p className="text-xs text-[#9CA3AF]">University of Calcutta</p>
-                <p className="text-xs text-[#9CA3AF] pt-1">
-                  Linear Algebra, Real Analysis, Probability, Matrix Analysis, and Optimization.
                 </p>
               </div>
             </div>
