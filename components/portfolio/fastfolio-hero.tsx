@@ -84,13 +84,6 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20 z-10 text-slate-100">
-      {/* Background Big Typography Watermark */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center overflow-hidden select-none opacity-5">
-        <span className="text-[10rem] sm:text-[16rem] leading-none font-black text-white tracking-tighter">
-          SAGNIK
-        </span>
-      </div>
-
       {/* Top Floating Badge */}
       <a
         href={RESUME_URL}
