@@ -10,7 +10,6 @@ import {
   ArrowUpRight,
   Sparkles,
   BookOpen,
-  GraduationCap,
   Code2,
 } from "lucide-react";
 
@@ -40,16 +39,13 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
         className="relative w-full max-w-2xl max-h-[85vh] bg-[#12151E] border border-white/10 rounded-3xl p-6 sm:p-8 overflow-y-auto shadow-2xl space-y-6 text-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Bar */}
+        {/* Header Bar - Clean title without AI twin subtitle */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <div>
-            <h3 className="text-base font-bold text-white tracking-tight">{content.title}</h3>
-            <p className="text-xs text-[#9CA3AF]">Sagnik Chandra's AI Twin Response</p>
-          </div>
-
+          <h3 className="text-lg font-bold text-white tracking-tight">{content.title}</h3>
           <button
             onClick={onClose}
             className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-[#9CA3AF] hover:text-white transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
@@ -58,51 +54,59 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
         {/* Content Body Based on Category */}
         <div className="space-y-6 text-sm">
           {content.type === "me" && (
-            <div className="space-y-6">
-              {/* Header Title & Subtitle Card */}
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">Sagnik Chandra</h2>
-                  <p className="text-xs font-mono text-blue-400 font-semibold mt-0.5">
-                    Kolkata, India
-                  </p>
+            <div className="space-y-5">
+              {/* Header Title Card */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xl font-bold text-white">Sagnik Chandra</h4>
+                  <span className="text-xs font-mono text-blue-400 font-semibold">Kolkata, India</span>
                 </div>
-
-                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                  Hey 👋 I'm Sagnik. I'm an aspiring Machine Learning Engineer & AI Researcher pursuing my M.Sc. in Data Science & AI at RKMVERI. I'm passionate about LLM retrieval, RAG pipelines, deep learning, and mathematical problem solving.
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed pt-1">
+                  👋 Hey there! I'm Sagnik Chandra, an aspiring Machine Learning Engineer & AI Researcher. I have a passion for turning complex AI research concepts into reliable, production-ready systems.
                 </p>
+              </div>
 
-                {/* Tag Pills */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                    AI
+              {/* Research Focus Card */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#A855F7] uppercase">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Current Research Focus</span>
+                </div>
+                <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
+                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures, exploring context positioning and attention degradation.
+                </p>
+              </div>
+
+              {/* Currently Learning Section */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs">
+                <div className="flex items-center gap-2 font-mono font-bold text-slate-300 uppercase">
+                  <Code2 className="w-4 h-4 text-emerald-400" />
+                  <span>Currently Learning</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    LangChain
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                    ML Engineer
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    RAG
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                    RKMVERI
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                    History & Psychology
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                    Gamer & Chess
+                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
+                    MCP (Model Context Protocol)
                   </span>
                 </div>
               </div>
 
-              {/* Conversational Detailed Story Paragraph */}
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-3 leading-relaxed text-xs sm:text-sm text-[#9CA3AF]">
-                <p>
-                  I'm Sagnik Chandra, a Machine Learning researcher and Data Science student specializing in AI at RKMVERI Belur. Driven by a deep curiosity for mathematics and intelligence systems, I love exploring how models process context and attention. Currently, I'm researching the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures, while learning LangChain, RAG, and MCP (Model Context Protocol).
-                </p>
-                <p>
-                  When I'm not in code or research papers, you'll find me reading books on <strong className="text-white">Modern and Medieval History</strong> and <strong className="text-white">Psychology</strong>, playing competitive <strong className="text-white">chess</strong>, or <strong className="text-white">gaming</strong>. What about you? What brings you here? 😊
+              {/* Personal Passions & Hobbies Card */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="text-xs font-mono font-semibold text-amber-400 uppercase">
+                  Beyond Coding & Research
+                </div>
+                <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
+                  When I'm not in code or research papers, I love reading books on <strong className="text-white">Modern & Medieval History</strong> and <strong className="text-white">Psychology</strong>, playing competitive <strong className="text-white">chess</strong>, or <strong className="text-white">gaming</strong>. What about you? What brings you here? 😊
                 </p>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action CTAs */}
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <a
                   href={RESUME_URL}
@@ -113,7 +117,6 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                   <Download className="w-4 h-4" />
                   <span>View Resume / Experience PDF</span>
                 </a>
-
                 <a
                   href="mailto:sagnikchandra@gmail.com"
                   className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2"
