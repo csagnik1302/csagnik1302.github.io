@@ -181,7 +181,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     try {
-      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v3");
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v4");
       if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
@@ -208,7 +208,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     if (type === "custom" && !text) return; // Do not cache empty custom responses
     responseCacheRef.current[qKey] = { text, title, type };
     try {
-      sessionStorage.setItem("sagnik_chat_cache_v3", JSON.stringify(responseCacheRef.current));
+      sessionStorage.setItem("sagnik_chat_cache_v4", JSON.stringify(responseCacheRef.current));
     } catch {}
   };
 
@@ -496,15 +496,59 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             {/* SECOND: Assistant Output Card Centered */}
             {msg.role === "assistant" && (
               <div className="flex justify-center w-full animate-slide-in-right">
-                <div className={`w-full max-w-4xl bg-[#12151E] border rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200 transition-all ${
-                  msg.type === "me" ? "border-emerald-500/30 shadow-emerald-950/20" :
-                  msg.type === "experience" ? "border-sky-500/30 shadow-sky-950/20" :
-                  msg.type === "education" ? "border-amber-500/30 shadow-amber-950/20" :
-                  msg.type === "projects" ? "border-blue-500/30 shadow-blue-950/20" :
-                  msg.type === "skills" ? "border-purple-500/30 shadow-purple-950/20" :
-                  msg.type === "contact" ? "border-pink-500/30 shadow-pink-950/20" :
-                  "border-white/10"
+                <div className={`w-full max-w-4xl rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200 transition-all border-2 ${
+                  msg.type === "me" ? "bg-gradient-to-b from-emerald-950/60 via-[#12151E] to-[#12151E] border-emerald-500/80 shadow-[0_0_40px_rgba(16,185,129,0.25)]" :
+                  msg.type === "experience" ? "bg-gradient-to-b from-sky-950/60 via-[#12151E] to-[#12151E] border-sky-500/80 shadow-[0_0_40px_rgba(56,189,248,0.25)]" :
+                  msg.type === "education" ? "bg-gradient-to-b from-amber-950/60 via-[#12151E] to-[#12151E] border-amber-500/80 shadow-[0_0_40px_rgba(245,158,11,0.25)]" :
+                  msg.type === "projects" ? "bg-gradient-to-b from-blue-950/60 via-[#12151E] to-[#12151E] border-blue-500/80 shadow-[0_0_40px_rgba(59,130,246,0.25)]" :
+                  msg.type === "skills" ? "bg-gradient-to-b from-purple-950/60 via-[#12151E] to-[#12151E] border-purple-500/80 shadow-[0_0_40px_rgba(168,85,247,0.25)]" :
+                  msg.type === "contact" ? "bg-gradient-to-b from-pink-950/60 via-[#12151E] to-[#12151E] border-pink-500/80 shadow-[0_0_40px_rgba(236,72,153,0.25)]" :
+                  "bg-[#12151E] border-white/10"
                 }`}>
+                  {/* Visual Header Pill Badge */}
+                  {msg.type !== "custom" && (
+                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                      <div className="flex items-center gap-2">
+                        {msg.type === "me" && (
+                          <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/60 text-emerald-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <Smile className="w-4 h-4 text-emerald-400" />
+                            <span>Me / Profile</span>
+                          </span>
+                        )}
+                        {msg.type === "experience" && (
+                          <span className="px-3 py-1 rounded-full bg-sky-500/20 border border-sky-500/60 text-sky-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <Code2 className="w-4 h-4 text-[#38BDF8]" />
+                            <span>Work & Research Experience</span>
+                          </span>
+                        )}
+                        {msg.type === "education" && (
+                          <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/60 text-amber-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <GraduationCap className="w-4 h-4 text-amber-400" />
+                            <span>Academic Education</span>
+                          </span>
+                        )}
+                        {msg.type === "projects" && (
+                          <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/60 text-blue-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <Briefcase className="w-4 h-4 text-blue-400" />
+                            <span>Featured AI Projects</span>
+                          </span>
+                        )}
+                        {msg.type === "skills" && (
+                          <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/60 text-purple-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <Layers className="w-4 h-4 text-purple-400" />
+                            <span>Technical Stack & Skills</span>
+                          </span>
+                        )}
+                        {msg.type === "contact" && (
+                          <span className="px-3 py-1 rounded-full bg-pink-500/20 border border-pink-500/60 text-pink-300 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <Mail className="w-4 h-4 text-pink-400" />
+                            <span>Contact & Direct Reach-Out</span>
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] font-mono text-slate-400">{msg.timestamp}</span>
+                    </div>
+                  )}
                   {/* Aspect 3: Render 1st-Person Card Views or Text Responses */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
