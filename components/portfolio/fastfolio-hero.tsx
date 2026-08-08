@@ -137,17 +137,7 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
             <span className="text-xs font-semibold text-white">Me</span>
           </button>
 
-          {/* Card 2: Projects */}
-          <button
-            onClick={() => handlePillClick("projects")}
-            disabled={isTypingPill}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
-          >
-            <Briefcase className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-semibold text-[#F3F4F6]">Projects</span>
-          </button>
-
-          {/* Card 3: Experience */}
+          {/* Card 2: Experience */}
           <button
             onClick={() => handlePillClick("experience")}
             disabled={isTypingPill}
@@ -157,17 +147,7 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
             <span className="text-xs font-semibold text-white">Experience</span>
           </button>
 
-          {/* Card 4: Skills */}
-          <button
-            onClick={() => handlePillClick("skills")}
-            disabled={isTypingPill}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
-          >
-            <Layers className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-semibold text-white">Skills</span>
-          </button>
-
-          {/* Card 5: Education */}
+          {/* Card 3: Education */}
           <button
             onClick={() => handlePillClick("education")}
             disabled={isTypingPill}
@@ -175,6 +155,26 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
           >
             <GraduationCap className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Education</span>
+          </button>
+
+          {/* Card 4: Projects */}
+          <button
+            onClick={() => handlePillClick("projects")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+          >
+            <Briefcase className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold text-[#F3F4F6]">Projects</span>
+          </button>
+
+          {/* Card 5: Skills */}
+          <button
+            onClick={() => handlePillClick("skills")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+          >
+            <Layers className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold text-white">Skills</span>
           </button>
 
           {/* Card 6: Contact */}
