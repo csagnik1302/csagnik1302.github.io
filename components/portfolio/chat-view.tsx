@@ -244,7 +244,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure LLM Processing Pipeline (Processes ALL Queries including "hi" via LLMs)
+  // Pure LLM Processing Pipeline with Automatic Quote Sanitization
   const fetchResponseWithLLM = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
@@ -272,8 +272,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // Helper for fetch with 3-second timeout signal
-    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 3000) => {
+    // Helper for fetch with 4-second timeout signal
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 4000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -287,7 +287,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     };
 
     // 3. Groq API LLM Call (Primary Provider - Llama 3.3 70B)
-    const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    const groqApiKey = rawGroqKey ? rawGroqKey.replace(/['"]/g, "").trim() : "";
+    
     if (groqApiKey) {
       try {
         const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
@@ -305,7 +307,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             temperature: 0.7,
             max_tokens: 300,
           }),
-        }, 3500);
+        }, 4000);
 
         if (res.ok) {
           const data = await res.json();
@@ -315,14 +317,18 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
+        } else {
+          console.warn("Groq API returned status:", res.status);
         }
       } catch (err) {
-        console.warn("Groq Provider timeout or failed, switching to Gemini Provider:", err);
+        console.warn("Groq Provider failed, switching to Gemini Provider:", err);
       }
     }
 
     // 4. Google Gemini API LLM Call (Secondary Provider - Gemini 1.5 Flash)
-    const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const rawGeminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const geminiApiKey = rawGeminiKey ? rawGeminiKey.replace(/['"]/g, "").trim() : "";
+
     if (geminiApiKey) {
       try {
         const res = await fetchWithTimeout(
@@ -338,7 +344,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
             }),
           },
-          3500
+          4000
         );
 
         if (res.ok) {
@@ -349,9 +355,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
+        } else {
+          console.warn("Gemini API returned status:", res.status);
         }
       } catch (err) {
-        console.warn("Gemini Provider timeout or failed, switching to Pollinations LLM:", err);
+        console.warn("Gemini Provider failed, switching to Pollinations LLM:", err);
       }
     }
 
@@ -360,7 +368,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       const promptEncoded = encodeURIComponent(SAGNIK_PORTFOLIO_SYSTEM_PROMPT + "\n\nUser Question: " + queryText);
       const res = await fetchWithTimeout(`https://text.pollinations.ai/${promptEncoded}?model=openai`, {
         method: "GET",
-      }, 3000);
+      }, 4000);
 
       if (res.ok) {
         const text = await res.text();
