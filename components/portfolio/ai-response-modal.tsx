@@ -11,12 +11,13 @@ import {
   Sparkles,
   BookOpen,
   Code2,
+  Briefcase,
 } from "lucide-react";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
 
 export interface ModalContent {
-  type: "me" | "projects" | "skills" | "education" | "contact" | "custom";
+  type: "me" | "projects" | "experience" | "skills" | "education" | "contact" | "custom";
   title: string;
   query?: string;
   answer?: string;
@@ -39,7 +40,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
         className="relative w-full max-w-2xl max-h-[85vh] bg-[#12151E] border border-white/10 rounded-3xl p-6 sm:p-8 overflow-y-auto shadow-2xl space-y-6 text-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Bar - Clean title without AI twin subtitle */}
+        {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <h3 className="text-lg font-bold text-white tracking-tight">{content.title}</h3>
           <button
@@ -181,6 +182,34 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                 </div>
                 <p className="text-xs text-[#9CA3AF] leading-relaxed">
                   TSP variant for urban drone delivery with congestion-aware Deterministic and Stochastic Hill Climbing algorithms.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {content.type === "experience" && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
+                  <span>2025 — Present</span>
+                  <span>AI Research</span>
+                </div>
+                <h4 className="font-bold text-white text-base">LLM Retrieval & RAG Research</h4>
+                <p className="text-xs font-mono text-slate-300">RKMVERI, Belur</p>
+                <p className="text-xs text-[#9CA3AF] leading-relaxed pt-1">
+                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in open-source LLM retrieval and RAG architectures. Analyzing context positioning, prompt length scaling, and attention weight degradation.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
+                  <span>Big Data & Graph Systems</span>
+                  <span>Open Source Research</span>
+                </div>
+                <h4 className="font-bold text-white text-base">Graph Mining & Distributed ETL Systems</h4>
+                <p className="text-xs font-mono text-slate-300">AcademicLens Architecture</p>
+                <p className="text-xs text-[#9CA3AF] leading-relaxed pt-1">
+                  Engineered large-scale graph extraction and distributed PySpark ETL pipelines ingesting academic paper datasets into Neo4j graph databases with multi-hop schemas and PageRank influence ranking algorithms.
                 </p>
               </div>
             </div>

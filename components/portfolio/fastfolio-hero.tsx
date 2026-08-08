@@ -12,6 +12,7 @@ import {
   Download,
   Github,
   Linkedin,
+  Code2,
 } from "lucide-react";
 import { ModalContent } from "./ai-response-modal";
 
@@ -84,17 +85,6 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20 z-10 text-slate-100">
-      {/* Top Floating Badge */}
-      <a
-        href={RESUME_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed top-6 left-6 z-40 group flex items-center gap-2 rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-xl px-4 py-2 border border-white/10 shadow-lg transition-all duration-300 text-xs font-mono text-white"
-      >
-        <Sparkles className="w-4 h-4 text-blue-400" />
-        <span>Resume PDF</span>
-      </a>
-
       {/* Hero Intro Header */}
       <div className="z-10 flex flex-col items-center text-center space-y-4 mb-8 md:mb-10">
         <h2 className="text-lg sm:text-2xl font-medium text-slate-300">
@@ -107,8 +97,8 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
       </div>
 
       {/* Interactive AI Question Input Bar */}
-      <div className="z-10 w-full max-w-xl space-y-6 flex flex-col items-center">
-        <form onSubmit={handleSearch} className="relative w-full">
+      <div className="z-10 w-full max-w-2xl space-y-6 flex flex-col items-center">
+        <form onSubmit={handleSearch} className="relative w-full max-w-xl">
           <div className="mx-auto flex items-center rounded-full border border-white/15 bg-white/5 py-2.5 pr-2.5 pl-6 backdrop-blur-xl transition-all hover:border-white/30 focus-within:border-blue-500 shadow-2xl">
             <input
               type="text"
@@ -128,50 +118,59 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
           </div>
         </form>
 
-        {/* 5 Quick Action Pill Cards Grid */}
-        <div className="grid w-full max-w-xl grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+        {/* 6 Quick Action Pill Cards Grid */}
+        <div className="grid w-full max-w-2xl grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 pt-2">
           {/* Card 1: Me */}
           <button
             onClick={() => onOpenModal({ type: "me", title: "About Sagnik Chandra" })}
-            className="glass-pill aspect-square w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
-            <Smile className="w-6 h-6 text-emerald-400 group-hover:scale-110 transition-transform" />
+            <Smile className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Me</span>
           </button>
 
           {/* Card 2: Projects */}
           <button
             onClick={() => onOpenModal({ type: "projects", title: "Featured ML Projects" })}
-            className="glass-pill aspect-square w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
-            <Briefcase className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform" />
+            <Briefcase className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-[#F3F4F6]">Projects</span>
           </button>
 
-          {/* Card 3: Skills */}
+          {/* Card 3: Experience */}
+          <button
+            onClick={() => onOpenModal({ type: "experience", title: "Research & Technical Experience" })}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+          >
+            <Code2 className="w-5 h-5 text-[#38BDF8] group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold text-white">Experience</span>
+          </button>
+
+          {/* Card 4: Skills */}
           <button
             onClick={() => onOpenModal({ type: "skills", title: "Technical Stack & Tools" })}
-            className="glass-pill aspect-square w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
-            <Layers className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform" />
+            <Layers className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Skills</span>
           </button>
 
-          {/* Card 4: Education */}
+          {/* Card 5: Education */}
           <button
             onClick={() => onOpenModal({ type: "education", title: "Academic Background" })}
-            className="glass-pill aspect-square w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
-            <GraduationCap className="w-6 h-6 text-amber-400 group-hover:scale-110 transition-transform" />
+            <GraduationCap className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Education</span>
           </button>
 
-          {/* Card 5: Contact */}
+          {/* Card 6: Contact */}
           <button
             onClick={() => onOpenModal({ type: "contact", title: "Contact & Resume" })}
-            className="glass-pill aspect-square col-span-2 sm:col-span-1 w-full rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
-            <Mail className="w-6 h-6 text-pink-400 group-hover:scale-110 transition-transform" />
+            <Mail className="w-5 h-5 text-pink-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Contact</span>
           </button>
         </div>
