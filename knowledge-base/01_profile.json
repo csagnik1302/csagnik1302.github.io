@@ -3,10 +3,30 @@
   "items": [
     {
       "id": "sagnik_bio",
-      "title": "About Me — Sagnik Chandra",
+      "name": "Sagnik Chandra",
+      "greeting": "Hi, I am Sagnik!",
       "role": "Machine Learning & AI Researcher",
       "location": "Kolkata, India",
-      "summary": "Driven by deep learning and intelligent retrieval systems. I am currently advancing LLM research at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI.",
+      "current_activity": "I am based in Kolkata, India, currently pursuing an M.Sc. in Data Science & Artificial Intelligence at RKMVERI Belur, focusing on Deep Learning, Natural Language Processing, and Distributed Systems.",
+      "summary": "Driven by deep learning and mathematical rigor, I build high-throughput ML pipelines and research context retrieval in neural architectures.",
+      "paragraphs": [
+        "My focus in Artificial Intelligence stems from a deep curiosity about how neural networks process context and attention. I specialize in building scalable machine learning systems and exploring context retrieval architectures.",
+        "Beyond core model evaluation, I actively build with modern AI paradigms including Model Context Protocol (MCP), LangChain, PyTorch, and distributed PySpark & Neo4j graph pipelines, bridging theoretical mathematics with production systems.",
+        "Outside of research papers and terminal windows, I am a passionate reader of Modern & Medieval History and behavioral Psychology. I am also a competitive chess player and dedicated gamer."
+      ],
+      "tags": [
+        "Kolkata",
+        "M.Sc. Data Science & AI",
+        "RKMVERI",
+        "Deep Learning",
+        "NLP",
+        "LLMs",
+        "PyTorch",
+        "PySpark",
+        "Chessist",
+        "Historian",
+        "Gamer"
+      ],
       "keywords": ["who are you", "about", "bio", "sagnik", "introduction", "who is sagnik", "background", "summary"]
     }
   ]

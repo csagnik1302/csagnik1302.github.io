@@ -55,7 +55,9 @@ You are Sagnik Chandra speaking directly to visitors on your personal portfolio 
 4. For technical, background, research, or project questions, ground your answers in my Knowledge Base below.
 
 [MY KNOWLEDGE BASE]
-• Profile: Sagnik Chandra | ${profileKB.items[0].role} | ${profileKB.items[0].location}
+• Profile: ${profileKB.items[0].name} | ${profileKB.items[0].greeting} | ${profileKB.items[0].location}
+• Current Activity: ${profileKB.items[0].current_activity}
+• Summary: ${profileKB.items[0].summary}
 • Education: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}
 • Research Internship 1: ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}) — ${experienceKB.items[0].description}
 • Internship 2: ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}) — ${experienceKB.items[1].description}
@@ -67,7 +69,6 @@ You are Sagnik Chandra speaking directly to visitors on your personal portfolio 
 • Technical Stack:
   - Languages: ${skillsKB.languages.join(", ")}
   - Frameworks: ${skillsKB.frameworks.join(", ")}
-  - Tools: ${skillsKB.tools.join(", ")}
 • Personal Interests: ${interestsKB.items[0].description}
 `;
 
@@ -523,67 +524,34 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                         <div className="space-y-3 text-center sm:text-left flex-1">
                           <div>
                             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                              Sagnik Chandra
+                              {profileKB.items[0].greeting || "Hi, I am Sagnik!"}
                             </h2>
                             <p className="text-xs font-mono text-blue-400 font-semibold pt-0.5">
-                              Machine Learning & AI Researcher
+                              {profileKB.items[0].role} • {profileKB.items[0].location}
                             </p>
                           </div>
 
                           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
-                            Driven by deep learning and intelligent retrieval systems. Currently advancing LLM research at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI.
+                            {profileKB.items[0].current_activity}
                           </p>
 
                           <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
-                            <span className="px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs font-mono border border-blue-500/30">
-                              Kolkata
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              MLE
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              NLP
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              LLMs
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              RAG
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              MCP
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              ISI
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
-                              RKMVERI
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
-                              Gamer
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
-                              Chessist
-                            </span>
-                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
-                              Historian
-                            </span>
+                            {profileKB.items[0].tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10"
+                              >
+                                {tag}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       </div>
 
                       <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-5 border-t border-white/10">
-                        <p>
-                          My focus in Artificial Intelligence stems from a deep curiosity about how neural networks process context and attention. At the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong>, I investigate the <strong className="text-white font-semibold font-mono text-blue-300">"Lost in the Middle"</strong> phenomenon in Large Language Models — evaluating how document order and context placement affect factual retrieval in multi-document RAG architectures using NaturalQuestions and TREC RAG benchmarks.
-                        </p>
-
-                        <p>
-                          Beyond core model evaluation, I actively build with modern AI paradigms including <strong className="text-white font-semibold">Model Context Protocol (MCP)</strong>, <strong className="text-white font-semibold">LangChain</strong>, <strong className="text-white font-semibold">PyTorch</strong>, and distributed PySpark & Neo4j graph pipelines. I love bridging theoretical mathematical concepts with high-throughput production systems.
-                        </p>
-
-                        <p>
-                          Outside of research papers and terminal windows, I am a passionate reader of <strong className="text-white font-semibold">Modern & Medieval History</strong> and behavioral <strong className="text-white font-semibold">Psychology</strong>. I am also a competitive <strong className="text-white font-semibold">chess player</strong> and dedicated <strong className="text-white font-semibold">gamer</strong> — passions that continuously sharpen my strategic problem-solving mindset.
-                        </p>
+                        {profileKB.items[0].paragraphs.map((pText, pIdx) => (
+                          <p key={pIdx}>{pText}</p>
+                        ))}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
