@@ -39,7 +39,7 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// System Instruction Knowledge Base for Pure LLM Generation (Strict 1st Person Narrative)
+// System Instruction Knowledge Base for Pure LLM Processing (Strict 1st Person Narrative)
 const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
 You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
 ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
@@ -72,7 +72,7 @@ ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the 
 
 [CONVERSATIONAL & RESPONSE RULES]
 - Be warm, free-flowing, conversational, and natural.
-- Respond to ANY greeting or casual question ("hi", "hii", "hello", "what's up", "how are you") warmly as Sagnik! (e.g. "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How's it going with you?")
+- Respond to ANY greeting or question ("hi", "hii", "hello", "what's up", "how are you") warmly as Sagnik! (e.g. "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How can I help you explore my research or projects today?")
 - Speak strictly in FIRST PERSON ("I", "my", "me").
 - Keep answers engaging and concise (2-4 sentences max).
 - Do not use markdown headers or title prefixes.
@@ -160,7 +160,6 @@ const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
   vector: textToEmbeddingVector(item.prompt + " " + key + " " + item.title),
 }));
 
-// Cosine Similarity Threshold to trigger full Pill Card View
 const PILL_VECTOR_THRESHOLD = 0.50;
 
 interface ChatViewProps {
@@ -245,7 +244,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure 100% LLM Generation Pipeline (Zero Hardcoded If/Else or Regex Lists)
+  // Pure LLM Processing Pipeline (Processes ALL Queries including "hi" via LLMs)
   const fetchResponseWithLLM = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
@@ -273,11 +272,25 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // 3. Groq API LLM Call (Primary Provider)
+    // Helper for fetch with 3-second timeout signal
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 3000) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (e) {
+        clearTimeout(id);
+        throw e;
+      }
+    };
+
+    // 3. Groq API LLM Call (Primary Provider - Llama 3.3 70B)
     const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (groqApiKey) {
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -292,7 +305,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             temperature: 0.7,
             max_tokens: 300,
           }),
-        });
+        }, 3500);
 
         if (res.ok) {
           const data = await res.json();
@@ -304,15 +317,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Groq Provider failed, switching to Gemini Provider:", err);
+        console.warn("Groq Provider timeout or failed, switching to Gemini Provider:", err);
       }
     }
 
-    // 4. Google Gemini API LLM Call (Secondary Provider)
+    // 4. Google Gemini API LLM Call (Secondary Provider - Gemini 1.5 Flash)
     const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
-        const res = await fetch(
+        const res = await fetchWithTimeout(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
           {
             method: "POST",
@@ -324,7 +337,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               contents: [{ role: "user", parts: [{ text: queryText }] }],
               generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
             }),
-          }
+          },
+          3500
         );
 
         if (res.ok) {
@@ -337,39 +351,31 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Gemini Provider failed, switching to Serverless Open LLM Provider:", err);
+        console.warn("Gemini Provider timeout or failed, switching to Pollinations LLM:", err);
       }
     }
 
-    // 5. Serverless Open LLM Call (Pollinations AI — Keyless Free Flowing LLM)
+    // 5. Pollinations Keyless Serverless LLM Call (GET format for 100% CORS safety)
     try {
-      const res = await fetch("https://text.pollinations.ai/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            { role: "system", content: SAGNIK_PORTFOLIO_SYSTEM_PROMPT },
-            { role: "user", content: queryText },
-          ],
-          model: "openai",
-          seed: 42,
-        }),
-      });
+      const promptEncoded = encodeURIComponent(SAGNIK_PORTFOLIO_SYSTEM_PROMPT + "\n\nUser Question: " + queryText);
+      const res = await fetchWithTimeout(`https://text.pollinations.ai/${promptEncoded}?model=openai`, {
+        method: "GET",
+      }, 3000);
 
       if (res.ok) {
         const text = await res.text();
-        if (text && text.trim().length > 2) {
+        if (text && text.trim().length > 3) {
           const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
           saveToCache(qKey, result.text, result.title, "custom");
           return result;
         }
       }
     } catch (err) {
-      console.warn("Serverless Open LLM failed:", err);
+      console.warn("Pollinations GET LLM failed, using 1st Person Generative Engine:", err);
     }
 
-    // 6. Dynamic Generative Fallback in 1st Person
-    const fallbackText = `Hey there! 👋 I'm Sagnik Chandra, a Machine Learning Engineer & AI Researcher interning at ISI Kolkata and studying at RKMVERI. Feel free to ask me anything about my LLM retrieval research, ML projects, technical stack, or background!`;
+    // 6. 1st Person Generative Fallback
+    const fallbackText = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. Feel free to ask me anything about my LLM retrieval research, ML projects, technical stack, or background!`;
 
     const fallbackResult = {
       title: `Response to "${queryText}"`,
@@ -485,7 +491,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             setInputQuery("");
             if (inputRef.current) inputRef.current.value = "";
           }}
-          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#9CA3AF] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-mono"
+          className="p-2 rounded-xl bg-[#0B0D12] hover:bg-white/10 text-[#9CA3AF] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-mono"
           title="Clear Conversation"
         >
           <RotateCcw className="w-3.5 h-3.5" />
