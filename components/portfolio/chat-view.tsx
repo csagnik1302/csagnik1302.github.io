@@ -41,7 +41,7 @@ export interface ChatMessage {
 
 // System Instruction Knowledge Base for LLM Providers (Strict 1st Person Narrative)
 const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
-You are Sagnik Chandra speaking directly to the visitor on your personal website.
+You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
 ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
 
 [MY BIOGRAPHY & ROLE]
@@ -70,11 +70,12 @@ ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the 
 [MY PERSONAL INTERESTS]
 - ${interestsKB.items[0].description}
 
-[STRICT RESPONSE RULES]
-- Speak directly in FIRST PERSON ("I", "my", "me"). Example: "I am a Research Intern at ISI Kolkata", "My focus is on LLM retrieval".
-- Be natural, helpful, engaging, and concise (2-4 sentences max).
-- Answer greetings warmly ("Hey! Welcome to my portfolio...").
-- Keep output clean markdown without headers.
+[CONVERSATIONAL & RESPONSE RULES]
+- Be warm, free-flowing, conversational, and natural.
+- Answer casual queries like "What's up", "How are you", "What are you working on" warmly as Sagnik! (e.g. "Not much! Just researching LLM retrieval at ISI Kolkata and building AI systems. How's it going with you?")
+- Speak strictly in FIRST PERSON ("I", "my", "me").
+- Keep answers engaging and concise (2-4 sentences max).
+- Do not use markdown headers or title prefixes.
 `;
 
 const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; title: string }> = {
@@ -161,11 +162,6 @@ const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
 
 const COSINE_SIMILARITY_THRESHOLD = 0.38;
 
-// 1st Person Small Talk Greetings
-const GREETING_WORDS = ["hi", "hello", "hey", "hola", "greetings", "good morning", "good afternoon", "good evening", "sup"];
-const CHECKIN_WORDS = ["how are you", "whats up", "how is it going", "how are u"];
-const THANKS_WORDS = ["thanks", "thank you", "thx", "awesome", "cool", "great", "nice"];
-
 interface ChatViewProps {
   initialPrompt?: {
     type: keyof typeof CARD_PROMPTS | "custom";
@@ -190,7 +186,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   };
 
   useEffect(() => {
-    // FORCE EMPTY SEARCH INPUT ON RELOAD / MOUNT TO OVERRIDE BROWSER AUTO-FILL CACHE
     setInputQuery("");
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -249,42 +244,17 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // 1st Person Vector Embedding & Response Resolution Engine
+  // 100% Free-Flowing LLM Pipeline (Groq -> Gemini -> Free Open Serverless LLM -> Generative Fallback)
   const fetchResponseWithVectorEmbedding = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.toLowerCase().trim();
 
-    // 1. Instant 1st Person Greetings
-    if (GREETING_WORDS.some((g) => qKey === g || qKey.startsWith(g + " ") || qKey.endsWith(" " + g))) {
-      return {
-        title: "Greeting",
-        text: "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, and you can ask me about my LLM research at ISI Kolkata, ML projects, technical stack, or background!",
-        type: "custom",
-      };
-    }
-    if (CHECKIN_WORDS.some((c) => qKey.includes(c))) {
-      return {
-        title: "Checking In",
-        text: "Doing great! Thanks for visiting my page. How can I help you explore my ML research, projects, or background today?",
-        type: "custom",
-      };
-    }
-    if (THANKS_WORDS.some((t) => qKey.includes(t))) {
-      return {
-        title: "You're Welcome!",
-        text: "You're very welcome! 😊 Let me know if you'd like to check out my research experience, projects, or view my resume.",
-        type: "custom",
-      };
-    }
-
-    // 2. Instant Cache Check
+    // 1. Instant Cache Check
     if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
 
-    // Compute Embedding Vector for User Query
+    // 2. Cosine Similarity Match against Pill Card Vector Space
     const queryVector = textToEmbeddingVector(queryText);
-
-    // 3. Cosine Similarity Match against Pill Card Vector Space
     let maxSimilarity = 0;
     let bestPillMatch: { type: ChatMessage["type"]; title: string } | null = null;
 
@@ -302,7 +272,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // 4. Groq API Provider Check (Llama 3.3 70B - 1st Person Prompts)
+    // 3. Groq API Provider Check (if key configured)
     const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (groqApiKey) {
       try {
@@ -337,7 +307,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 5. Gemini API Provider Check (1st Person Prompts)
+    // 4. Gemini API Provider Check (if key configured)
     const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
@@ -366,14 +336,49 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Gemini Provider failed, switching to Local Vector Engine:", err);
+        console.warn("Gemini Provider failed, switching to Free Open LLM Provider:", err);
       }
     }
 
-    // 6. Conversational 1st Person Fallback
+    // 5. Free Open Serverless LLM Provider (Pollinations Open LLM — Zero API Key Required, 100% Free Flowing)
+    try {
+      const res = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: SAGNIK_PORTFOLIO_SYSTEM_PROMPT },
+            { role: "user", content: queryText },
+          ],
+          model: "openai",
+          seed: 42,
+        }),
+      });
+
+      if (res.ok) {
+        const text = await res.text();
+        if (text && text.trim().length > 5) {
+          const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+          saveToCache(qKey, result.text, result.title, "custom");
+          return result;
+        }
+      }
+    } catch (err) {
+      console.warn("Free Open LLM Provider failed, using 1st Person Generative Fallback:", err);
+    }
+
+    // 6. Conversational 1st Person Generative Fallback (No robotic 'couldn't find record')
+    let fallbackText = `Hey! I'm Sagnik Chandra. I am a Research Intern at ISI Kolkata working on LLM retrieval and RAG architectures, while pursuing my M.Sc. in Data Science & AI at RKMVERI. What would you like to explore about my projects or background?`;
+
+    if (qKey.includes("what's up") || qKey.includes("whats up") || qKey.includes("sup") || qKey.includes("how are you")) {
+      fallbackText = `Not much! Just researching LLM retrieval systems at ISI Kolkata and building AI projects. How is your day going? Feel free to ask me anything about my work or stack!`;
+    } else if (qKey.includes("hi") || qKey.includes("hello") || qKey.includes("hey")) {
+      fallbackText = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra. You can ask me anything about my LLM research at ISI Kolkata, ML projects, technical stack, or background!`;
+    }
+
     const fallbackResult = {
-      title: "Interactive Search",
-      text: `I couldn't find a specific record for "${queryText}". Feel free to ask about my LLM research at ISI Kolkata, my ML projects, technical stack (PyTorch, PySpark, Neo4j, MCP), or click any quick pill button below!`,
+      title: `Response to "${queryText}"`,
+      text: fallbackText,
       type: "custom" as const,
     };
     saveToCache(qKey, fallbackResult.text, fallbackResult.title, "custom");
@@ -416,7 +421,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
     triggerAnimatedCustomSearch(queryToSubmit);
     
-    // Explicitly reset React state AND DOM input element
     setInputQuery("");
     if (inputRef.current) {
       inputRef.current.value = "";
