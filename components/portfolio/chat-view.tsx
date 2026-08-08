@@ -218,7 +218,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure Client-Side Local AI Engine (Zero External API Keys, 100% Reliable & Fast)
+  // Secure Cloudflare Worker Proxy LLM Engine (Zero Key Exposure, Blazing Fast ~300ms)
   const generateLLMResponse = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
@@ -246,7 +246,50 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // 3. Smart Intent RAG Engine
+    // Helper timeout wrapper
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 8000) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(id);
+        return res;
+      } catch (e) {
+        clearTimeout(id);
+        throw e;
+      }
+    };
+
+    // 3. Cloudflare Worker LLM Proxy Call (Groq Llama 3.1 8B Instant)
+    const WORKER_URL = "https://sagnik-portfolio-ai.sagnikchandra.workers.dev/";
+
+    try {
+      const res = await fetchWithTimeout(
+        WORKER_URL,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: queryText,
+            systemPrompt: SYSTEM_PROMPT,
+          }),
+        },
+        8000
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.text && data.text.trim()) {
+          const result = { text: data.text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+          saveToCache(qKey, result.text, result.title, "custom");
+          return result;
+        }
+      }
+    } catch (err) {
+      console.warn("Cloudflare Worker LLM Proxy call failed:", err);
+    }
+
+    // 4. Smart Intent RAG Engine Fallback
     const words = qKey.replace(/[^\w\s]/g, "").split(/\s+/).filter(Boolean);
 
     const isGreeting = words.some(w => ["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup", "greetings", "weather", "nice", "good", "morning", "afternoon", "evening"].includes(w)) || qKey.includes("whats up") || qKey.includes("how are you");
