@@ -12,6 +12,7 @@ import {
   BookOpen,
   Code2,
   Briefcase,
+  Award,
 } from "lucide-react";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
@@ -74,7 +75,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                   <span>Current Research Focus</span>
                 </div>
                 <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
-                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures, exploring context positioning and attention degradation.
+                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures at Indian Statistical Institute (ISI), exploring context positioning and attention degradation.
                 </p>
               </div>
 
@@ -129,87 +130,125 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
             </div>
           )}
 
-          {content.type === "projects" && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-white">Neural Literary Style Transfer</h4>
-                  <a
-                    href="https://github.com/csagnik1302"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
-                  >
-                    <span>GitHub</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
+          {content.type === "experience" && (
+            <div className="space-y-5">
+              {/* Experience 1: ISI */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <h4 className="font-bold text-white text-base">Research Intern</h4>
+                    <p className="text-xs font-mono text-blue-400 font-semibold">
+                      Indian Statistical Institute (ISI)
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono text-[#9CA3AF]">May 2026 — Ongoing</span>
                 </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                  Semi-automated pipeline to rewrite Bengali sentences in a target author's style without parallel corpora using BiGRU encoder & Gradient Reversal Layer (GRL).
-                </p>
+
+                <ul className="space-y-2 text-xs sm:text-sm text-[#9CA3AF] list-disc list-inside leading-relaxed">
+                  <li>
+                    Analyzed the existence of the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLMs on factoid texts as defined in source publications, using custom datasets defined from NaturalQuestions with Llama 3.1 8B Instruct.
+                  </li>
+                  <li>
+                    Currently working on defining an extended experimental validation of the Lost in the Middle phenomenon on complete RAG pipelines on non-factoid texts using a modified MS MARCO 2.1 dataset from the TREC RAG 2024 benchmark.
+                  </li>
+                </ul>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-white">AcademicLens — Citation Graph Mining</h4>
-                  <a
-                    href="https://github.com/csagnik1302"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
-                  >
-                    <span>GitHub</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
+              {/* Experience 2: DeepThought */}
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <h4 className="font-bold text-white text-base">Data Science Intern</h4>
+                    <p className="text-xs font-mono text-blue-400 font-semibold">
+                      DeepThought CultureTech Ventures
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono text-[#9CA3AF]">Oct 2024 — Jul 2025</span>
                 </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                  Large-scale academic intelligence graph mapping papers from OpenAlex using PySpark ETL into Neo4j with PageRank influence ranking.
-                </p>
-              </div>
 
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-white">Drone Delivery Route Optimization</h4>
-                  <a
-                    href="https://github.com/csagnik1302"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
-                  >
-                    <span>GitHub</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                  TSP variant for urban drone delivery with congestion-aware Deterministic and Stochastic Hill Climbing algorithms.
-                </p>
+                <ul className="space-y-2 text-xs sm:text-sm text-[#9CA3AF] list-disc list-inside leading-relaxed">
+                  <li>
+                    Led and contributed to 10+ cross-functional initiatives spanning AI automation, CRM optimization, data operations, recruitment, UX research, and business growth.
+                  </li>
+                  <li>
+                    Built AI-powered workflows and redesigned CRM/KPI reporting systems, reducing manual effort by 1–4 hours daily, cutting turnaround time from 3 days to 1 day, and improving process efficiency by 60% for 30+ stakeholders.
+                  </li>
+                </ul>
               </div>
             </div>
           )}
 
-          {content.type === "experience" && (
+          {content.type === "projects" && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
-                  <span>2025 — Present</span>
-                  <span>AI Research</span>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white">Neural Text Style Transfer with Adversarial Learning</h4>
+                  <a
+                    href="https://github.com/csagnik1302"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>GitHub</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
                 </div>
-                <h4 className="font-bold text-white text-base">LLM Retrieval & RAG Research</h4>
-                <p className="text-xs font-mono text-slate-300">RKMVERI, Belur</p>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed pt-1">
-                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in open-source LLM retrieval and RAG architectures. Analyzing context positioning, prompt length scaling, and attention weight degradation.
+                <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                  Built semi-automated pipeline to rewrite Bengali sentences in the style of five authors without parallel corpora using BiGRU encoder with Gradient Reversal Layer (GRL) and style-conditioned GRU decoder.
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
-                  <span>Big Data & Graph Systems</span>
-                  <span>Open Source Research</span>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white">AcademicLens — Citation Graph Mining at Scale</h4>
+                  <a
+                    href="https://github.com/csagnik1302"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>GitHub</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
                 </div>
-                <h4 className="font-bold text-white text-base">Graph Mining & Distributed ETL Systems</h4>
-                <p className="text-xs font-mono text-slate-300">AcademicLens Architecture</p>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed pt-1">
-                  Engineered large-scale graph extraction and distributed PySpark ETL pipelines ingesting academic paper datasets into Neo4j graph databases with multi-hop schemas and PageRank influence ranking algorithms.
+                <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                  Built large-scale academic intelligence system over 10M+ OpenAlex research papers using PySpark & Neo4j with distributed Author–Paper–Citation–Topic graph and PageRank influence ranking.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white">Stellar Object Classification (SDSS DR18)</h4>
+                  <a
+                    href="https://github.com/csagnik1302"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>GitHub</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
+                </div>
+                <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                  Supervised multi-class classification system classifying galaxies, quasars, and stars using CatBoost & XGBoost with Optuna Bayesian hyperparameter tuning, achieving &gt;99% test accuracy.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-white">Traffic-Aware Single-Drone Delivery Route Optimisation</h4>
+                  <a
+                    href="https://github.com/csagnik1302"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    <span>GitHub</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </a>
+                </div>
+                <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                  Evaluated deterministic and stochastic hill climbing algorithms for drone delivery route optimization across 120 delivery locations with node-level congestion modeling.
                 </p>
               </div>
             </div>
@@ -218,9 +257,9 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           {content.type === "skills" && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <h4 className="font-bold text-white text-xs font-mono uppercase">Languages & Frameworks</h4>
+                <h4 className="font-bold text-white text-xs font-mono uppercase">Languages</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Python", "PyTorch", "TensorFlow", "Keras", "LangChain", "C", "SQL"].map((s) => (
+                  {["Python", "C", "Cypher", "R", "SQL"].map((s) => (
                     <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
                       {s}
                     </span>
@@ -229,9 +268,9 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
               </div>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <h4 className="font-bold text-white text-xs font-mono uppercase">AI & Data Science</h4>
+                <h4 className="font-bold text-white text-xs font-mono uppercase">Frameworks & ML Libraries</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {["Ollama", "Hugging Face", "NumPy", "Pandas", "Scikit-Learn", "Matplotlib", "Seaborn"].map((s) => (
+                  {["Scikit-learn", "PyTorch", "Pandas", "NumPy", "Matplotlib", "Seaborn", "PySpark", "LangChain"].map((s) => (
                     <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
                       {s}
                     </span>
@@ -240,9 +279,9 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
               </div>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <h4 className="font-bold text-white text-xs font-mono uppercase">Tools & Systems</h4>
+                <h4 className="font-bold text-white text-xs font-mono uppercase">Tools & Platforms</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {["PySpark", "Neo4j", "MySQL", "Git", "Docker", "Linux", "Jupyter", "Anaconda", "MCP"].map((s) => (
+                  {["Neo4j", "Git", "GitHub", "Jupyter Notebook", "Docker", "Linux (Ubuntu)", "MCP"].map((s) => (
                     <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
                       {s}
                     </span>
@@ -256,13 +295,13 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
                 <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
-                  <span>2025 — Present</span>
+                  <span>2025 — 2027</span>
                   <span>Master's Degree</span>
                 </div>
-                <h4 className="font-bold text-white text-base">M.Sc. in Data Science & AI</h4>
-                <p className="text-xs text-[#9CA3AF]">RKMVERI, Belur</p>
+                <h4 className="font-bold text-white text-base">M.Sc. in Data Science & Artificial Intelligence</h4>
+                <p className="text-xs text-[#9CA3AF]">Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur</p>
                 <p className="text-xs text-[#9CA3AF] pt-1">
-                  Focusing on Deep Learning, NLP, LLM Retrieval, RAG Pipelines, and Data Mining.
+                  Focusing on Deep Learning, NLP, LLM Retrieval, RAG Pipelines, and Distributed Data Processing.
                 </p>
               </div>
             </div>
