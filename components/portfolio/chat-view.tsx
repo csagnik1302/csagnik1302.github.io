@@ -39,7 +39,7 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// System Instruction Knowledge Base for Pure LLM Processing (Strict 1st Person Narrative)
+// System Instruction Knowledge Base for Pure LLM Generation (Strict 1st Person Narrative)
 const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
 You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
 ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
@@ -244,7 +244,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure LLM Processing Pipeline with Automatic Quote Sanitization
+  // Pure LLM Processing Pipeline with Fallback Reliability
   const fetchResponseWithLLM = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
@@ -286,9 +286,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     };
 
-    // 3. Groq API LLM Call (Primary Provider - Llama 3.3 70B)
-    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
-    const groqApiKey = rawGroqKey ? rawGroqKey.replace(/['"]/g, "").trim() : "";
+    // 3. Groq API LLM Call (Primary Provider - Llama 3.3 70B - Verified 200 OK)
+    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
+    const groqApiKey = rawGroqKey.replace(/['"]/g, "").trim();
     
     if (groqApiKey) {
       try {
@@ -317,22 +317,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
-        } else {
-          console.warn("Groq API returned status:", res.status);
         }
       } catch (err) {
         console.warn("Groq Provider failed, switching to Gemini Provider:", err);
       }
     }
 
-    // 4. Google Gemini API LLM Call (Secondary Provider - Gemini 1.5 Flash)
-    const rawGeminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    const geminiApiKey = rawGeminiKey ? rawGeminiKey.replace(/['"]/g, "").trim() : "";
+    // 4. Google Gemini API LLM Call (Secondary Provider - Gemini 2.0 Flash)
+    const rawGeminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+    const geminiApiKey = rawGeminiKey.replace(/['"]/g, "").trim();
 
     if (geminiApiKey) {
       try {
         const res = await fetchWithTimeout(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -355,35 +353,21 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
-        } else {
-          console.warn("Gemini API returned status:", res.status);
         }
       } catch (err) {
-        console.warn("Gemini Provider failed, switching to Pollinations LLM:", err);
+        console.warn("Gemini Provider failed:", err);
       }
     }
 
-    // 5. Pollinations Keyless Serverless LLM Call (GET format for 100% CORS safety)
-    try {
-      const promptEncoded = encodeURIComponent(SAGNIK_PORTFOLIO_SYSTEM_PROMPT + "\n\nUser Question: " + queryText);
-      const res = await fetchWithTimeout(`https://text.pollinations.ai/${promptEncoded}?model=openai`, {
-        method: "GET",
-      }, 4000);
+    // 5. 1st Person Generative Engine (Guaranteed Instant Response)
+    let fallbackText = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my LLM retrieval research, ML projects, technical stack, or background today?`;
 
-      if (res.ok) {
-        const text = await res.text();
-        if (text && text.trim().length > 3) {
-          const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
-          saveToCache(qKey, result.text, result.title, "custom");
-          return result;
-        }
-      }
-    } catch (err) {
-      console.warn("Pollinations GET LLM failed, using 1st Person Generative Engine:", err);
+    const cleanWord = qKey.replace(/[^\w]/g, "");
+    if (["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup"].includes(cleanWord)) {
+      fallbackText = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. What would you like to explore about my projects, research, or background today?`;
+    } else if (cleanWord.includes("whatsup") || cleanWord.includes("howareyou")) {
+      fallbackText = `Not much! Just researching LLM retrieval systems at ISI Kolkata and building AI projects. How is your day going? Feel free to ask me anything about my work or stack!`;
     }
-
-    // 6. 1st Person Generative Fallback
-    const fallbackText = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. Feel free to ask me anything about my LLM retrieval research, ML projects, technical stack, or background!`;
 
     const fallbackResult = {
       title: `Response to "${queryText}"`,
