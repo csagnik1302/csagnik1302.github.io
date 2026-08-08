@@ -130,8 +130,18 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
+    // 1. First: User Prompt appears on the LEFT side
+    const userMsg: ChatMessage = {
+      id: Date.now().toString() + "-user",
+      role: "user",
+      content: userPrompt,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
+    // 2. Then: Assistant Page Output appears on the RIGHT side after brief typing delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -142,14 +152,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
-      const userMsg: ChatMessage = {
-        id: Date.now().toString() + "-user",
-        role: "user",
-        content: userPrompt,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-
-      setMessages((prev) => [...prev, assistantMsg, userMsg]);
+      setMessages((prev) => [...prev, assistantMsg]);
     }, 450);
   };
 
@@ -165,8 +168,18 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
+    // 1. First: User Prompt appears on the LEFT side
+    const userMsg: ChatMessage = {
+      id: Date.now().toString() + "-user",
+      role: "user",
+      content: queryText,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
+    // 2. Then: Assistant Page Output appears on the RIGHT side after brief typing delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -178,14 +191,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
-      const userMsg: ChatMessage = {
-        id: Date.now().toString() + "-user",
-        role: "user",
-        content: queryText,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-
-      setMessages((prev) => [...prev, assistantMsg, userMsg]);
+      setMessages((prev) => [...prev, assistantMsg]);
     }, 450);
   };
 
@@ -233,7 +239,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       </header>
 
       {/* Main Conversation Stream */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8 pb-36">
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36">
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
@@ -245,11 +251,21 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className="space-y-3">
-            {/* Assistant Response Card */}
+          <React.Fragment key={msg.id}>
+            {/* FIRST: User Prompt on the LEFT side */}
+            {msg.role === "user" && (
+              <div className="flex justify-start animate-slide-in-left pt-2">
+                <div className="bg-white/10 text-white border border-white/15 px-5 py-3 rounded-3xl rounded-tl-sm text-sm max-w-[85%] sm:max-w-[75%] shadow-lg flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#0171E3] shrink-0" />
+                  <span className="font-medium text-slate-100">{msg.content}</span>
+                </div>
+              </div>
+            )}
+
+            {/* SECOND: Page Output Card on the RIGHT side */}
             {msg.role === "assistant" && (
-              <div className="flex justify-start animate-slide-in-left">
-                <div className="w-full bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
+              <div className="flex justify-end animate-slide-in-right">
+                <div className="w-full max-w-3xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
                   {/* Assistant Header Badge */}
                   <div className="flex items-center gap-2 text-xs font-mono text-blue-400 pb-2 border-b border-white/10">
                     <Sparkles className="w-4 h-4" />
@@ -579,29 +595,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                 </div>
               </div>
             )}
-
-            {/* User Prompt Speech Bubble Positioned at Bottom-Left */}
-            {msg.role === "user" && (
-              <div className="flex justify-start animate-slide-in-left pt-1">
-                <div className="bg-white/10 border border-white/15 text-slate-200 px-4 py-2 rounded-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5 shadow-md">
-                  <span className="w-2 h-2 rounded-full bg-[#0171E3] shrink-0" />
-                  <span className="text-slate-400 font-mono text-xs">Prompt:</span>
-                  <span className="text-white font-medium">{msg.content}</span>
-                </div>
-              </div>
-            )}
-          </div>
+          </React.Fragment>
         ))}
 
-        {/* Animated AI Typing Indicator */}
+        {/* Animated AI Typing Indicator on the Right */}
         {isTyping && (
-          <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] animate-fade-in pl-2 pt-2">
-            <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
-            <span>Sagnik AI is typing</span>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="flex justify-end animate-fade-in pr-2 pt-2">
+            <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
+              <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
+              <span>Generating page response...</span>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
             </div>
           </div>
         )}
