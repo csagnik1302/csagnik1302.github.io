@@ -264,6 +264,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
     const groqKey = rawGroqKey.replace(/['"]/g, "").trim();
 
+    console.log(`[AI Engine Diagnostic] Query: "${queryText}" | Groq Key Present: ${Boolean(groqKey)}`);
+
     if (groqKey) {
       try {
         const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
@@ -287,13 +289,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           const data = await res.json();
           const text = data?.choices?.[0]?.message?.content;
           if (text && text.trim()) {
-            const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+            const result = { text: text.trim(), title: `AI Response (Groq Llama 3.1 8B)`, type: "custom" as const };
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
+        } else {
+          console.warn(`[AI Engine Diagnostic] Groq API returned status: ${res.status}`);
         }
       } catch (err) {
-        console.warn("Groq LLM call failed or timed out:", err);
+        console.warn("[AI Engine Diagnostic] Groq LLM call failed or timed out:", err);
       }
     }
 
@@ -320,13 +324,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           const data = await res.json();
           const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (text && text.trim()) {
-            const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+            const result = { text: text.trim(), title: `AI Response (Gemini 2.0 Flash)`, type: "custom" as const };
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
+        } else {
+          console.warn(`[AI Engine Diagnostic] Gemini API returned status: ${res.status}`);
         }
       } catch (err) {
-        console.warn("Gemini LLM call failed or timed out:", err);
+        console.warn("[AI Engine Diagnostic] Gemini LLM call failed or timed out:", err);
       }
     }
 
@@ -351,7 +357,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     const fallbackResult = {
-      title: `Response to "${queryText}"`,
+      title: `AI Response (Local Fallback Engine)`,
       text: textOut,
       type: "custom" as const,
     };
