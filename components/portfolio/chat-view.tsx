@@ -130,7 +130,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
-    // 1. First: User Prompt appears on the LEFT side
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -141,7 +140,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    // 2. Then: Assistant Page Output appears on the RIGHT side after brief typing delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -168,7 +166,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 1. First: User Prompt appears on the LEFT side
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -179,7 +176,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    // 2. Then: Assistant Page Output appears on the RIGHT side after brief typing delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -210,9 +206,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0B0D12] text-slate-100 font-sans">
+    <div
+      className="flex flex-col min-h-screen bg-[#0B0D12] text-slate-100 font-sans cursor-pointer"
+      onClick={onBackToHome}
+    >
       {/* Top ChatGPT / Gemini Style Navigation Bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+      <header
+        className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10 shadow-lg cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToHome}
@@ -239,7 +241,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       </header>
 
       {/* Main Conversation Stream */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36">
+      <main
+        className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36 cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
@@ -617,7 +622,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       </main>
 
       {/* Floating Bottom ChatGPT / Gemini Input Dock */}
-      <footer className="fixed bottom-0 inset-x-0 z-30 p-4 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/95 to-transparent backdrop-blur-xl">
+      <footer
+        className="fixed bottom-0 inset-x-0 z-30 p-4 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/95 to-transparent backdrop-blur-xl cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="w-full max-w-2xl mx-auto space-y-3">
           {/* Quick Action Pill Buttons Grid */}
           <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 no-scrollbar">
