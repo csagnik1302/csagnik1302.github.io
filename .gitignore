@@ -12,6 +12,10 @@ __v0_jsx-dev-runtime.ts
 .env.*.local
 .env.*
 
+# Build output (Ignore out/ so secrets are never pushed to git)
+out
+out/
+
 # Common ignores
 node_modules
 .next/

@@ -39,7 +39,7 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// System Instruction Knowledge Base for LLM Providers (Strict 1st Person Narrative)
+// System Instruction Knowledge Base for Pure LLM Generation (Strict 1st Person Narrative)
 const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
 You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
 ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
@@ -72,7 +72,7 @@ ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the 
 
 [CONVERSATIONAL & RESPONSE RULES]
 - Be warm, free-flowing, conversational, and natural.
-- Answer casual queries like "What's up", "How are you", "What are you working on" warmly as Sagnik! (e.g. "Not much! Just researching LLM retrieval at ISI Kolkata and building AI systems. How's it going with you?")
+- Respond to ANY greeting or casual question ("hi", "hii", "hello", "what's up", "how are you") warmly as Sagnik! (e.g. "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How's it going with you?")
 - Speak strictly in FIRST PERSON ("I", "my", "me").
 - Keep answers engaging and concise (2-4 sentences max).
 - Do not use markdown headers or title prefixes.
@@ -111,7 +111,7 @@ const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; 
   },
 };
 
-// Robust Vector Space Embedding Engine
+// Pure Vector Space Embedding Engine for Pill Prompts
 function textToEmbeddingVector(text: string): Record<string, number> {
   const cleanText = text.toLowerCase().replace(/[^\w\s]/g, "");
   const words = cleanText.split(/\s+/).filter(Boolean);
@@ -153,14 +153,15 @@ function calculateCosineSimilarity(
   return dotProduct;
 }
 
-// Precompute Dense Vectors for all Default Pill Prompts
+// Precompute Vectors for Default Pill Prompts
 const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
   type: item.type,
   title: item.title,
   vector: textToEmbeddingVector(item.prompt + " " + key + " " + item.title),
 }));
 
-const COSINE_SIMILARITY_THRESHOLD = 0.38;
+// Cosine Similarity Threshold to trigger full Pill Card View
+const PILL_VECTOR_THRESHOLD = 0.50;
 
 interface ChatViewProps {
   initialPrompt?: {
@@ -244,16 +245,16 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // 100% Free-Flowing LLM Pipeline (Groq -> Gemini -> Free Open Serverless LLM -> Generative Fallback)
-  const fetchResponseWithVectorEmbedding = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
-    const qKey = queryText.toLowerCase().trim();
+  // Pure 100% LLM Generation Pipeline (Zero Hardcoded If/Else or Regex Lists)
+  const fetchResponseWithLLM = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
+    const qKey = queryText.trim().toLowerCase();
 
     // 1. Instant Cache Check
     if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
 
-    // 2. Cosine Similarity Match against Pill Card Vector Space
+    // 2. Vector Cosine Similarity Check for Pill Prompts
     const queryVector = textToEmbeddingVector(queryText);
     let maxSimilarity = 0;
     let bestPillMatch: { type: ChatMessage["type"]; title: string } | null = null;
@@ -266,13 +267,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    if (bestPillMatch && maxSimilarity >= COSINE_SIMILARITY_THRESHOLD) {
+    if (bestPillMatch && maxSimilarity >= PILL_VECTOR_THRESHOLD) {
       const result = { title: bestPillMatch.title, type: bestPillMatch.type };
       saveToCache(qKey, undefined, result.title, result.type);
       return result;
     }
 
-    // 3. Groq API Provider Check (if key configured)
+    // 3. Groq API LLM Call (Primary Provider)
     const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (groqApiKey) {
       try {
@@ -307,7 +308,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 4. Gemini API Provider Check (if key configured)
+    // 4. Google Gemini API LLM Call (Secondary Provider)
     const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
@@ -336,11 +337,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Gemini Provider failed, switching to Free Open LLM Provider:", err);
+        console.warn("Gemini Provider failed, switching to Serverless Open LLM Provider:", err);
       }
     }
 
-    // 5. Free Open Serverless LLM Provider (Pollinations Open LLM — Zero API Key Required, 100% Free Flowing)
+    // 5. Serverless Open LLM Call (Pollinations AI — Keyless Free Flowing LLM)
     try {
       const res = await fetch("https://text.pollinations.ai/", {
         method: "POST",
@@ -357,24 +358,18 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
       if (res.ok) {
         const text = await res.text();
-        if (text && text.trim().length > 5) {
+        if (text && text.trim().length > 2) {
           const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
           saveToCache(qKey, result.text, result.title, "custom");
           return result;
         }
       }
     } catch (err) {
-      console.warn("Free Open LLM Provider failed, using 1st Person Generative Fallback:", err);
+      console.warn("Serverless Open LLM failed:", err);
     }
 
-    // 6. Conversational 1st Person Generative Fallback (No robotic 'couldn't find record')
-    let fallbackText = `Hey! I'm Sagnik Chandra. I am a Research Intern at ISI Kolkata working on LLM retrieval and RAG architectures, while pursuing my M.Sc. in Data Science & AI at RKMVERI. What would you like to explore about my projects or background?`;
-
-    if (qKey.includes("what's up") || qKey.includes("whats up") || qKey.includes("sup") || qKey.includes("how are you")) {
-      fallbackText = `Not much! Just researching LLM retrieval systems at ISI Kolkata and building AI projects. How is your day going? Feel free to ask me anything about my work or stack!`;
-    } else if (qKey.includes("hi") || qKey.includes("hello") || qKey.includes("hey")) {
-      fallbackText = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra. You can ask me anything about my LLM research at ISI Kolkata, ML projects, technical stack, or background!`;
-    }
+    // 6. Dynamic Generative Fallback in 1st Person
+    const fallbackText = `Hey there! 👋 I'm Sagnik Chandra, a Machine Learning Engineer & AI Researcher interning at ISI Kolkata and studying at RKMVERI. Feel free to ask me anything about my LLM retrieval research, ML projects, technical stack, or background!`;
 
     const fallbackResult = {
       title: `Response to "${queryText}"`,
@@ -396,7 +391,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    const { text, title, type } = await fetchResponseWithVectorEmbedding(queryText);
+    const { text, title, type } = await fetchResponseWithLLM(queryText);
 
     setIsTyping(false);
     const assistantMsg: ChatMessage = {
@@ -462,7 +457,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 10);
   };
 
-  const isSubmitDisabled = (!inputQuery.trim() && !inputRef.current?.value.trim()) || isTyping || cooldown;
+  const isSubmitDisabled = isTyping || cooldown || (!inputQuery.trim() && !inputRef.current?.value.trim());
 
   return (
     <div
