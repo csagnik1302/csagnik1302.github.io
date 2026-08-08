@@ -130,14 +130,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
-    const userMsg: ChatMessage = {
-      id: Date.now().toString() + "-user",
-      role: "user",
-      content: userPrompt,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
     setTimeout(() => {
@@ -149,7 +141,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         title: title || "Response",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
-      setMessages((prev) => [...prev, assistantMsg]);
+
+      const userMsg: ChatMessage = {
+        id: Date.now().toString() + "-user",
+        role: "user",
+        content: userPrompt,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+
+      setMessages((prev) => [...prev, assistantMsg, userMsg]);
     }, 450);
   };
 
@@ -165,14 +165,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    const userMsg: ChatMessage = {
-      id: Date.now().toString() + "-user",
-      role: "user",
-      content: queryText,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
     setTimeout(() => {
@@ -185,7 +177,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         title: `Answer for "${queryText}"`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
-      setMessages((prev) => [...prev, assistantMsg]);
+
+      const userMsg: ChatMessage = {
+        id: Date.now().toString() + "-user",
+        role: "user",
+        content: queryText,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+
+      setMessages((prev) => [...prev, assistantMsg, userMsg]);
     }, 450);
   };
 
@@ -233,7 +233,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       </header>
 
       {/* Main Conversation Stream */}
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8 pb-36">
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
@@ -245,18 +245,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className="space-y-2">
-            {/* User Prompt Speech Bubble Left-aligned at Bottom */}
-            {msg.role === "user" && (
-              <div className="flex justify-start animate-slide-in-left pt-2">
-                <div className="bg-white/10 text-white border border-white/15 px-5 py-3 rounded-3xl rounded-tl-sm text-sm max-w-[90%] sm:max-w-[80%] shadow-lg flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#0171E3] shrink-0" />
-                  <span className="font-medium text-slate-100">{msg.content}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Assistant Response Card Left-aligned */}
+          <div key={msg.id} className="space-y-3">
+            {/* Assistant Response Card */}
             {msg.role === "assistant" && (
               <div className="flex justify-start animate-slide-in-left">
                 <div className="w-full bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
@@ -586,6 +576,17 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* User Prompt Speech Bubble Positioned at Bottom-Left */}
+            {msg.role === "user" && (
+              <div className="flex justify-start animate-slide-in-left pt-1">
+                <div className="bg-white/10 border border-white/15 text-slate-200 px-4 py-2 rounded-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5 shadow-md">
+                  <span className="w-2 h-2 rounded-full bg-[#0171E3] shrink-0" />
+                  <span className="text-slate-400 font-mono text-xs">Prompt:</span>
+                  <span className="text-white font-medium">{msg.content}</span>
                 </div>
               </div>
             )}
