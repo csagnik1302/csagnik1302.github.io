@@ -282,6 +282,27 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     // 3. Cloudflare Worker LLM Proxy Call (Groq Llama 3.1 8B Instant)
     const WORKER_URL = "https://sagnik-portfolio-ai.sagnikchandra.workers.dev/";
 
+    // Helper to detect query intent and match color theme
+    const detectIntentType = (qStr: string): ChatMessage["type"] => {
+      const q = qStr.toLowerCase();
+      if (q.includes("research") || q.includes("lost in the middle") || q.includes("isi") || q.includes("experience") || q.includes("work") || q.includes("intern")) {
+        return "experience";
+      }
+      if (q.includes("education") || q.includes("study") || q.includes("rkmveri") || q.includes("degree") || q.includes("msc") || q.includes("bsc") || q.includes("college") || q.includes("university") || q.includes("math")) {
+        return "education";
+      }
+      if (q.includes("project") || q.includes("bengali") || q.includes("academiclens") || q.includes("drone") || q.includes("stellar") || q.includes("graph")) {
+        return "projects";
+      }
+      if (q.includes("skill") || q.includes("stack") || q.includes("python") || q.includes("pytorch") || q.includes("pyspark") || q.includes("language") || q.includes("tool") || q.includes("framework") || q.includes("sql")) {
+        return "skills";
+      }
+      if (q.includes("contact") || q.includes("email") || q.includes("phone") || q.includes("reach") || q.includes("hire") || q.includes("linkedin") || q.includes("github") || q.includes("instagram")) {
+        return "contact";
+      }
+      return "me";
+    };
+
     try {
       const res = await fetchWithTimeout(
         WORKER_URL,
@@ -298,11 +319,12 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
       if (res.ok) {
         const data = await res.json();
-          if (data && data.text && data.text.trim()) {
-            const result = { text: data.text.trim(), title: "AI Response", type: "custom" as const };
-            saveToCache(qKey, result.text, result.title, "custom");
-            return result;
-          }
+        if (data && data.text && data.text.trim()) {
+          const detectedType = detectIntentType(queryText);
+          const result = { text: data.text.trim(), title: "AI Response", type: detectedType };
+          saveToCache(qKey, result.text, result.title, detectedType);
+          return result;
+        }
       }
     } catch (err) {
       console.warn("Cloudflare Worker LLM Proxy call failed:", err);
@@ -317,34 +339,39 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     const isSkills = qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark") || qKey.includes("language") || qKey.includes("tool") || qKey.includes("framework") || words.includes("c") || words.includes("r") || qKey.includes("sql");
     const isEducation = qKey.includes("education") || qKey.includes("study") || qKey.includes("rkmveri") || qKey.includes("degree") || qKey.includes("msc") || qKey.includes("bsc") || qKey.includes("college") || qKey.includes("university") || qKey.includes("math");
     const isContact = qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire") || qKey.includes("linkedin") || qKey.includes("github");
-    const isBio = qKey.includes("who are you") || qKey.includes("about") || qKey.includes("bio") || qKey.includes("background") || qKey.includes("sagnik");
 
     let textOut = "";
+    let detectedType: ChatMessage["type"] = "me";
 
     if (isGreeting && !isResearch && !isProject && !isSkills) {
       textOut = `Hey there! 👋 Welcome to my portfolio website. How's your day going? Feel free to ask me about my research, projects, or background!`;
+      detectedType = "me";
     } else if (isResearch) {
       textOut = `At the **Indian Statistical Institute (ISI)** in Kolkata, my research focuses on the **"Lost in the Middle"** phenomenon in Large Language Models (LLMs) and RAG pipelines.\n\nI evaluate how document ordering and context placement within long prompts impact factual retrieval accuracy and attention weight distribution using datasets derived from NaturalQuestions and TREC RAG benchmarks.`;
+      detectedType = "experience";
     } else if (isProject) {
       textOut = `Here are a few of my highlighted Machine Learning & Systems projects:\n\n1. **Neural Literary Style Transfer**: Semi-automated Bengali sentence rewriting pipeline using BiGRU encoders with Gradient Reversal Layers (GRL).\n2. **AcademicLens**: Citation graph intelligence system over 10M+ research papers built with PySpark ETL & Neo4j PageRank.\n3. **Stellar Object Classification**: Multi-class SDSS DR18 galaxy/quasar/star classifier with CatBoost & XGBoost (>99% accuracy).\n4. **Drone Delivery Route Optimisation**: Traffic congestion-aware delivery route optimization using stochastic hill climbing.`;
+      detectedType = "projects";
     } else if (isSkills) {
       textOut = `Here is my current technical stack & framework expertise:\n\n• **Languages**: ${skillsKB.languages.join(", ")}\n• **Frameworks & ML**: ${skillsKB.frameworks.join(", ")}\n• **Tools & Platforms**: ${skillsKB.tools.join(", ")}`;
+      detectedType = "skills";
     } else if (isEducation) {
       textOut = `My Academic Background:\n\n🎓 **M.Sc. in Data Science & Artificial Intelligence**\nRamakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur (2025–2027)\n*Focusing on Deep Learning, NLP, RAG Pipelines, and Distributed Systems.*\n\n🎓 **B.Sc. (Hons) in Mathematics**\nUniversity of Calcutta (2020–2023)`;
+      detectedType = "education";
     } else if (isContact) {
       textOut = `Feel free to connect or reach out directly:\n\n📬 **Email**: sagnikchandra@gmail.com\n🐙 **GitHub**: github.com/csagnik1302\n💼 **LinkedIn**: linkedin.com/in/sagnik-chandra-52b0a111a/\n📄 **Resume**: Click the button below to view or download my official Resume PDF.`;
-    } else if (isBio) {
-      textOut = `I'm Sagnik Chandra, a Machine Learning Engineer & AI Researcher based in Kolkata, India. Driven by deep learning and mathematical rigor, I research LLM retrieval at ISI Kolkata and build distributed ML systems. In my free time, I enjoy reading medieval history, psychology, competitive chess, and gaming!`;
+      detectedType = "contact";
     } else {
       textOut = `I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI Belur. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. How can I assist you with my research, projects, or background?`;
+      detectedType = "me";
     }
 
     const result = {
       title: `Response to "${queryText}"`,
       text: textOut,
-      type: "custom" as const,
+      type: detectedType,
     };
-    saveToCache(qKey, result.text, result.title, "custom");
+    saveToCache(qKey, result.text, result.title, detectedType);
     return result;
   };
 
