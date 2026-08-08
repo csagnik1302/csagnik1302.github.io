@@ -130,7 +130,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
-    // 1. Pop out prompt bubble from bottom input dock onto the left side of stream
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -141,7 +140,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    // 2. Response card slides in after brief generating delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -205,7 +203,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     if (isTyping) return;
     const item = CARD_PROMPTS[cardKey];
     
-    // Type out prompt text in bottom search bar then pop out prompt bubble
     let i = 0;
     const fullText = item.prompt;
     setInputQuery("");
@@ -293,7 +290,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {/* Render Response Content Based on Type */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
-                      {/* Top Profile Block - Raphaël Giraud Layout Reference */}
+                      {/* Top Profile Block - Curtain Raiser */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                           <Image
@@ -310,47 +307,67 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                               Sagnik Chandra
                             </h2>
-                            <p className="text-xs font-mono text-slate-400 font-medium pt-0.5">
-                              Kolkata, India
+                            <p className="text-xs font-mono text-blue-400 font-semibold pt-0.5">
+                              Machine Learning & AI Researcher
                             </p>
                           </div>
 
-                          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                            Hey 👋 I'm Sagnik. I'm an aspiring Machine Learning Engineer & AI Researcher pursuing my M.Sc. in Data Science & AI at RKMVERI. I'm currently interning at ISI Kolkata researching LLM retrieval.
+                          {/* Curtain Raiser Intro Paragraph */}
+                          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                            Driven by deep learning and intelligent retrieval systems. Currently advancing LLM research at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI.
                           </p>
 
-                          {/* Tag Badges */}
+                          {/* Structured Single-Word & Acronym Badges */}
                           <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                              AI
+                            <span className="px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs font-mono border border-blue-500/30">
+                              Kolkata
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                              ML Engineer
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              MLE
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              NLP
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              LLMs
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              RAG
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              MCP
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
+                              ISI
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10">
                               RKMVERI
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                              ISI Intern
+                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
+                              Gamer
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                              History & Psychology
+                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
+                              Chessist
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
-                              Gamer & Chess
+                            <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30">
+                              Historian
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Bottom Conversational Story Paragraph */}
-                      <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-4 border-t border-white/10">
+                      {/* Bottom Space - Deep Narrative Story */}
+                      <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-5 border-t border-white/10">
                         <p>
-                          I'm Sagnik Chandra, an AI researcher and Data Science student specializing in Machine Learning at RKMVERI Belur. Driven by a deep curiosity for mathematics and intelligence systems, I love exploring how models process context and attention. Currently, I'm at the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong> researching the <strong className="text-white font-semibold">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures, while learning LangChain, RAG, and MCP (Model Context Protocol).
+                          My focus in Artificial Intelligence stems from a deep curiosity about how neural networks process context and attention. At the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong>, I investigate the <strong className="text-white font-semibold font-mono text-blue-300">"Lost in the Middle"</strong> phenomenon in Large Language Models — evaluating how document order and context placement affect factual retrieval in multi-document RAG architectures using NaturalQuestions and TREC RAG benchmarks.
                         </p>
 
                         <p>
-                          When I'm not in code or research papers, you'll find me reading books on <strong className="text-white font-semibold">Modern and Medieval History</strong> and <strong className="text-white font-semibold">Psychology</strong>, playing competitive <strong className="text-white font-semibold">chess</strong>, or <strong className="text-white font-semibold">gaming</strong>. Voilà! What about you? What brings you here? 😊
+                          Beyond core model evaluation, I actively build with modern AI paradigms including <strong className="text-white font-semibold">Model Context Protocol (MCP)</strong>, <strong className="text-white font-semibold">LangChain</strong>, <strong className="text-white font-semibold">PyTorch</strong>, and distributed PySpark & Neo4j graph pipelines. I love bridging theoretical mathematical concepts with high-throughput production systems.
+                        </p>
+
+                        <p>
+                          Outside of research papers and terminal windows, I am a passionate reader of <strong className="text-white font-semibold">Modern & Medieval History</strong> and behavioral <strong className="text-white font-semibold">Psychology</strong>. I am also a competitive <strong className="text-white font-semibold">chess player</strong> and dedicated <strong className="text-white font-semibold">gamer</strong> — passions that continuously sharpen my strategic problem-solving mindset.
                         </p>
                       </div>
 
