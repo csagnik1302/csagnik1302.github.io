@@ -246,16 +246,17 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
         {messages.map((msg) => (
           <div key={msg.id} className="space-y-2">
-            {/* User Speech Bubble with Right Slide-in Animation */}
+            {/* User Prompt Speech Bubble Left-aligned at Bottom */}
             {msg.role === "user" && (
-              <div className="flex justify-end animate-slide-in-right">
-                <div className="bg-[#0171E3] text-white px-5 py-3 rounded-3xl rounded-tr-sm text-sm max-w-[85%] sm:max-w-[75%] shadow-lg">
-                  {msg.content}
+              <div className="flex justify-start animate-slide-in-left pt-2">
+                <div className="bg-white/10 text-white border border-white/15 px-5 py-3 rounded-3xl rounded-tl-sm text-sm max-w-[90%] sm:max-w-[80%] shadow-lg flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#0171E3] shrink-0" />
+                  <span className="font-medium text-slate-100">{msg.content}</span>
                 </div>
               </div>
             )}
 
-            {/* Assistant Response Card with Left Slide-in Animation */}
+            {/* Assistant Response Card Left-aligned */}
             {msg.role === "assistant" && (
               <div className="flex justify-start animate-slide-in-left">
                 <div className="w-full bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
