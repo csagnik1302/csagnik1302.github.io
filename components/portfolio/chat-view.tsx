@@ -473,12 +473,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             {msg.role === "assistant" && (
               <div className="flex justify-center w-full animate-slide-in-right">
                 <div className="w-full max-w-4xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
-                  {/* Assistant Header Badge */}
-                  <div className="flex items-center gap-2 text-xs font-mono text-blue-400 pb-2 border-b border-white/10">
-                    <Sparkles className="w-4 h-4" />
-                    <span>{msg.title || "Response"}</span>
-                  </div>
-
                   {/* Aspect 3: Render 1st-Person Card Views or Text Responses */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
