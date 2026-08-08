@@ -279,11 +279,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
       if (res.ok) {
         const data = await res.json();
-        if (data && data.text && data.text.trim()) {
-          const result = { text: data.text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
-          saveToCache(qKey, result.text, result.title, "custom");
-          return result;
-        }
+          if (data && data.text && data.text.trim()) {
+            const result = { text: data.text.trim(), title: "AI Response", type: "custom" as const };
+            saveToCache(qKey, result.text, result.title, "custom");
+            return result;
+          }
       }
     } catch (err) {
       console.warn("Cloudflare Worker LLM Proxy call failed:", err);
@@ -799,17 +799,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                       <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap">
                         {msg.content}
                       </p>
-                      <div className="pt-2">
-                        <a
-                          href={RESUME_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>View Official Resume</span>
-                        </a>
-                      </div>
                     </div>
                   )}
                 </div>
