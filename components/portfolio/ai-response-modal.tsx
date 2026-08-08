@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   X,
   Download,
@@ -11,8 +12,6 @@ import {
   Sparkles,
   BookOpen,
   Code2,
-  Briefcase,
-  Award,
 } from "lucide-react";
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
@@ -56,60 +55,60 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
         {/* Content Body Based on Category */}
         <div className="space-y-6 text-sm">
           {content.type === "me" && (
-            <div className="space-y-5">
-              {/* Header Title Card */}
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xl font-bold text-white">Sagnik Chandra</h4>
-                  <span className="text-xs font-mono text-blue-400 font-semibold">Kolkata, India</span>
+            <div className="space-y-6">
+              {/* Story Intro Header with Profile Photo */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-2">
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shrink-0 border-2 border-white/15 shadow-xl">
+                  <Image
+                    src="/sagnik-profile.jpg"
+                    alt="Sagnik Chandra"
+                    fill
+                    className="object-cover object-center"
+                    priority
+                  />
                 </div>
-                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed pt-1">
-                  👋 Hey there! I'm Sagnik Chandra, an aspiring Machine Learning Engineer & AI Researcher. I have a passion for turning complex AI research concepts into reliable, production-ready systems.
+
+                <div className="space-y-2 text-center sm:text-left">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                    Hey, I'm Sagnik Chandra 👋
+                  </h2>
+                  <p className="text-xs font-mono text-blue-400 font-medium">
+                    Machine Learning Researcher • Kolkata, India
+                  </p>
+                  <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                      RKMVERI
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                      ISI Research Intern
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                      History & Psychology
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                      Gamer & Chess
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seamless Storytelling Flow (No Inner Sub-Cards) */}
+              <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal pt-2 border-t border-white/10">
+                <p>
+                  I'm an AI researcher and Data Science student at RKMVERI Belur, driven by a deep curiosity for mathematics and intelligent systems. My work revolves around understanding how large language models process context and attention — currently, I'm at the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong> researching the <strong className="text-white font-semibold">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG pipelines.
                 </p>
-              </div>
 
-              {/* Research Focus Card */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#A855F7] uppercase">
-                  <BookOpen className="w-4 h-4" />
-                  <span>Current Research Focus</span>
-                </div>
-                <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
-                  Investigating the <strong className="text-white">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures at Indian Statistical Institute (ISI), exploring context positioning and attention degradation.
+                <p>
+                  Beyond research, I'm constantly expanding my engineering toolkit, diving into <strong className="text-white font-semibold">LangChain</strong>, advanced <strong className="text-white font-semibold">RAG architectures</strong>, and <strong className="text-white font-semibold">Model Context Protocol (MCP)</strong> to build scalable, production-ready AI systems.
                 </p>
-              </div>
 
-              {/* Currently Learning Section */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs">
-                <div className="flex items-center gap-2 font-mono font-bold text-slate-300 uppercase">
-                  <Code2 className="w-4 h-4 text-emerald-400" />
-                  <span>Currently Learning</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
-                    LangChain
-                  </span>
-                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
-                    RAG
-                  </span>
-                  <span className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-mono text-white border border-white/10">
-                    MCP (Model Context Protocol)
-                  </span>
-                </div>
-              </div>
-
-              {/* Personal Passions & Hobbies Card */}
-              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="text-xs font-mono font-semibold text-amber-400 uppercase">
-                  Beyond Coding & Research
-                </div>
-                <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">
-                  When I'm not in code or research papers, I love reading books on <strong className="text-white">Modern & Medieval History</strong> and <strong className="text-white">Psychology</strong>, playing competitive <strong className="text-white">chess</strong>, or <strong className="text-white">gaming</strong>. What about you? What brings you here? 😊
+                <p>
+                  When I'm not immersed in code or research papers, I love exploring human history and mindsets — reading books on <strong className="text-white font-semibold">Modern and Medieval History</strong> and <strong className="text-white font-semibold">Psychology</strong>, sharpening my strategy over competitive <strong className="text-white font-semibold">chess</strong>, or relaxing with <strong className="text-white font-semibold">gaming</strong>. What about you? What brings you here? 😊
                 </p>
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
                 <a
                   href={RESUME_URL}
                   target="_blank"
