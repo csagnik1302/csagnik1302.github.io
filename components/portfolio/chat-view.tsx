@@ -30,36 +30,47 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+// Granular Unlimited Knowledge Base for Custom Search
 const KNOWLEDGE_RESPONSES = [
   {
-    keywords: ["lost in the middle", "llm", "rag", "retrieval", "research", "currently working", "mcp", "langchain"],
-    title: "Research & Learning Focus",
-    text: "Sagnik is currently conducting research on the 'Lost in the Middle' phenomenon in Large Language Model (LLM) retrieval and RAG pipelines at ISI Kolkata, and currently learning LangChain, RAG, and MCP (Model Context Protocol).",
+    keywords: ["lost in the middle", "llm", "rag", "retrieval", "isi", "research", "naturalquestions", "ms marco", "trec"],
+    title: "ISI Kolkata Research — Lost in the Middle & RAG",
+    text: "Sagnik is a Research Intern at the Indian Statistical Institute (ISI) Kolkata (May 2026 – Present). He investigates the 'Lost in the Middle' phenomenon in Large Language Models (LLMs) on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct. He is extending this validation to full RAG pipelines on non-factoid texts using the modified MS MARCO 2.1 dataset from the TREC RAG 2024 benchmark.",
   },
   {
-    keywords: ["resume", "cv", "experience", "document", "download"],
-    title: "Official Resume & Credentials",
-    text: "You can view and download Sagnik's latest official Resume & Experience PDF directly from Google Drive!",
+    keywords: ["deepthought", "internship", "crm", "kpi", "automation", "efficiency"],
+    title: "DeepThought Internship — Data Science & AI",
+    text: "At DeepThought CultureTech Ventures (Oct 2024 – Jul 2025), Sagnik served as a Data Science Intern leading 10+ AI automation & CRM reporting initiatives. He redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting operational efficiency by 60% across 30+ stakeholders.",
   },
   {
     keywords: ["project", "projects", "style transfer", "bengali", "academiclens", "drone", "citation", "stellar"],
-    title: "Featured ML & Data Projects",
-    text: "Sagnik's key projects:\n• Neural Text Style Transfer with Adversarial Learning (BiGRU + GRL Discriminator)\n• AcademicLens (10M+ Research Papers Intelligence Graph in Neo4j/PySpark)\n• Stellar Object Classification (SDSS DR18 CatBoost >99% Accuracy)\n• Drone Delivery Route Optimization (TSP & Hill Climbing)",
+    title: "Featured ML & Data Engineering Projects",
+    text: "Sagnik's Key Projects:\n1. Neural Text Style Transfer: Semi-automated pipeline to rewrite Bengali sentences in five author styles using BiGRU + GRL Discriminator.\n2. AcademicLens: Distributed graph intelligence system over 10M+ OpenAlex research papers in Neo4j/PySpark with PageRank influence scoring.\n3. Stellar Object Classification: SDSS DR18 galaxy/quasar/star classifier with CatBoost/XGBoost achieving >99% test accuracy.\n4. Drone Route Optimisation: Stochastic and deterministic hill climbing for delivery routing across 120 locations.",
   },
   {
-    keywords: ["education", "rkmveri", "degree", "university", "math", "msc"],
-    title: "Academic Background",
-    text: "Sagnik's Academic Record:\n🎓 M.Sc. in Data Science & Artificial Intelligence @ RKMVERI Belur (2025–2027)",
+    keywords: ["education", "rkmveri", "degree", "university", "master", "msc"],
+    title: "Academic Degree — RKMVERI Belur",
+    text: "Sagnik is pursuing his M.Sc. in Data Science & Artificial Intelligence (2025–2027) at Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur. His curriculum focuses on Deep Learning, NLP, Distributed Computing, and Statistical Machine Learning.",
   },
   {
     keywords: ["skills", "python", "pytorch", "pyspark", "tools", "stack", "neo4j", "langchain", "ollama", "sql", "mcp"],
-    title: "Technical Stack & Frameworks",
-    text: "Sagnik's Technical Stack:\n• Languages: Python, C, Cypher, R, SQL\n• Frameworks: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain\n• Tools & Platforms: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), MCP",
+    title: "Technical Stack & Tools",
+    text: "Sagnik's Technical Stack:\n• Languages: Python, C, Cypher, R, SQL\n• Frameworks & Libraries: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain\n• Platforms & Tools: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), Model Context Protocol (MCP)",
   },
   {
-    keywords: ["contact", "email", "hire", "job", "reach", "linkedin", "github"],
-    title: "Contact Information",
-    text: "Contact Sagnik Chandra:\n📬 Email: sagnikchandra@gmail.com\n🐙 GitHub: github.com/csagnik1302\n💼 LinkedIn: linkedin.com/in/sagnik-chandra-52b0a111a/",
+    keywords: ["history", "psychology", "chess", "gamer", "gaming", "books", "hobbies", "passions"],
+    title: "Personal Interests & Hobbies",
+    text: "Outside of computer science, Sagnik is an avid reader of Modern & Medieval History and behavioral Psychology. He is also a competitive chess player and dedicated gamer — hobbies that sharpen his analytical strategy and problem-solving mindset.",
+  },
+  {
+    keywords: ["contact", "email", "hire", "job", "reach", "linkedin", "github", "location", "kolkata"],
+    title: "Contact & Social Links",
+    text: "Contact Sagnik Chandra:\n📍 Location: Kolkata, India\n📬 Email: sagnikchandra@gmail.com\n🐙 GitHub: github.com/csagnik1302\n💼 LinkedIn: linkedin.com/in/sagnik-chandra-52b0a111a/",
+  },
+  {
+    keywords: ["resume", "cv", "pdf", "download"],
+    title: "Official Resume & Experience PDF",
+    text: "You can view and download Sagnik's latest official Resume & Experience PDF directly from Google Drive:\nhttps://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing",
   },
 ];
 
@@ -154,16 +165,39 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
+  // High-accuracy Unlimited Client-Side Intelligence Engine
   const triggerAnimatedCustomSearch = (queryText: string) => {
-    const q = queryText.toLowerCase();
-    let matchedAnswer =
-      "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur and interning at ISI Kolkata. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and is currently learning LangChain, RAG, and MCP.";
+    const q = queryText.toLowerCase().trim();
+    let bestMatchTitle = `Answer for "${queryText}"`;
+    let bestMatchText = "";
+    let highestScore = 0;
+
+    // Vector-style token matching across granular knowledge base
+    const queryTokens = q.split(/\s+/).filter((t) => t.length > 2);
 
     for (const item of KNOWLEDGE_RESPONSES) {
-      if (item.keywords.some((kw) => q.includes(kw))) {
-        matchedAnswer = item.text;
-        break;
+      let score = 0;
+      for (const kw of item.keywords) {
+        if (q.includes(kw)) {
+          score += 3;
+        }
       }
+      for (const token of queryTokens) {
+        if (item.text.toLowerCase().includes(token) || item.title.toLowerCase().includes(token)) {
+          score += 1;
+        }
+      }
+
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatchTitle = item.title;
+        bestMatchText = item.text;
+      }
+    }
+
+    if (!bestMatchText || highestScore === 0) {
+      bestMatchText = `Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher based in Kolkata, India. He is currently pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur and conducting research at ISI Kolkata on the 'Lost in the Middle' phenomenon in LLM retrieval and RAG pipelines. He actively works with PyTorch, PySpark, Neo4j, LangChain, and Model Context Protocol (MCP).`;
+      bestMatchTitle = `Sagnik Chandra Overview`;
     }
 
     const userMsg: ChatMessage = {
@@ -182,8 +216,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         id: Date.now().toString() + "-assistant",
         role: "assistant",
         type: "custom",
-        content: matchedAnswer,
-        title: `Answer for "${queryText}"`,
+        content: bestMatchText,
+        title: bestMatchTitle,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
@@ -638,7 +672,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           <div className="flex justify-center animate-fade-in pt-2">
             <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
               <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
-              <span>Generating response...</span>
+              <span>Searching knowledge base...</span>
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
