@@ -30,7 +30,70 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// Granular Unlimited Knowledge Base for Custom Search
+// System Instruction Knowledge Base for LLM Providers
+const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
+You are the interactive AI portfolio assistant for Sagnik Chandra.
+Answer any visitor question naturally, warmly, and accurately using Sagnik's official background below:
+
+[BIOGRAPHY & ROLE]
+- Name: Sagnik Chandra
+- Role: Aspiring Machine Learning Engineer & AI Researcher
+- Location: Kolkata, India
+- Degree: M.Sc. in Data Science & Artificial Intelligence (2025–2027) @ Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur.
+
+[EXPERIENCE & RESEARCH]
+1. Research Intern @ Indian Statistical Institute (ISI) Kolkata (May 2026 – Ongoing):
+   - Investigates the "Lost in the Middle" phenomenon in Large Language Models (LLMs) on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct.
+   - Extending validation to complete RAG pipelines on non-factoid texts using modified MS MARCO 2.1 dataset from TREC RAG 2024 benchmark.
+2. Data Science Intern @ DeepThought CultureTech Ventures (Oct 2024 – Jul 2025):
+   - Led 10+ AI automation & CRM reporting initiatives.
+   - Redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting efficiency by 60% across 30+ stakeholders.
+
+[FEATURED ML PROJECTS]
+1. Neural Text Style Transfer with Adversarial Learning: BiGRU encoder with Gradient Reversal Layer (GRL) and style-conditioned GRU decoder for Bengali text style transfer.
+2. AcademicLens: Distributed academic graph intelligence system over 10M+ OpenAlex research papers using PySpark & Neo4j with PageRank influence ranking.
+3. Stellar Object Classification (SDSS DR18): CatBoost & XGBoost classifier with Optuna Bayesian tuning achieving >99% test accuracy.
+4. Drone Route Optimisation: Stochastic and deterministic hill climbing for single-drone delivery route optimization across 120 delivery locations.
+
+[SKILLS & TOOLING]
+- Languages: Python, C, Cypher, R, SQL
+- Frameworks & Libraries: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain
+- Tools & Platforms: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), Model Context Protocol (MCP)
+
+[PERSONAL INTERESTS & PERSONA]
+- Avid reader of Modern & Medieval History and behavioral Psychology.
+- Competitive chess player and dedicated gamer — strategic passions that hone his problem-solving mindset.
+
+[RESPONSE RULES]
+- Be natural, helpful, engaging, and concise (2-4 sentences max).
+- Answer greetings warmly.
+- Keep output clean markdown without headers.
+`;
+
+// Intent Patterns Fallback when API providers are offline or rate-limited
+const SMALL_TALK_PATTERNS = [
+  {
+    keywords: ["hello", "hi", "hey", "hola", "greetings", "good morning", "good afternoon", "good evening", "hey there"],
+    title: "Greeting",
+    text: "Hey there! 👋 Welcome to Sagnik Chandra's interactive portfolio. Feel free to ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack, or background!",
+  },
+  {
+    keywords: ["how are you", "how's it going", "what's up", "sup", "how do you do"],
+    title: "Checking In",
+    text: "Doing great! Thanks for visiting. How can I help you explore Sagnik's ML research, projects, or background today?",
+  },
+  {
+    keywords: ["thanks", "thank you", "thx", "awesome", "cool", "great", "nice"],
+    title: "You're Welcome!",
+    text: "You're very welcome! 😊 Let me know if you'd like to check out Sagnik's research experience, projects, or download his resume.",
+  },
+  {
+    keywords: ["who are you", "what is this", "what can you do", "help", "options"],
+    title: "Portfolio Guide",
+    text: "I am Sagnik's interactive portfolio assistant! You can click any quick pill button below (Me, Projects, Experience, Skills, Education, Contact) or type custom questions like 'Tell me about ISI research' or 'What programming languages do you use?'",
+  },
+];
+
 const KNOWLEDGE_RESPONSES = [
   {
     keywords: ["lost in the middle", "llm", "rag", "retrieval", "isi", "research", "naturalquestions", "ms marco", "trec"],
@@ -119,13 +182,25 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // In-Memory & LocalStorage Client-Side Response Cache
+  const responseCacheRef = useRef<Record<string, { text: string; title: string }>>({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
+    // Load cached responses from sessionStorage if available
+    try {
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache");
+      if (savedCache) {
+        responseCacheRef.current = JSON.parse(savedCache);
+      }
+    } catch {}
+
     if (initialPrompt) {
       if (initialPrompt.type in CARD_PROMPTS) {
         const item = CARD_PROMPTS[initialPrompt.type];
@@ -139,6 +214,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  const saveToCache = (qKey: string, text: string, title: string) => {
+    responseCacheRef.current[qKey] = { text, title };
+    try {
+      sessionStorage.setItem("sagnik_chat_cache", JSON.stringify(responseCacheRef.current));
+    } catch {}
+  };
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
     const userMsg: ChatMessage = {
@@ -165,41 +247,130 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // High-accuracy Unlimited Client-Side Intelligence Engine
-  const triggerAnimatedCustomSearch = (queryText: string) => {
-    const q = queryText.toLowerCase().trim();
-    let bestMatchTitle = `Answer for "${queryText}"`;
-    let bestMatchText = "";
-    let highestScore = 0;
+  // Multi-Provider Cascade: Local Cache -> Groq API -> Gemini API -> Local Engine
+  const fetchLLMResponseWithCascade = async (queryText: string): Promise<{ text: string; title: string }> => {
+    const qKey = queryText.toLowerCase().trim();
 
-    // Vector-style token matching across granular knowledge base
-    const queryTokens = q.split(/\s+/).filter((t) => t.length > 2);
+    // 1. Instant Local Cache Check (0ms, 0 Token Usage)
+    if (responseCacheRef.current[qKey]) {
+      return responseCacheRef.current[qKey];
+    }
+
+    // 2. Groq API Provider Check (Llama 3.3 70B — 30 RPM Free)
+    const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    if (groqApiKey) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${groqApiKey}`,
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: SAGNIK_PORTFOLIO_SYSTEM_PROMPT },
+              { role: "user", content: queryText },
+            ],
+            temperature: 0.7,
+            max_tokens: 300,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.choices?.[0]?.message?.content;
+          if (text) {
+            const result = { text: text.trim(), title: `Response to "${queryText}"` };
+            saveToCache(qKey, result.text, result.title);
+            return result;
+          }
+        }
+      } catch (err) {
+        console.warn("Groq Provider failed, switching to Gemini Provider:", err);
+      }
+    }
+
+    // 3. Google Gemini API Provider Check (15 RPM Free)
+    const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    if (geminiApiKey) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system_instruction: {
+                parts: [{ text: SAGNIK_PORTFOLIO_SYSTEM_PROMPT }],
+              },
+              contents: [{ role: "user", parts: [{ text: queryText }] }],
+              generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+            }),
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            const result = { text: text.trim(), title: `Response to "${queryText}"` };
+            saveToCache(qKey, result.text, result.title);
+            return result;
+          }
+        }
+      } catch (err) {
+        console.warn("Gemini Provider failed, switching to Local Intent Engine:", err);
+      }
+    }
+
+    // 4. Local Intent Engine Fallback (0ms, 100% Offline, Unlimited)
+    // Small Talk Match
+    for (const pattern of SMALL_TALK_PATTERNS) {
+      if (pattern.keywords.some((kw) => qKey === kw || qKey.startsWith(kw + " ") || qKey.endsWith(" " + kw))) {
+        const result = { text: pattern.text, title: pattern.title };
+        saveToCache(qKey, result.text, result.title);
+        return result;
+      }
+    }
+
+    // Knowledge Scoring
+    const queryTokens = qKey.split(/\s+/).filter((t) => t.length > 2);
+    let highestScore = 0;
+    let matchedTitle = `Answer for "${queryText}"`;
+    let matchedText = "";
 
     for (const item of KNOWLEDGE_RESPONSES) {
       let score = 0;
       for (const kw of item.keywords) {
-        if (q.includes(kw)) {
-          score += 3;
-        }
+        if (qKey.includes(kw)) score += 3;
       }
       for (const token of queryTokens) {
-        if (item.text.toLowerCase().includes(token) || item.title.toLowerCase().includes(token)) {
-          score += 1;
-        }
+        if (item.text.toLowerCase().includes(token) || item.title.toLowerCase().includes(token)) score += 1;
       }
 
-      if (score > highestScore) {
+      if (score > highestScore && score >= 2) {
         highestScore = score;
-        bestMatchTitle = item.title;
-        bestMatchText = item.text;
+        matchedTitle = item.title;
+        matchedText = item.text;
       }
     }
 
-    if (!bestMatchText || highestScore === 0) {
-      bestMatchText = `Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher based in Kolkata, India. He is currently pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur and conducting research at ISI Kolkata on the 'Lost in the Middle' phenomenon in LLM retrieval and RAG pipelines. He actively works with PyTorch, PySpark, Neo4j, LangChain, and Model Context Protocol (MCP).`;
-      bestMatchTitle = `Sagnik Chandra Overview`;
+    if (matchedText) {
+      const result = { text: matchedText, title: matchedTitle };
+      saveToCache(qKey, result.text, result.title);
+      return result;
     }
 
+    const fallbackResult = {
+      title: "Interactive Search",
+      text: `I couldn't find a specific record for "${queryText}". You can ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack (PyTorch, PySpark, Neo4j, MCP), or click any quick pill button below!`,
+    };
+    saveToCache(qKey, fallbackResult.text, fallbackResult.title);
+    return fallbackResult;
+  };
+
+  const triggerAnimatedCustomSearch = async (queryText: string) => {
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -210,32 +381,39 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    setTimeout(() => {
-      setIsTyping(false);
-      const assistantMsg: ChatMessage = {
-        id: Date.now().toString() + "-assistant",
-        role: "assistant",
-        type: "custom",
-        content: bestMatchText,
-        title: bestMatchTitle,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
+    const { text, title } = await fetchLLMResponseWithCascade(queryText);
 
-      setMessages((prev) => [...prev, assistantMsg]);
-    }, 450);
+    setIsTyping(false);
+    const assistantMsg: ChatMessage = {
+      id: Date.now().toString() + "-assistant",
+      role: "assistant",
+      type: "custom",
+      content: text,
+      title: title,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    setMessages((prev) => [...prev, assistantMsg]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputQuery.trim() || isTyping) return;
+    if (!inputQuery.trim() || isTyping || cooldown) return;
+
+    // Rate Limiting Cooldown (1 sec)
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 1000);
 
     triggerAnimatedCustomSearch(inputQuery);
     setInputQuery("");
   };
 
   const handlePillClick = (cardKey: keyof typeof CARD_PROMPTS) => {
-    if (isTyping) return;
+    if (isTyping || cooldown) return;
     const item = CARD_PROMPTS[cardKey];
+
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 1000);
     
     let i = 0;
     const fullText = item.prompt;
@@ -672,7 +850,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           <div className="flex justify-center animate-fade-in pt-2">
             <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
               <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
-              <span>Searching knowledge base...</span>
+              <span>Thinking...</span>
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -695,7 +873,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 no-scrollbar">
             <button
               onClick={() => handlePillClick("me")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Smile className="w-3.5 h-3.5 text-emerald-400" />
@@ -703,7 +881,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             </button>
             <button
               onClick={() => handlePillClick("projects")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Briefcase className="w-3.5 h-3.5 text-blue-400" />
@@ -711,7 +889,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             </button>
             <button
               onClick={() => handlePillClick("experience")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Code2 className="w-3.5 h-3.5 text-[#38BDF8]" />
@@ -719,7 +897,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             </button>
             <button
               onClick={() => handlePillClick("skills")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Layers className="w-3.5 h-3.5 text-purple-400" />
@@ -727,7 +905,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             </button>
             <button
               onClick={() => handlePillClick("education")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
@@ -735,7 +913,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             </button>
             <button
               onClick={() => handlePillClick("contact")}
-              disabled={isTyping}
+              disabled={isTyping || cooldown}
               className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Mail className="w-3.5 h-3.5 text-pink-400" />
@@ -751,11 +929,12 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
                 placeholder="Ask me anything..."
-                className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none"
+                disabled={isTyping || cooldown}
+                className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={!inputQuery.trim() || isTyping}
+                disabled={!inputQuery.trim() || isTyping || cooldown}
                 aria-label="Submit question"
                 className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0"
               >
