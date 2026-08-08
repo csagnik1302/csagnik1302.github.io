@@ -1,9 +1,11 @@
 {
   "category": "contact",
   "email": "sagnikchandra@gmail.com",
+  "phone": "+91 82405 92956",
   "github": "https://github.com/csagnik1302",
   "linkedin": "https://www.linkedin.com/in/sagnik-chandra-52b0a111a/",
+  "instagram": "https://www.instagram.com/sagnik_chandra",
   "resume": "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing",
   "location": "Kolkata, India",
-  "keywords": ["contact", "email", "hire", "job", "reach", "linkedin", "github", "location", "resume", "cv"]
+  "keywords": ["contact", "email", "phone", "hire", "job", "reach", "linkedin", "github", "instagram", "location", "resume", "cv"]
 }

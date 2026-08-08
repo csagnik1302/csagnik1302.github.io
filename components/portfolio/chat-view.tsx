@@ -8,6 +8,11 @@ import {
   Layers,
   GraduationCap,
   Mail,
+  Phone,
+  Instagram,
+  Send,
+  CheckCircle2,
+  MessageSquare,
   ArrowRight,
   ArrowLeft,
   Sparkles,
@@ -151,6 +156,24 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const [inputQuery, setInputQuery] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [cooldown, setCooldown] = useState(false);
+  
+  const [reachoutName, setReachoutName] = useState("");
+  const [reachoutEmail, setReachoutEmail] = useState("");
+  const [reachoutMessage, setReachoutMessage] = useState("");
+  const [reachoutSent, setReachoutSent] = useState(false);
+
+  const handleReachoutSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reachoutMessage.trim()) return;
+
+    const subject = encodeURIComponent(`Message from Portfolio Visitor: ${reachoutName || "Anonymous"}`);
+    const body = encodeURIComponent(
+      `Name: ${reachoutName || "Not provided"}\nEmail: ${reachoutEmail || "Not provided"}\n\nMessage:\n${reachoutMessage}`
+    );
+
+    window.open(`mailto:${contactKB.email}?subject=${subject}&body=${body}`, "_blank");
+    setReachoutSent(true);
+  };
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -677,45 +700,150 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   )}
 
                   {msg.type === "contact" && (
-                    <div className="space-y-4">
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                        <div className="text-xs font-semibold text-[#9CA3AF] uppercase font-mono">Direct Email</div>
-                        <div className="text-sm font-mono text-white">{contactKB.email}</div>
+                    <div className="space-y-6">
+                      {/* Header Info Grid: Email & Phone */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <a
+                          href={`mailto:${contactKB.email}`}
+                          className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all group space-y-1.5"
+                        >
+                          <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] uppercase">
+                            <Mail className="w-3.5 h-3.5 text-blue-400" />
+                            <span>Direct Email</span>
+                          </div>
+                          <div className="text-sm font-mono font-semibold text-white group-hover:text-blue-300 transition-colors truncate">
+                            {contactKB.email}
+                          </div>
+                        </a>
+
+                        <a
+                          href={`tel:${(contactKB.phone || "+91 82405 92956").replace(/\s+/g, "")}`}
+                          className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all group space-y-1.5"
+                        >
+                          <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] uppercase">
+                            <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Phone Number</span>
+                          </div>
+                          <div className="text-sm font-mono font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                            {contactKB.phone || "+91 82405 92956"}
+                          </div>
+                        </a>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
-                        {contactKB.github && (
-                          <a
-                            href={contactKB.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5"
-                          >
-                            <Github className="w-4 h-4" />
-                            <span>GitHub</span>
-                          </a>
-                        )}
-                        {contactKB.linkedin && (
-                          <a
-                            href={contactKB.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5"
-                          >
-                            <Linkedin className="w-4 h-4" />
-                            <span>LinkedIn</span>
-                          </a>
-                        )}
-                        {RESUME_URL && (
-                          <a
-                            href={RESUME_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5"
-                          >
-                            <Download className="w-4 h-4" />
-                            <span>Resume PDF</span>
-                          </a>
+                      {/* Connect & Profile Badges */}
+                      <div className="space-y-2">
+                        <div className="text-xs font-mono text-[#9CA3AF] uppercase">Social & Professional Profiles</div>
+                        <div className="flex flex-wrap gap-2">
+                          {contactKB.linkedin && (
+                            <a
+                              href={contactKB.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-300 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95"
+                            >
+                              <Linkedin className="w-4 h-4 text-blue-400" />
+                              <span>LinkedIn</span>
+                              <ArrowUpRight className="w-3 h-3 text-blue-400/60" />
+                            </a>
+                          )}
+                          {contactKB.github && (
+                            <a
+                              href={contactKB.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-semibold flex items-center gap-2 transition-all active:scale-95"
+                            >
+                              <Github className="w-4 h-4 text-slate-300" />
+                              <span>GitHub</span>
+                              <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                            </a>
+                          )}
+                          {contactKB.instagram && (
+                            <a
+                              href={contactKB.instagram}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2.5 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 border border-pink-500/30 text-pink-300 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95"
+                            >
+                              <Instagram className="w-4 h-4 text-pink-400" />
+                              <span>Instagram</span>
+                              <ArrowUpRight className="w-3 h-3 text-pink-400/60" />
+                            </a>
+                          )}
+                          {RESUME_URL && (
+                            <a
+                              href={RESUME_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                            >
+                              <Download className="w-4 h-4" />
+                              <span>Official Resume PDF</span>
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Interactive Reach-Out Form */}
+                      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/15 space-y-4 shadow-xl">
+                        <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+                          <MessageSquare className="w-4 h-4 text-blue-400" />
+                          <h4 className="font-bold text-white text-sm">Send a Direct Message / Reach Out</h4>
+                        </div>
+
+                        {reachoutSent ? (
+                          <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs space-y-1.5 flex items-start gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                            <div>
+                              <div className="font-bold text-sm">Message Compiled & Opened!</div>
+                              <p className="text-emerald-300/90 leading-relaxed">
+                                Your message has been formatted into your default email app to send directly to Sagnik Chandra (<span className="font-mono underline">{contactKB.email}</span>).
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <form onSubmit={handleReachoutSubmit} className="space-y-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Your Name</label>
+                                <input
+                                  type="text"
+                                  value={reachoutName}
+                                  onChange={(e) => setReachoutName(e.target.value)}
+                                  placeholder="John Doe"
+                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Your Email</label>
+                                <input
+                                  type="email"
+                                  value={reachoutEmail}
+                                  onChange={(e) => setReachoutEmail(e.target.value)}
+                                  placeholder="john@example.com"
+                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Message / Project Inquiry</label>
+                              <textarea
+                                rows={3}
+                                value={reachoutMessage}
+                                onChange={(e) => setReachoutMessage(e.target.value)}
+                                placeholder="Hi Sagnik, I'd like to discuss research collaboration, a project opportunity, or connect..."
+                                required
+                                className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all resize-none"
+                              />
+                            </div>
+                            <button
+                              type="submit"
+                              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25 active:scale-98 cursor-pointer"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Send Direct Message to Sagnik</span>
+                            </button>
+                          </form>
                         )}
                       </div>
                     </div>
