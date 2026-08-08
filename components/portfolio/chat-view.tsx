@@ -496,12 +496,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             {/* SECOND: Assistant Output Card Centered */}
             {msg.role === "assistant" && (
               <div className="flex justify-center w-full animate-slide-in-right">
-                <div className="w-full max-w-4xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
+                <div className={`w-full max-w-4xl bg-[#12151E] border rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200 transition-all ${
+                  msg.type === "me" ? "border-emerald-500/30 shadow-emerald-950/20" :
+                  msg.type === "experience" ? "border-sky-500/30 shadow-sky-950/20" :
+                  msg.type === "education" ? "border-amber-500/30 shadow-amber-950/20" :
+                  msg.type === "projects" ? "border-blue-500/30 shadow-blue-950/20" :
+                  msg.type === "skills" ? "border-purple-500/30 shadow-purple-950/20" :
+                  msg.type === "contact" ? "border-pink-500/30 shadow-pink-950/20" :
+                  "border-white/10"
+                }`}>
                   {/* Aspect 3: Render 1st-Person Card Views or Text Responses */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                        <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
+                        <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-emerald-500/30 shadow-2xl">
                           <Image
                             src="/sagnik-profile.jpeg"
                             alt="Sagnik Chandra"
@@ -516,7 +524,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                               {profileKB.items[0].greeting || "Hi, I am Sagnik!"}
                             </h2>
-                            <p className="text-xs font-mono text-blue-400 font-semibold pt-0.5">
+                            <p className="text-xs font-mono text-emerald-400 font-semibold pt-0.5">
                               {profileKB.items[0].role} • {profileKB.items[0].location}
                             </p>
                           </div>
@@ -529,7 +537,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                             {profileKB.items[0].tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="px-2.5 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-mono border border-white/10"
+                                className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-mono border border-emerald-500/30"
                               >
                                 {tag}
                               </span>
@@ -538,27 +546,27 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                         </div>
                       </div>
 
-                      <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-5 border-t border-white/10">
+                      <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-5 border-t border-emerald-500/20">
                         {profileKB.items[0].paragraphs.map((pText, pIdx) => (
                           <p key={pIdx}>{pText}</p>
                         ))}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
+                      <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-emerald-500/20">
                         <a
                           href={RESUME_URL}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-blue-600/20"
+                          className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-500 transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20"
                         >
                           <Download className="w-4 h-4" />
                           <span>View Resume / Experience PDF</span>
                         </a>
                         <a
                           href="mailto:sagnikchandra@gmail.com"
-                          className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2"
+                          className="px-4 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-semibold text-xs transition-all flex items-center gap-2"
                         >
-                          <Mail className="w-4 h-4 text-[#9CA3AF]" />
+                          <Mail className="w-4 h-4 text-emerald-400" />
                           <span>Send Email</span>
                         </a>
                       </div>
@@ -568,15 +576,15 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {msg.type === "experience" && (
                     <div className="space-y-5">
                       {experienceKB.items.map((exp, idx) => (
-                        <div key={idx} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+                        <div key={idx} className="p-5 rounded-2xl bg-sky-500/5 border border-sky-500/20 hover:border-sky-500/40 transition-colors space-y-3">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <div>
                               <h4 className="font-bold text-white text-base">{exp.role}</h4>
-                              <p className="text-xs font-mono text-blue-400 font-semibold">{exp.company}</p>
+                              <p className="text-xs font-mono text-[#38BDF8] font-semibold">{exp.company}</p>
                             </div>
-                            <span className="text-xs font-mono text-[#9CA3AF]">{exp.period}</span>
+                            <span className="text-xs font-mono text-sky-300/80">{exp.period}</span>
                           </div>
-                          <p className="text-xs sm:text-sm text-[#9CA3AF] leading-relaxed">{exp.description}</p>
+                          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{exp.description}</p>
                         </div>
                       ))}
                     </div>
@@ -585,20 +593,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {msg.type === "projects" && (
                     <div className="space-y-4">
                       {projectsKB.items.map((proj, idx) => (
-                        <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                        <div key={idx} className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 hover:border-blue-500/40 transition-colors space-y-2">
                           <div className="flex items-center justify-between">
                             <h4 className="font-bold text-white">{proj.title}</h4>
                             <a
                               href={contactKB.github}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs text-blue-400 hover:underline flex items-center gap-1 shrink-0"
+                              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 shrink-0 font-medium"
                             >
                               <span>GitHub</span>
                               <ArrowUpRight className="w-3 h-3" />
                             </a>
                           </div>
-                          <p className="text-xs text-[#9CA3AF] leading-relaxed">{proj.description}</p>
+                          <p className="text-xs text-slate-300 leading-relaxed">{proj.description}</p>
                         </div>
                       ))}
                     </div>
@@ -606,33 +614,33 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
                   {msg.type === "skills" && (
                     <div className="space-y-4">
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                        <h4 className="font-bold text-white text-xs font-mono uppercase">Languages</h4>
+                      <div className="p-4 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2">
+                        <h4 className="font-bold text-purple-300 text-xs font-mono uppercase tracking-wider">Languages</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {skillsKB.languages.map((s) => (
-                            <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
+                            <span key={s} className="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-mono text-purple-200">
                               {s}
                             </span>
                           ))}
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                        <h4 className="font-bold text-white text-xs font-mono uppercase">Frameworks & ML Libraries</h4>
+                      <div className="p-4 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2">
+                        <h4 className="font-bold text-purple-300 text-xs font-mono uppercase tracking-wider">Frameworks & ML Libraries</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {skillsKB.frameworks.map((s) => (
-                            <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
+                            <span key={s} className="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-mono text-purple-200">
                               {s}
                             </span>
                           ))}
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                        <h4 className="font-bold text-white text-xs font-mono uppercase">Tools & Platforms</h4>
+                      <div className="p-4 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-2">
+                        <h4 className="font-bold text-purple-300 text-xs font-mono uppercase tracking-wider">Tools & Platforms</h4>
                         <div className="flex flex-wrap gap-1.5">
                           {skillsKB.tools.map((s) => (
-                            <span key={s} className="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-mono text-slate-200">
+                            <span key={s} className="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-mono text-purple-200">
                               {s}
                             </span>
                           ))}
@@ -644,14 +652,14 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {msg.type === "education" && (
                     <div className="space-y-4">
                       {educationKB.items.map((edu, idx) => (
-                        <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                          <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
+                        <div key={idx} className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 hover:border-amber-500/40 transition-colors space-y-1">
+                          <div className="flex items-center justify-between text-xs text-amber-400 font-mono">
                             <span>{edu.period}</span>
-                            <span>{edu.degree.includes("M.Sc") ? "Master's Degree" : "Bachelor's Degree"}</span>
+                            <span className="text-amber-300/80">{edu.degree.includes("M.Sc") ? "Master's Degree" : "Bachelor's Degree"}</span>
                           </div>
                           <h4 className="font-bold text-white text-base">{edu.degree}</h4>
-                          <p className="text-xs text-[#9CA3AF]">{edu.institution}</p>
-                          {edu.focus && <p className="text-xs text-[#9CA3AF] pt-1">{edu.focus}</p>}
+                          <p className="text-xs text-slate-300">{edu.institution}</p>
+                          {edu.focus && <p className="text-xs text-slate-400 pt-1">{edu.focus}</p>}
                         </div>
                       ))}
                     </div>
@@ -663,22 +671,22 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <a
                           href={`mailto:${contactKB.email}`}
-                          className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 transition-all group space-y-1.5"
+                          className="p-4 rounded-2xl bg-pink-500/5 border border-pink-500/20 hover:border-pink-500/50 hover:bg-pink-500/10 transition-all group space-y-1.5"
                         >
-                          <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] uppercase">
-                            <Mail className="w-3.5 h-3.5 text-blue-400" />
+                          <div className="flex items-center gap-2 text-xs font-mono text-pink-300 uppercase">
+                            <Mail className="w-3.5 h-3.5 text-pink-400" />
                             <span>Direct Email</span>
                           </div>
-                          <div className="text-sm font-mono font-semibold text-white group-hover:text-blue-300 transition-colors truncate">
+                          <div className="text-sm font-mono font-semibold text-white group-hover:text-pink-300 transition-colors truncate">
                             {contactKB.email}
                           </div>
                         </a>
 
                         <a
                           href={`tel:${(contactKB.phone || "+91 82405 92956").replace(/\s+/g, "")}`}
-                          className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all group space-y-1.5"
+                          className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all group space-y-1.5"
                         >
-                          <div className="flex items-center gap-2 text-xs font-mono text-[#9CA3AF] uppercase">
+                          <div className="flex items-center gap-2 text-xs font-mono text-emerald-300 uppercase">
                             <Phone className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Phone Number</span>
                           </div>
@@ -690,7 +698,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
                       {/* Connect & Profile Badges */}
                       <div className="space-y-2">
-                        <div className="text-xs font-mono text-[#9CA3AF] uppercase">Social & Professional Profiles</div>
+                        <div className="text-xs font-mono text-pink-300/80 uppercase">Social & Professional Profiles</div>
                         <div className="flex flex-wrap gap-2">
                           {contactKB.linkedin && (
                             <a
@@ -733,7 +741,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                               href={RESUME_URL}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-lg shadow-pink-600/20 active:scale-95"
                             >
                               <Download className="w-4 h-4" />
                               <span>Official Resume PDF</span>
@@ -743,9 +751,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                       </div>
 
                       {/* Interactive Reach-Out Form */}
-                      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-white/10 via-white/5 to-transparent border border-white/15 space-y-4 shadow-xl">
-                        <div className="flex items-center gap-2 border-b border-white/10 pb-3">
-                          <MessageSquare className="w-4 h-4 text-blue-400" />
+                      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-pink-500/10 via-pink-500/5 to-transparent border border-pink-500/20 space-y-4 shadow-xl">
+                        <div className="flex items-center gap-2 border-b border-pink-500/20 pb-3">
+                          <MessageSquare className="w-4 h-4 text-pink-400" />
                           <h4 className="font-bold text-white text-sm">Send a Direct Message / Reach Out</h4>
                         </div>
 
@@ -763,40 +771,40 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                           <form onSubmit={handleReachoutSubmit} className="space-y-3">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Your Name</label>
+                                <label className="block text-[11px] font-mono text-pink-300/80 mb-1">Your Name</label>
                                 <input
                                   type="text"
                                   value={reachoutName}
                                   onChange={(e) => setReachoutName(e.target.value)}
                                   placeholder="John Doe"
-                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all"
+                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-pink-500/20 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-pink-500 transition-all"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Your Email</label>
+                                <label className="block text-[11px] font-mono text-pink-300/80 mb-1">Your Email</label>
                                 <input
                                   type="email"
                                   value={reachoutEmail}
                                   onChange={(e) => setReachoutEmail(e.target.value)}
                                   placeholder="john@example.com"
-                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all"
+                                  className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-pink-500/20 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-pink-500 transition-all"
                                 />
                               </div>
                             </div>
                             <div>
-                              <label className="block text-[11px] font-mono text-[#9CA3AF] mb-1">Message / Project Inquiry</label>
+                              <label className="block text-[11px] font-mono text-pink-300/80 mb-1">Message / Project Inquiry</label>
                               <textarea
                                 rows={3}
                                 value={reachoutMessage}
                                 onChange={(e) => setReachoutMessage(e.target.value)}
                                 placeholder="Hi Sagnik, I'd like to discuss research collaboration, a project opportunity, or connect..."
                                 required
-                                className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-blue-500 transition-all resize-none"
+                                className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-pink-500/20 text-xs text-white placeholder-[#6B7280] focus:outline-none focus:border-pink-500 transition-all resize-none"
                               />
                             </div>
                             <button
                               type="submit"
-                              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25 active:scale-98 cursor-pointer"
+                              className="w-full py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-pink-600/25 active:scale-98 cursor-pointer"
                             >
                               <Send className="w-3.5 h-3.5" />
                               <span>Send Direct Message to Sagnik</span>
