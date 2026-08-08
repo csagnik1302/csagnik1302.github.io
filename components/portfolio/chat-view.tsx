@@ -179,7 +179,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const [inputQuery, setInputQuery] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [cooldown, setCooldown] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   const responseCacheRef = useRef<Record<string, { text?: string; title: string; type: ChatMessage["type"] }>>({});
 
@@ -188,6 +190,12 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   };
 
   useEffect(() => {
+    // FORCE EMPTY SEARCH INPUT ON RELOAD / MOUNT TO OVERRIDE BROWSER AUTO-FILL CACHE
+    setInputQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+
     try {
       const savedCache = sessionStorage.getItem("sagnik_chat_cache");
       if (savedCache) {
@@ -400,13 +408,19 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputQuery.trim() || isTyping || cooldown) return;
+    const queryToSubmit = inputQuery.trim() || inputRef.current?.value.trim() || "";
+    if (!queryToSubmit || isTyping || cooldown) return;
 
     setCooldown(true);
     setTimeout(() => setCooldown(false), 1000);
 
-    triggerAnimatedCustomSearch(inputQuery);
+    triggerAnimatedCustomSearch(queryToSubmit);
+    
+    // Explicitly reset React state AND DOM input element
     setInputQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const handlePillClick = (cardKey: keyof typeof CARD_PROMPTS) => {
@@ -419,19 +433,32 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     let i = 0;
     const fullText = item.prompt;
     setInputQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+
     const interval = setInterval(() => {
       if (i < fullText.length) {
-        setInputQuery(fullText.substring(0, i + 1));
+        const partial = fullText.substring(0, i + 1);
+        setInputQuery(partial);
+        if (inputRef.current) {
+          inputRef.current.value = partial;
+        }
         i++;
       } else {
         clearInterval(interval);
         setTimeout(() => {
           triggerAnimatedStream(item.prompt, item.type, item.title);
           setInputQuery("");
+          if (inputRef.current) {
+            inputRef.current.value = "";
+          }
         }, 100);
       }
     }, 10);
   };
+
+  const isSubmitDisabled = (!inputQuery.trim() && !inputRef.current?.value.trim()) || isTyping || cooldown;
 
   return (
     <div
@@ -454,7 +481,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         </div>
 
         <button
-          onClick={() => setMessages([])}
+          onClick={() => {
+            setMessages([]);
+            setInputQuery("");
+            if (inputRef.current) inputRef.current.value = "";
+          }}
           className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#9CA3AF] hover:text-white transition-colors flex items-center gap-1.5 text-xs font-mono"
           title="Clear Conversation"
         >
@@ -926,18 +957,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           <form onSubmit={handleSubmit} className="relative w-full">
             <div className="mx-auto flex items-center rounded-full border border-white/15 bg-[#12151E]/90 py-2.5 pr-2.5 pl-6 backdrop-blur-2xl transition-all hover:border-white/30 focus-within:border-blue-500 shadow-2xl">
               <input
+                ref={inputRef}
                 type="text"
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
                 placeholder="Ask me anything..."
+                autoComplete="off"
                 disabled={isTyping || cooldown}
                 className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={!inputQuery.trim() || isTyping || cooldown}
+                disabled={isSubmitDisabled}
                 aria-label="Submit question"
-                className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0"
+                className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0 cursor-pointer"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>

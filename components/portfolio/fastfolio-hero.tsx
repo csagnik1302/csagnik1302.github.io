@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Smile,
   Briefcase,
@@ -33,12 +33,26 @@ interface FastfolioHeroProps {
 export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
   const [query, setQuery] = useState("");
   const [isTypingPill, setIsTypingPill] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Force empty input value on page reload to override browser form cache
+    setQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || isTypingPill) return;
+    const activeQuery = query.trim() || inputRef.current?.value.trim() || "";
+    if (!activeQuery || isTypingPill) return;
 
-    onStartChat("custom", query);
+    onStartChat("custom", activeQuery);
+    setQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const handlePillClick = (type: "me" | "projects" | "experience" | "skills" | "education" | "contact") => {
@@ -46,17 +60,28 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
     setIsTypingPill(true);
     const fullText = CARD_PROMPT_TEXTS[type] || "";
 
-    // Typewriter effect in search bar before transitioning
     let i = 0;
     setQuery("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+
     const interval = setInterval(() => {
       if (i < fullText.length) {
-        setQuery(fullText.substring(0, i + 1));
+        const partial = fullText.substring(0, i + 1);
+        setQuery(partial);
+        if (inputRef.current) {
+          inputRef.current.value = partial;
+        }
         i++;
       } else {
         clearInterval(interval);
         setTimeout(() => {
           onStartChat(type);
+          setQuery("");
+          if (inputRef.current) {
+            inputRef.current.value = "";
+          }
         }, 150);
       }
     }, 12);
@@ -80,18 +105,20 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
         <form onSubmit={handleSearch} className="relative w-full max-w-xl">
           <div className="mx-auto flex items-center rounded-full border border-white/15 bg-white/5 py-2.5 pr-2.5 pl-6 backdrop-blur-xl transition-all hover:border-white/30 focus-within:border-blue-500 shadow-2xl">
             <input
+              ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask me anything..."
+              autoComplete="off"
               disabled={isTypingPill}
-              className="w-full border-none bg-transparent text-sm sm:text-base text-white placeholder-[#9CA3AF] focus:outline-none"
+              className="w-full border-none bg-transparent text-sm sm:text-base text-white placeholder-[#9CA3AF] focus:outline-none disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={!query.trim() || isTypingPill}
               aria-label="Submit question"
-              className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0"
+              className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0 cursor-pointer"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
