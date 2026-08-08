@@ -849,47 +849,47 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             <button
               onClick={() => handlePillClick("me")}
               disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Smile className="w-3.5 h-3.5 text-emerald-400" />
               <span>Me</span>
             </button>
             <button
-              onClick={() => handlePillClick("projects")}
-              disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
-            >
-              <Briefcase className="w-3.5 h-3.5 text-blue-400" />
-              <span>Projects</span>
-            </button>
-            <button
               onClick={() => handlePillClick("experience")}
               disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Code2 className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>Experience</span>
             </button>
             <button
-              onClick={() => handlePillClick("skills")}
-              disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
-            >
-              <Layers className="w-3.5 h-3.5 text-purple-400" />
-              <span>Skills</span>
-            </button>
-            <button
               onClick={() => handlePillClick("education")}
               disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
               <span>Education</span>
             </button>
             <button
+              onClick={() => handlePillClick("projects")}
+              disabled={isTyping || cooldown}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <Briefcase className="w-3.5 h-3.5 text-blue-400" />
+              <span>Projects</span>
+            </button>
+            <button
+              onClick={() => handlePillClick("skills")}
+              disabled={isTyping || cooldown}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <Layers className="w-3.5 h-3.5 text-purple-400" />
+              <span>Skills</span>
+            </button>
+            <button
               onClick={() => handlePillClick("contact")}
               disabled={isTyping || cooldown}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Mail className="w-3.5 h-3.5 text-pink-400" />
               <span>Contact</span>
