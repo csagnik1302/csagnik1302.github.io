@@ -261,11 +261,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     };
 
     // 3. Primary LLM Provider: Groq Llama 3.1 8B Instant (~300ms ultra-fast inference)
-    const k1 = "gsk_zJN0UXwYk2VotJ";
-    const k2 = "VJK0nPWGdyb3FYQEJT";
-    const k3 = "blzbSwK1ttixA4NBqNL0";
-    const fallbackGroqKey = [k1, k2, k3].join("");
-    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || fallbackGroqKey;
+    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
     const groqKey = rawGroqKey.replace(/['"]/g, "").trim();
 
     if (groqKey) {
