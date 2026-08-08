@@ -39,40 +39,41 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// System Instruction Knowledge Base for LLM Providers
+// System Instruction Knowledge Base for LLM Providers (Strict 1st Person Narrative)
 const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
-You are the interactive AI portfolio assistant for Sagnik Chandra.
-Answer any visitor question naturally, warmly, and accurately using Sagnik's official background below:
+You are Sagnik Chandra speaking directly to the visitor on your personal website.
+ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
 
-[BIOGRAPHY & ROLE]
+[MY BIOGRAPHY & ROLE]
 - Name: Sagnik Chandra
 - Role: ${profileKB.items[0].role}
 - Location: ${profileKB.items[0].location}
 - Degree: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}.
 
-[EXPERIENCE & RESEARCH]
+[MY EXPERIENCE & RESEARCH]
 1. ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}):
    - ${experienceKB.items[0].description}
 2. ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}):
    - ${experienceKB.items[1].description}
 
-[FEATURED ML PROJECTS]
+[MY FEATURED ML PROJECTS]
 1. ${projectsKB.items[0].title}: ${projectsKB.items[0].description}
 2. ${projectsKB.items[1].title}: ${projectsKB.items[1].description}
 3. ${projectsKB.items[2].title}: ${projectsKB.items[2].description}
 4. ${projectsKB.items[3].title}: ${projectsKB.items[3].description}
 
-[SKILLS & TOOLING]
+[MY SKILLS & TOOLING]
 - Languages: ${skillsKB.languages.join(", ")}
 - Frameworks & Libraries: ${skillsKB.frameworks.join(", ")}
 - Tools & Platforms: ${skillsKB.tools.join(", ")}
 
-[PERSONAL INTERESTS & PERSONA]
+[MY PERSONAL INTERESTS]
 - ${interestsKB.items[0].description}
 
-[RESPONSE RULES]
+[STRICT RESPONSE RULES]
+- Speak directly in FIRST PERSON ("I", "my", "me"). Example: "I am a Research Intern at ISI Kolkata", "My focus is on LLM retrieval".
 - Be natural, helpful, engaging, and concise (2-4 sentences max).
-- Answer greetings warmly.
+- Answer greetings warmly ("Hey! Welcome to my portfolio...").
 - Keep output clean markdown without headers.
 `;
 
@@ -80,51 +81,51 @@ const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; 
   me: {
     prompt: "Who are you? I want to know more about you.",
     type: "me",
-    title: "About Sagnik Chandra",
+    title: "About Me — Sagnik Chandra",
   },
   projects: {
     prompt: "What projects have you built?",
     type: "projects",
-    title: "Featured ML Projects",
+    title: "My Featured ML Projects",
   },
   experience: {
     prompt: "Tell me about your research and work experience.",
     type: "experience",
-    title: "Research & Technical Experience",
+    title: "My Research & Work Experience",
   },
   skills: {
     prompt: "What are your technical skills and stack?",
     type: "skills",
-    title: "Technical Stack & Tools",
+    title: "My Technical Stack & Tools",
   },
   education: {
     prompt: "What is your academic background?",
     type: "education",
-    title: "Academic Background",
+    title: "My Academic Background",
   },
   contact: {
     prompt: "How can I contact you or view your resume?",
     type: "contact",
-    title: "Contact & Credentials",
+    title: "Contact Me & Resume",
   },
 };
 
-// Vector Space Embedding & Cosine Similarity Engine (No Hardcoding)
+// Robust Vector Space Embedding Engine
 function textToEmbeddingVector(text: string): Record<string, number> {
   const cleanText = text.toLowerCase().replace(/[^\w\s]/g, "");
   const words = cleanText.split(/\s+/).filter(Boolean);
   const vec: Record<string, number> = {};
 
   for (const w of words) {
-    vec[w] = (vec[w] || 0) + 1.5;
-    // Extract tri-gram character sub-features for subword semantics
-    for (let i = 0; i < w.length - 2; i++) {
-      const tri = w.substring(i, i + 3);
-      vec[tri] = (vec[tri] || 0) + 0.5;
+    vec[w] = (vec[w] || 0) + 3.0;
+    if (w.length >= 3) {
+      for (let i = 0; i < w.length - 2; i++) {
+        const tri = w.substring(i, i + 3);
+        vec[tri] = (vec[tri] || 0) + 0.5;
+      }
     }
   }
 
-  // L2 Vector Normalization
   let norm = 0;
   for (const k in vec) {
     norm += vec[k] * vec[k];
@@ -158,27 +159,12 @@ const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
   vector: textToEmbeddingVector(item.prompt + " " + key + " " + item.title),
 }));
 
-// Cosine Similarity Threshold for Pill Card Equivalence
-const COSINE_SIMILARITY_THRESHOLD = 0.42;
+const COSINE_SIMILARITY_THRESHOLD = 0.38;
 
-// Conversational Small-Talk Vectors
-const SMALL_TALK_VECTORS = [
-  {
-    vector: textToEmbeddingVector("hello hi hey greetings good morning good afternoon hola"),
-    title: "Greeting",
-    text: "Hey there! 👋 Welcome to Sagnik Chandra's interactive portfolio. Feel free to ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack, or background!",
-  },
-  {
-    vector: textToEmbeddingVector("how are you doing whats up how is it going sup"),
-    title: "Checking In",
-    text: "Doing great! Thanks for visiting. How can I help you explore Sagnik's ML research, projects, or background today?",
-  },
-  {
-    vector: textToEmbeddingVector("thanks thank you awesome cool great nice excellent"),
-    title: "You're Welcome!",
-    text: "You're very welcome! 😊 Let me know if you'd like to check out Sagnik's research experience, projects, or download his resume.",
-  },
-];
+// 1st Person Small Talk Greetings
+const GREETING_WORDS = ["hi", "hello", "hey", "hola", "greetings", "good morning", "good afternoon", "good evening", "sup"];
+const CHECKIN_WORDS = ["how are you", "whats up", "how is it going", "how are u"];
+const THANKS_WORDS = ["thanks", "thank you", "thx", "awesome", "cool", "great", "nice"];
 
 interface ChatViewProps {
   initialPrompt?: {
@@ -255,11 +241,34 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Vector Space Embedding & Cosine Similarity Matching Engine
+  // 1st Person Vector Embedding & Response Resolution Engine
   const fetchResponseWithVectorEmbedding = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.toLowerCase().trim();
 
-    // 1. Instant Cache Check
+    // 1. Instant 1st Person Greetings
+    if (GREETING_WORDS.some((g) => qKey === g || qKey.startsWith(g + " ") || qKey.endsWith(" " + g))) {
+      return {
+        title: "Greeting",
+        text: "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, and you can ask me about my LLM research at ISI Kolkata, ML projects, technical stack, or background!",
+        type: "custom",
+      };
+    }
+    if (CHECKIN_WORDS.some((c) => qKey.includes(c))) {
+      return {
+        title: "Checking In",
+        text: "Doing great! Thanks for visiting my page. How can I help you explore my ML research, projects, or background today?",
+        type: "custom",
+      };
+    }
+    if (THANKS_WORDS.some((t) => qKey.includes(t))) {
+      return {
+        title: "You're Welcome!",
+        text: "You're very welcome! 😊 Let me know if you'd like to check out my research experience, projects, or view my resume.",
+        type: "custom",
+      };
+    }
+
+    // 2. Instant Cache Check
     if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
@@ -267,7 +276,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     // Compute Embedding Vector for User Query
     const queryVector = textToEmbeddingVector(queryText);
 
-    // 2. Cosine Similarity Match against Pill Card Vector Space
+    // 3. Cosine Similarity Match against Pill Card Vector Space
     let maxSimilarity = 0;
     let bestPillMatch: { type: ChatMessage["type"]; title: string } | null = null;
 
@@ -279,14 +288,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // If Cosine Similarity >= Threshold (0.42), consider equivalent to Pill Card
     if (bestPillMatch && maxSimilarity >= COSINE_SIMILARITY_THRESHOLD) {
       const result = { title: bestPillMatch.title, type: bestPillMatch.type };
       saveToCache(qKey, undefined, result.title, result.type);
       return result;
     }
 
-    // 3. Groq API Provider Check (Llama 3.3 70B)
+    // 4. Groq API Provider Check (Llama 3.3 70B - 1st Person Prompts)
     const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (groqApiKey) {
       try {
@@ -321,7 +329,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 4. Gemini API Provider Check
+    // 5. Gemini API Provider Check (1st Person Prompts)
     const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
@@ -354,27 +362,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 5. Small Talk Vector Match
-    let maxSmallTalkSim = 0;
-    let bestSmallTalkMatch: { title: string; text: string } | null = null;
-
-    for (const stObj of SMALL_TALK_VECTORS) {
-      const sim = calculateCosineSimilarity(queryVector, stObj.vector);
-      if (sim > maxSmallTalkSim) {
-        maxSmallTalkSim = sim;
-        bestSmallTalkMatch = stObj;
-      }
-    }
-
-    if (bestSmallTalkMatch && maxSmallTalkSim >= 0.25) {
-      const result = { text: bestSmallTalkMatch.text, title: bestSmallTalkMatch.title, type: "custom" as const };
-      saveToCache(qKey, result.text, result.title, "custom");
-      return result;
-    }
-
+    // 6. Conversational 1st Person Fallback
     const fallbackResult = {
       title: "Interactive Search",
-      text: `I couldn't find a specific record for "${queryText}". You can ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack (PyTorch, PySpark, Neo4j, MCP), or click any quick pill button below!`,
+      text: `I couldn't find a specific record for "${queryText}". Feel free to ask about my LLM research at ISI Kolkata, my ML projects, technical stack (PyTorch, PySpark, Neo4j, MCP), or click any quick pill button below!`,
       type: "custom" as const,
     };
     saveToCache(qKey, fallbackResult.text, fallbackResult.title, "custom");
@@ -482,7 +473,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
             <h2 className="text-2xl font-bold text-white">Ask Away !</h2>
             <p className="text-xs sm:text-sm text-[#9CA3AF] max-w-md">
-              Select a quick prompt below or type your question in the chat bar to explore Sagnik's background, research, projects, and skills.
+              Select a quick prompt below or type your question in the chat bar to explore my background, research, projects, and skills.
             </p>
           </div>
         )}
@@ -933,7 +924,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
           {/* Search Input Bar */}
           <form onSubmit={handleSubmit} className="relative w-full">
-            <div className="mx-auto flex items-center rounded-full border border-white/15 bg-white/10 py-2.5 pr-2.5 pl-6 backdrop-blur-2xl transition-all hover:border-white/30 focus-within:border-blue-500 shadow-2xl">
+            <div className="mx-auto flex items-center rounded-full border border-white/15 bg-[#12151E]/90 py-2.5 pr-2.5 pl-6 backdrop-blur-2xl transition-all hover:border-white/30 focus-within:border-blue-500 shadow-2xl">
               <input
                 type="text"
                 value={inputQuery}

@@ -4,25 +4,25 @@
     {
       "id": "style_transfer",
       "title": "Neural Text Style Transfer with Adversarial Learning",
-      "description": "Built semi-automated pipeline to rewrite Bengali sentences in five author styles without parallel corpora using BiGRU encoder with Gradient Reversal Layer (GRL) and style-conditioned GRU decoder.",
+      "description": "I built a semi-automated pipeline to rewrite Bengali sentences in five author styles without parallel corpora using BiGRU encoder with Gradient Reversal Layer (GRL) and style-conditioned GRU decoder.",
       "keywords": ["projects", "project", "style transfer", "bengali", "bigru", "grl", "adversarial"]
     },
     {
       "id": "academiclens",
       "title": "AcademicLens — Citation Graph Mining at Scale",
-      "description": "Built large-scale academic intelligence system over 10M+ OpenAlex research papers using PySpark & Neo4j with distributed Author–Paper–Citation–Topic graph and PageRank influence ranking.",
+      "description": "I built a large-scale academic intelligence system over 10M+ OpenAlex research papers using PySpark & Neo4j with distributed Author–Paper–Citation–Topic graph and PageRank influence ranking.",
       "keywords": ["academiclens", "graph", "neo4j", "pyspark", "openalex", "pagerank", "citation"]
     },
     {
       "id": "stellar_classification",
       "title": "Stellar Object Classification (SDSS DR18)",
-      "description": "Supervised multi-class classification system classifying galaxies, quasars, and stars using CatBoost & XGBoost with Optuna Bayesian hyperparameter tuning, achieving >99% test accuracy.",
+      "description": "I engineered a multi-class classification system classifying galaxies, quasars, and stars using CatBoost & XGBoost with Optuna Bayesian hyperparameter tuning, achieving >99% test accuracy.",
       "keywords": ["stellar", "sdss", "catboost", "xgboost", "optuna", "galaxy", "quasar", "star"]
     },
     {
       "id": "drone_delivery",
       "title": "Traffic-Aware Single-Drone Delivery Route Optimisation",
-      "description": "Evaluated deterministic and stochastic hill climbing algorithms for drone delivery route optimization across 120 delivery locations with node-level congestion modeling.",
+      "description": "I evaluated deterministic and stochastic hill climbing algorithms for drone delivery route optimization across 120 delivery locations with node-level congestion modeling.",
       "keywords": ["drone", "route optimization", "tsp", "hill climbing", "delivery"]
     }
   ]

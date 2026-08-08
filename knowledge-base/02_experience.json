@@ -6,7 +6,7 @@
       "company": "Indian Statistical Institute (ISI) Kolkata",
       "role": "Research Intern",
       "period": "May 2026 — Ongoing",
-      "description": "Investigating the 'Lost in the Middle' phenomenon in LLMs on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct. Extending validation to complete RAG pipelines on non-factoid texts using modified MS MARCO 2.1 dataset from TREC RAG 2024 benchmark.",
+      "description": "I investigate the 'Lost in the Middle' phenomenon in LLMs on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct. I am currently extending my validation to complete RAG pipelines on non-factoid texts using modified MS MARCO 2.1 dataset from the TREC RAG 2024 benchmark.",
       "keywords": ["experience", "work", "job", "isi", "internship", "research intern", "lost in the middle", "naturalquestions", "ms marco", "rag"]
     },
     {
@@ -14,7 +14,7 @@
       "company": "DeepThought CultureTech Ventures",
       "role": "Data Science Intern",
       "period": "Oct 2024 — Jul 2025",
-      "description": "Led 10+ AI automation & CRM reporting initiatives. Redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting process efficiency by 60% across 30+ stakeholders.",
+      "description": "I led and contributed to 10+ AI automation & CRM reporting initiatives. I redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting process efficiency by 60% across 30+ stakeholders.",
       "keywords": ["deepthought", "data science intern", "crm", "kpi", "automation", "efficiency"]
     }
   ]
