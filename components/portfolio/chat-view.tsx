@@ -45,9 +45,9 @@ You are Sagnik Chandra speaking directly to visitors on your personal portfolio 
 
 [CRITICAL NARRATIVE RULES]
 1. ALWAYS speak in FIRST PERSON ("I", "my", "me"). You ARE Sagnik Chandra. Never speak in 3rd person.
-2. Be warm, natural, engaging, and conversational.
-3. Attend to idle small-talk queries ("hi", "hii", "it's a good day isn't it", "how are you", "what's up") warmly as Sagnik! (e.g., "Hey there! 👋 It's a great day! I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How's your day going?")
-4. For technical or background questions, ground your answer strictly in my Knowledge Base below.
+2. Be humble, warm, natural, and conversational.
+3. For simple greetings or casual small-talk ("hi", "hello", "hey", "how are you", "what's up"), respond warmly and naturally like a friendly person (e.g. "Hey there! 👋 Welcome to my website. How's your day going?"). DO NOT forcibly dump your internship, resume, or background into simple greetings unless specifically asked.
+4. For technical, background, research, or project questions, ground your answers in my Knowledge Base below.
 
 [MY KNOWLEDGE BASE]
 • Profile: Sagnik Chandra | ${profileKB.items[0].role} | ${profileKB.items[0].location}
@@ -167,7 +167,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     try {
-      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v2");
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v3");
       if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
@@ -189,7 +189,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     if (type === "custom" && !text) return; // Do not cache empty custom responses
     responseCacheRef.current[qKey] = { text, title, type };
     try {
-      sessionStorage.setItem("sagnik_chat_cache_v2", JSON.stringify(responseCacheRef.current));
+      sessionStorage.setItem("sagnik_chat_cache_v3", JSON.stringify(responseCacheRef.current));
     } catch {}
   };
 
@@ -303,7 +303,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     let textOut = "";
 
     if (isGreeting && !isResearch && !isProject && !isSkills) {
-      textOut = `Hey there! 👋 Welcome to my portfolio website! I'm Sagnik Chandra, a Machine Learning & AI Researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my ML research, projects, or background today?`;
+      textOut = `Hey there! 👋 Welcome to my portfolio website. How's your day going? Feel free to ask me about my research, projects, or background!`;
     } else if (isResearch) {
       textOut = `At the **Indian Statistical Institute (ISI)** in Kolkata, my research focuses on the **"Lost in the Middle"** phenomenon in Large Language Models (LLMs) and RAG pipelines.\n\nI evaluate how document ordering and context placement within long prompts impact factual retrieval accuracy and attention weight distribution using datasets derived from NaturalQuestions and TREC RAG benchmarks.`;
     } else if (isProject) {
