@@ -249,10 +249,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     // 3. Smart Intent RAG Engine
     const words = qKey.replace(/[^\w\s]/g, "").split(/\s+/).filter(Boolean);
 
-    const isGreeting = words.some(w => ["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup", "greetings"].includes(w)) || qKey.includes("whats up") || qKey.includes("how are you");
+    const isGreeting = words.some(w => ["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup", "greetings", "weather", "nice", "good", "morning", "afternoon", "evening"].includes(w)) || qKey.includes("whats up") || qKey.includes("how are you");
     const isResearch = qKey.includes("research") || qKey.includes("lost in the middle") || qKey.includes("isi") || qKey.includes("kolkata") || qKey.includes("rag") || qKey.includes("retrieval");
     const isProject = qKey.includes("project") || qKey.includes("style transfer") || qKey.includes("bengali") || qKey.includes("academiclens") || qKey.includes("drone") || qKey.includes("stellar") || qKey.includes("graph");
-    const isSkills = qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark") || qKey.includes("language") || qKey.includes("tool") || qKey.includes("framework") || qKey.includes("c") || qKey.includes("sql");
+    const isSkills = qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark") || qKey.includes("language") || qKey.includes("tool") || qKey.includes("framework") || words.includes("c") || words.includes("r") || qKey.includes("sql");
     const isEducation = qKey.includes("education") || qKey.includes("study") || qKey.includes("rkmveri") || qKey.includes("degree") || qKey.includes("msc") || qKey.includes("bsc") || qKey.includes("college") || qKey.includes("university") || qKey.includes("math");
     const isContact = qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire") || qKey.includes("linkedin") || qKey.includes("github");
     const isBio = qKey.includes("who are you") || qKey.includes("about") || qKey.includes("bio") || qKey.includes("background") || qKey.includes("sagnik");
