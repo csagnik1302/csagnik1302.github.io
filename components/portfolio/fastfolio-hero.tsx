@@ -17,18 +17,49 @@ import {
 
 const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
 
+const CARD_PROMPT_TEXTS: Record<string, string> = {
+  me: "Who are you? I want to know more about you.",
+  projects: "What projects have you built?",
+  experience: "Tell me about your research and work experience.",
+  skills: "What are your technical skills and stack?",
+  education: "What is your academic background?",
+  contact: "How can I contact you or view your resume?",
+};
+
 interface FastfolioHeroProps {
   onStartChat: (type: "me" | "projects" | "experience" | "skills" | "education" | "contact" | "custom", query?: string) => void;
 }
 
 export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
   const [query, setQuery] = useState("");
+  const [isTypingPill, setIsTypingPill] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim() || isTypingPill) return;
 
     onStartChat("custom", query);
+  };
+
+  const handlePillClick = (type: "me" | "projects" | "experience" | "skills" | "education" | "contact") => {
+    if (isTypingPill) return;
+    setIsTypingPill(true);
+    const fullText = CARD_PROMPT_TEXTS[type] || "";
+
+    // Typewriter effect in search bar before transitioning
+    let i = 0;
+    setQuery("");
+    const interval = setInterval(() => {
+      if (i < fullText.length) {
+        setQuery(fullText.substring(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          onStartChat(type);
+        }, 150);
+      }
+    }, 12);
   };
 
   return (
@@ -53,11 +84,12 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask me anything..."
+              disabled={isTypingPill}
               className="w-full border-none bg-transparent text-sm sm:text-base text-white placeholder-[#9CA3AF] focus:outline-none"
             />
             <button
               type="submit"
-              disabled={!query.trim()}
+              disabled={!query.trim() || isTypingPill}
               aria-label="Submit question"
               className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0"
             >
@@ -70,8 +102,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
         <div className="grid w-full max-w-2xl grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 pt-2">
           {/* Card 1: Me */}
           <button
-            onClick={() => onStartChat("me")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("me")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <Smile className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Me</span>
@@ -79,8 +112,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
 
           {/* Card 2: Projects */}
           <button
-            onClick={() => onStartChat("projects")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("projects")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <Briefcase className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-[#F3F4F6]">Projects</span>
@@ -88,8 +122,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
 
           {/* Card 3: Experience */}
           <button
-            onClick={() => onStartChat("experience")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("experience")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <Code2 className="w-5 h-5 text-[#38BDF8] group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Experience</span>
@@ -97,8 +132,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
 
           {/* Card 4: Skills */}
           <button
-            onClick={() => onStartChat("skills")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("skills")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <Layers className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Skills</span>
@@ -106,8 +142,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
 
           {/* Card 5: Education */}
           <button
-            onClick={() => onStartChat("education")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("education")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <GraduationCap className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Education</span>
@@ -115,8 +152,9 @@ export function FastfolioHero({ onStartChat }: FastfolioHeroProps) {
 
           {/* Card 6: Contact */}
           <button
-            onClick={() => onStartChat("contact")}
-            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
+            onClick={() => handlePillClick("contact")}
+            disabled={isTypingPill}
+            className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
           >
             <Mail className="w-5 h-5 text-pink-400 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-semibold text-white">Contact</span>

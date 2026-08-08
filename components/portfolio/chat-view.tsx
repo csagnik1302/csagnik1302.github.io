@@ -130,6 +130,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
+    // 1. Pop out prompt bubble from bottom input dock onto the left side of stream
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -140,6 +141,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
+    // 2. Response card slides in after brief generating delay
     setTimeout(() => {
       setIsTyping(false);
       const assistantMsg: ChatMessage = {
@@ -202,7 +204,23 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const handlePillClick = (cardKey: keyof typeof CARD_PROMPTS) => {
     if (isTyping) return;
     const item = CARD_PROMPTS[cardKey];
-    triggerAnimatedStream(item.prompt, item.type, item.title);
+    
+    // Type out prompt text in bottom search bar then pop out prompt bubble
+    let i = 0;
+    const fullText = item.prompt;
+    setInputQuery("");
+    const interval = setInterval(() => {
+      if (i < fullText.length) {
+        setInputQuery(fullText.substring(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => {
+          triggerAnimatedStream(item.prompt, item.type, item.title);
+          setInputQuery("");
+        }, 100);
+      }
+    }, 10);
   };
 
   return (
@@ -275,7 +293,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {/* Render Response Content Based on Type */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
-                      {/* Top Profile Block - Raphaël Giraud Layout Reference with 4:3 Aspect Ratio Container */}
+                      {/* Top Profile Block - Raphaël Giraud Layout Reference */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                           <Image
