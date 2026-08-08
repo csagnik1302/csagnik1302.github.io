@@ -183,6 +183,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
   useEffect(() => {
     scrollToBottom();
+    if (!isTyping) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+    }
   }, [messages, isTyping]);
 
   const saveToCache = (qKey: string, text: string | undefined, title: string, type: ChatMessage["type"]) => {
@@ -887,6 +892,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                 onChange={(e) => setInputQuery(e.target.value)}
                 placeholder="Ask me anything..."
                 autoComplete="off"
+                autoFocus
                 disabled={isTyping || cooldown}
                 className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none disabled:opacity-50"
               />
