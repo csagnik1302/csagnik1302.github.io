@@ -37,12 +37,16 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[85vh] bg-[#12151E] border border-white/10 rounded-3xl p-6 sm:p-8 overflow-y-auto shadow-2xl space-y-6 text-slate-200"
+        className="relative w-full max-w-2xl max-h-[88vh] bg-[#12151E] border border-white/10 rounded-3xl p-6 sm:p-8 overflow-y-auto shadow-2xl space-y-6 text-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <h3 className="text-lg font-bold text-white tracking-tight">{content.title}</h3>
+          <div className="flex items-center gap-2 text-xs font-mono text-blue-400">
+            <Sparkles className="w-4 h-4" />
+            <span>AI Response</span>
+          </div>
+
           <button
             onClick={onClose}
             className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-[#9CA3AF] hover:text-white transition-colors"
@@ -52,13 +56,22 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           </button>
         </div>
 
+        {/* User Prompt Speech Bubble */}
+        {content.query && (
+          <div className="flex justify-end">
+            <div className="bg-[#0171E3] text-white px-4 py-2.5 rounded-2xl rounded-tr-sm text-xs sm:text-sm max-w-[90%] shadow-md">
+              {content.query}
+            </div>
+          </div>
+        )}
+
         {/* Content Body Based on Category */}
         <div className="space-y-6 text-sm">
           {content.type === "me" && (
-            <div className="space-y-6">
-              {/* Story Intro Header with Profile Photo */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-2">
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shrink-0 border-2 border-white/15 shadow-xl">
+            <div className="space-y-6 pt-1">
+              {/* Top Profile Block - Exact Layout from Reference Screenshot */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                   <Image
                     src="/sagnik-profile.jpg"
                     alt="Sagnik Chandra"
@@ -68,47 +81,57 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
                   />
                 </div>
 
-                <div className="space-y-2 text-center sm:text-left">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                    Hey, I'm Sagnik Chandra 👋
-                  </h2>
-                  <p className="text-xs font-mono text-blue-400 font-medium">
-                    Machine Learning Researcher • Kolkata, India
+                <div className="space-y-3 text-center sm:text-left flex-1">
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                      Sagnik Chandra
+                    </h2>
+                    <p className="text-xs font-mono text-slate-400 font-medium pt-0.5">
+                      Kolkata, India
+                    </p>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                    Hey 👋 I'm Sagnik. I'm an aspiring Machine Learning Engineer & AI Researcher pursuing my M.Sc. in Data Science & AI at RKMVERI. I'm currently interning at ISI Kolkata researching LLM retrieval.
                   </p>
+
+                  {/* Tag Badges */}
                   <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
+                      AI
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
+                      ML Engineer
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
                       RKMVERI
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
-                      ISI Research Intern
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
+                      ISI Intern
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
                       History & Psychology
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-mono text-slate-200 border border-white/10">
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-mono text-slate-200 border border-white/10">
                       Gamer & Chess
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Seamless Storytelling Flow (No Inner Sub-Cards) */}
-              <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal pt-2 border-t border-white/10">
+              {/* Bottom Conversational Story Paragraph (Matching Screenshot Style) */}
+              <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-4 border-t border-white/10">
                 <p>
-                  I'm an AI researcher and Data Science student at RKMVERI Belur, driven by a deep curiosity for mathematics and intelligent systems. My work revolves around understanding how large language models process context and attention — currently, I'm at the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong> researching the <strong className="text-white font-semibold">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG pipelines.
+                  I'm Sagnik Chandra, an AI researcher and Data Science student specializing in Machine Learning at RKMVERI Belur. Driven by a deep curiosity for mathematics and intelligence systems, I love exploring how models process context and attention. Currently, I'm at the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong> researching the <strong className="text-white font-semibold">"Lost in the Middle"</strong> phenomenon in LLM retrieval and RAG architectures, while learning LangChain, RAG, and MCP (Model Context Protocol).
                 </p>
 
                 <p>
-                  Beyond research, I'm constantly expanding my engineering toolkit, diving into <strong className="text-white font-semibold">LangChain</strong>, advanced <strong className="text-white font-semibold">RAG architectures</strong>, and <strong className="text-white font-semibold">Model Context Protocol (MCP)</strong> to build scalable, production-ready AI systems.
-                </p>
-
-                <p>
-                  When I'm not immersed in code or research papers, I love exploring human history and mindsets — reading books on <strong className="text-white font-semibold">Modern and Medieval History</strong> and <strong className="text-white font-semibold">Psychology</strong>, sharpening my strategy over competitive <strong className="text-white font-semibold">chess</strong>, or relaxing with <strong className="text-white font-semibold">gaming</strong>. What about you? What brings you here? 😊
+                  When I'm not in code or research papers, you'll find me reading books on <strong className="text-white font-semibold">Modern and Medieval History</strong> and <strong className="text-white font-semibold">Psychology</strong>, playing competitive <strong className="text-white font-semibold">chess</strong>, or <strong className="text-white font-semibold">gaming</strong>. Voilà! What about you? What brings you here? 😊
                 </p>
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
                 <a
                   href={RESUME_URL}
                   target="_blank"
@@ -130,7 +153,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "experience" && (
-            <div className="space-y-5">
+            <div className="space-y-5 pt-1">
               {/* Experience 1: ISI */}
               <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -178,7 +201,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "projects" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-white">Neural Text Style Transfer with Adversarial Learning</h4>
@@ -254,7 +277,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "skills" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
                 <h4 className="font-bold text-white text-xs font-mono uppercase">Languages</h4>
                 <div className="flex flex-wrap gap-1.5">
@@ -291,7 +314,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "education" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
                 <div className="flex items-center justify-between text-xs text-blue-400 font-mono">
                   <span>2025 — 2027</span>
@@ -307,7 +330,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "contact" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                 <div className="text-xs font-semibold text-[#9CA3AF] uppercase font-mono">Direct Email</div>
                 <div className="text-sm font-mono text-white">sagnikchandra@gmail.com</div>
@@ -346,7 +369,7 @@ export function AIResponseModal({ content, onClose }: AIResponseModalProps) {
           )}
 
           {content.type === "custom" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-1">
               <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap">
                 {content.answer}
               </p>

@@ -22,7 +22,7 @@ const KNOWLEDGE_RESPONSES = [
   {
     keywords: ["lost in the middle", "llm", "rag", "retrieval", "research", "currently working", "mcp", "langchain"],
     title: "Research & Learning Focus",
-    text: "Sagnik is currently conducting research on the 'Lost in the Middle' phenomenon in Large Language Model (LLM) retrieval and RAG pipelines, and currently learning LangChain, RAG, and MCP (Model Context Protocol).",
+    text: "Sagnik is currently conducting research on the 'Lost in the Middle' phenomenon in Large Language Model (LLM) retrieval and RAG pipelines at ISI Kolkata, and currently learning LangChain, RAG, and MCP (Model Context Protocol).",
   },
   {
     keywords: ["resume", "cv", "experience", "document", "download"],
@@ -30,19 +30,19 @@ const KNOWLEDGE_RESPONSES = [
     text: "You can view and download Sagnik's latest official Resume & Experience PDF directly from Google Drive!",
   },
   {
-    keywords: ["project", "projects", "style transfer", "bengali", "academiclens", "drone", "citation"],
+    keywords: ["project", "projects", "style transfer", "bengali", "academiclens", "drone", "citation", "stellar"],
     title: "Featured ML & Data Projects",
-    text: "Sagnik's key projects:\n• Neural Literary Style Transfer (BiGRU + GRL Discriminator)\n• AcademicLens (10M+ Research Papers Intelligence Graph in Neo4j/PySpark)\n• Drone Delivery Route Optimization (TSP & Hill Climbing)",
+    text: "Sagnik's key projects:\n• Neural Text Style Transfer with Adversarial Learning (BiGRU + GRL Discriminator)\n• AcademicLens (10M+ Research Papers Intelligence Graph in Neo4j/PySpark)\n• Stellar Object Classification (SDSS DR18 CatBoost >99% Accuracy)\n• Drone Delivery Route Optimization (TSP & Hill Climbing)",
   },
   {
     keywords: ["education", "rkmveri", "degree", "university", "math", "msc"],
     title: "Academic Background",
-    text: "Sagnik's Academic Record:\n🎓 M.Sc. in Data Science & AI @ RKMVERI Belur (2025–Present)",
+    text: "Sagnik's Academic Record:\n🎓 M.Sc. in Data Science & Artificial Intelligence @ RKMVERI Belur (2025–2027)",
   },
   {
     keywords: ["skills", "python", "pytorch", "pyspark", "tools", "stack", "neo4j", "langchain", "ollama", "sql", "mcp"],
     title: "Technical Stack & Frameworks",
-    text: "Sagnik's Technical Stack:\n• Languages & Frameworks: Python, PyTorch, TensorFlow, Keras, LangChain, C, SQL\n• AI & Data Science: Ollama, Hugging Face, NumPy, Pandas, Scikit-Learn\n• Tools & Systems: PySpark, Neo4j, MySQL, Git, Docker, Linux, Jupyter, Anaconda, MCP",
+    text: "Sagnik's Technical Stack:\n• Languages: Python, C, Cypher, R, SQL\n• Frameworks: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain\n• Tools & Platforms: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), MCP",
   },
   {
     keywords: ["contact", "email", "hire", "job", "reach", "linkedin", "github"],
@@ -50,6 +50,15 @@ const KNOWLEDGE_RESPONSES = [
     text: "Contact Sagnik Chandra:\n📬 Email: sagnikchandra@gmail.com\n🐙 GitHub: github.com/csagnik1302\n💼 LinkedIn: linkedin.com/in/sagnik-chandra-52b0a111a/",
   },
 ];
+
+const CARD_PROMPTS = {
+  me: "Who are you? I want to know more about you.",
+  projects: "What projects have you built?",
+  experience: "Tell me about your research and work experience.",
+  skills: "What are your technical skills and stack?",
+  education: "What is your academic background?",
+  contact: "How can I contact you or view your resume?",
+};
 
 interface FastfolioHeroProps {
   onOpenModal: (content: ModalContent) => void;
@@ -64,7 +73,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
     const q = query.toLowerCase();
     let matchedAnswer =
-      "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and is currently learning LangChain, RAG, and MCP.";
+      "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur and interning at ISI Kolkata. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and is currently learning LangChain, RAG, and MCP.";
 
     for (const item of KNOWLEDGE_RESPONSES) {
       if (item.keywords.some((kw) => q.includes(kw))) {
@@ -81,6 +90,16 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
     });
 
     setQuery("");
+  };
+
+  const triggerCardPrompt = (type: keyof typeof CARD_PROMPTS, title: string) => {
+    const promptText = CARD_PROMPTS[type];
+    setQuery(promptText);
+    onOpenModal({
+      type,
+      title,
+      query: promptText,
+    });
   };
 
   return (
@@ -122,7 +141,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
         <div className="grid w-full max-w-2xl grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 pt-2">
           {/* Card 1: Me */}
           <button
-            onClick={() => onOpenModal({ type: "me", title: "About Sagnik Chandra" })}
+            onClick={() => triggerCardPrompt("me", "About Sagnik Chandra")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Smile className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
@@ -131,7 +150,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
           {/* Card 2: Projects */}
           <button
-            onClick={() => onOpenModal({ type: "projects", title: "Featured ML Projects" })}
+            onClick={() => triggerCardPrompt("projects", "Featured ML Projects")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Briefcase className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
@@ -140,7 +159,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
           {/* Card 3: Experience */}
           <button
-            onClick={() => onOpenModal({ type: "experience", title: "Research & Technical Experience" })}
+            onClick={() => triggerCardPrompt("experience", "Research & Technical Experience")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Code2 className="w-5 h-5 text-[#38BDF8] group-hover:scale-110 transition-transform" />
@@ -149,7 +168,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
           {/* Card 4: Skills */}
           <button
-            onClick={() => onOpenModal({ type: "skills", title: "Technical Stack & Tools" })}
+            onClick={() => triggerCardPrompt("skills", "Technical Stack & Tools")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Layers className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
@@ -158,7 +177,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
           {/* Card 5: Education */}
           <button
-            onClick={() => onOpenModal({ type: "education", title: "Academic Background" })}
+            onClick={() => triggerCardPrompt("education", "Academic Background")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <GraduationCap className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
@@ -167,7 +186,7 @@ export function FastfolioHero({ onOpenModal }: FastfolioHeroProps) {
 
           {/* Card 6: Contact */}
           <button
-            onClick={() => onOpenModal({ type: "contact", title: "Contact & Resume" })}
+            onClick={() => triggerCardPrompt("contact", "Contact & Resume")}
             className="glass-pill aspect-square w-full rounded-2xl p-3 flex flex-col items-center justify-center gap-2 group cursor-pointer"
           >
             <Mail className="w-5 h-5 text-pink-400 group-hover:scale-110 transition-transform" />
