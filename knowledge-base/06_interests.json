@@ -1,0 +1,12 @@
+{
+  "category": "interests",
+  "items": [
+    {
+      "id": "hobbies",
+      "reading": "Modern & Medieval History books, behavioral Psychology books",
+      "roles": ["Gamer", "Chessist", "Historian"],
+      "description": "Outside of computer science, Sagnik is an avid reader of Modern & Medieval History and behavioral Psychology. He is also a competitive chess player and dedicated gamer — hobbies that sharpen his strategic problem-solving mindset.",
+      "keywords": ["hobbies", "interests", "history", "psychology", "chess", "gamer", "gaming", "books", "passions"]
+    }
+  ]
+}

@@ -19,7 +19,16 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-const RESUME_URL = "https://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing";
+// Import Modular Knowledge Base JSON Files
+import profileKB from "@/knowledge-base/01_profile.json";
+import experienceKB from "@/knowledge-base/02_experience.json";
+import projectsKB from "@/knowledge-base/03_projects.json";
+import skillsKB from "@/knowledge-base/04_skills.json";
+import educationKB from "@/knowledge-base/05_education.json";
+import interestsKB from "@/knowledge-base/06_interests.json";
+import contactKB from "@/knowledge-base/07_contact.json";
+
+const RESUME_URL = contactKB.resume;
 
 export interface ChatMessage {
   id: string;
@@ -37,105 +46,35 @@ Answer any visitor question naturally, warmly, and accurately using Sagnik's off
 
 [BIOGRAPHY & ROLE]
 - Name: Sagnik Chandra
-- Role: Aspiring Machine Learning Engineer & AI Researcher
-- Location: Kolkata, India
-- Degree: M.Sc. in Data Science & Artificial Intelligence (2025–2027) @ Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur.
+- Role: ${profileKB.items[0].role}
+- Location: ${profileKB.items[0].location}
+- Degree: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}.
 
 [EXPERIENCE & RESEARCH]
-1. Research Intern @ Indian Statistical Institute (ISI) Kolkata (May 2026 – Ongoing):
-   - Investigates the "Lost in the Middle" phenomenon in Large Language Models (LLMs) on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct.
-   - Extending validation to complete RAG pipelines on non-factoid texts using modified MS MARCO 2.1 dataset from TREC RAG 2024 benchmark.
-2. Data Science Intern @ DeepThought CultureTech Ventures (Oct 2024 – Jul 2025):
-   - Led 10+ AI automation & CRM reporting initiatives.
-   - Redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting efficiency by 60% across 30+ stakeholders.
+1. ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}):
+   - ${experienceKB.items[0].description}
+2. ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}):
+   - ${experienceKB.items[1].description}
 
 [FEATURED ML PROJECTS]
-1. Neural Text Style Transfer with Adversarial Learning: BiGRU encoder with Gradient Reversal Layer (GRL) and style-conditioned GRU decoder for Bengali text style transfer.
-2. AcademicLens: Distributed academic graph intelligence system over 10M+ OpenAlex research papers using PySpark & Neo4j with PageRank influence ranking.
-3. Stellar Object Classification (SDSS DR18): CatBoost & XGBoost classifier with Optuna Bayesian tuning achieving >99% test accuracy.
-4. Drone Route Optimisation: Stochastic and deterministic hill climbing for single-drone delivery route optimization across 120 delivery locations.
+1. ${projectsKB.items[0].title}: ${projectsKB.items[0].description}
+2. ${projectsKB.items[1].title}: ${projectsKB.items[1].description}
+3. ${projectsKB.items[2].title}: ${projectsKB.items[2].description}
+4. ${projectsKB.items[3].title}: ${projectsKB.items[3].description}
 
 [SKILLS & TOOLING]
-- Languages: Python, C, Cypher, R, SQL
-- Frameworks & Libraries: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain
-- Tools & Platforms: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), Model Context Protocol (MCP)
+- Languages: ${skillsKB.languages.join(", ")}
+- Frameworks & Libraries: ${skillsKB.frameworks.join(", ")}
+- Tools & Platforms: ${skillsKB.tools.join(", ")}
 
 [PERSONAL INTERESTS & PERSONA]
-- Avid reader of Modern & Medieval History and behavioral Psychology.
-- Competitive chess player and dedicated gamer — strategic passions that hone his problem-solving mindset.
+- ${interestsKB.items[0].description}
 
 [RESPONSE RULES]
 - Be natural, helpful, engaging, and concise (2-4 sentences max).
 - Answer greetings warmly.
 - Keep output clean markdown without headers.
 `;
-
-// Intent Patterns Fallback when API providers are offline or rate-limited
-const SMALL_TALK_PATTERNS = [
-  {
-    keywords: ["hello", "hi", "hey", "hola", "greetings", "good morning", "good afternoon", "good evening", "hey there"],
-    title: "Greeting",
-    text: "Hey there! 👋 Welcome to Sagnik Chandra's interactive portfolio. Feel free to ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack, or background!",
-  },
-  {
-    keywords: ["how are you", "how's it going", "what's up", "sup", "how do you do"],
-    title: "Checking In",
-    text: "Doing great! Thanks for visiting. How can I help you explore Sagnik's ML research, projects, or background today?",
-  },
-  {
-    keywords: ["thanks", "thank you", "thx", "awesome", "cool", "great", "nice"],
-    title: "You're Welcome!",
-    text: "You're very welcome! 😊 Let me know if you'd like to check out Sagnik's research experience, projects, or download his resume.",
-  },
-  {
-    keywords: ["who are you", "what is this", "what can you do", "help", "options"],
-    title: "Portfolio Guide",
-    text: "I am Sagnik's interactive portfolio assistant! You can click any quick pill button below (Me, Projects, Experience, Skills, Education, Contact) or type custom questions like 'Tell me about ISI research' or 'What programming languages do you use?'",
-  },
-];
-
-const KNOWLEDGE_RESPONSES = [
-  {
-    keywords: ["lost in the middle", "llm", "rag", "retrieval", "isi", "research", "naturalquestions", "ms marco", "trec"],
-    title: "ISI Kolkata Research — Lost in the Middle & RAG",
-    text: "Sagnik is a Research Intern at the Indian Statistical Institute (ISI) Kolkata (May 2026 – Present). He investigates the 'Lost in the Middle' phenomenon in Large Language Models (LLMs) on factoid texts using NaturalQuestions with Llama 3.1 8B Instruct. He is extending this validation to full RAG pipelines on non-factoid texts using the modified MS MARCO 2.1 dataset from the TREC RAG 2024 benchmark.",
-  },
-  {
-    keywords: ["deepthought", "internship", "crm", "kpi", "automation", "efficiency"],
-    title: "DeepThought Internship — Data Science & AI",
-    text: "At DeepThought CultureTech Ventures (Oct 2024 – Jul 2025), Sagnik served as a Data Science Intern leading 10+ AI automation & CRM reporting initiatives. He redesigned KPI reporting and automated workflows, saving 1–4 hours daily and boosting operational efficiency by 60% across 30+ stakeholders.",
-  },
-  {
-    keywords: ["project", "projects", "style transfer", "bengali", "academiclens", "drone", "citation", "stellar"],
-    title: "Featured ML & Data Engineering Projects",
-    text: "Sagnik's Key Projects:\n1. Neural Text Style Transfer: Semi-automated pipeline to rewrite Bengali sentences in five author styles using BiGRU + GRL Discriminator.\n2. AcademicLens: Distributed graph intelligence system over 10M+ OpenAlex research papers in Neo4j/PySpark with PageRank influence scoring.\n3. Stellar Object Classification: SDSS DR18 galaxy/quasar/star classifier with CatBoost/XGBoost achieving >99% test accuracy.\n4. Drone Route Optimisation: Stochastic and deterministic hill climbing for delivery routing across 120 locations.",
-  },
-  {
-    keywords: ["education", "rkmveri", "degree", "university", "master", "msc"],
-    title: "Academic Degree — RKMVERI Belur",
-    text: "Sagnik is pursuing his M.Sc. in Data Science & Artificial Intelligence (2025–2027) at Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur. His curriculum focuses on Deep Learning, NLP, Distributed Computing, and Statistical Machine Learning.",
-  },
-  {
-    keywords: ["skills", "python", "pytorch", "pyspark", "tools", "stack", "neo4j", "langchain", "ollama", "sql", "mcp"],
-    title: "Technical Stack & Tools",
-    text: "Sagnik's Technical Stack:\n• Languages: Python, C, Cypher, R, SQL\n• Frameworks & Libraries: PyTorch, Scikit-learn, Pandas, NumPy, Matplotlib, Seaborn, PySpark, LangChain\n• Platforms & Tools: Neo4j, Git, GitHub, Jupyter Notebook, Docker, Linux (Ubuntu), Model Context Protocol (MCP)",
-  },
-  {
-    keywords: ["history", "psychology", "chess", "gamer", "gaming", "books", "hobbies", "passions"],
-    title: "Personal Interests & Hobbies",
-    text: "Outside of computer science, Sagnik is an avid reader of Modern & Medieval History and behavioral Psychology. He is also a competitive chess player and dedicated gamer — hobbies that sharpen his analytical strategy and problem-solving mindset.",
-  },
-  {
-    keywords: ["contact", "email", "hire", "job", "reach", "linkedin", "github", "location", "kolkata"],
-    title: "Contact & Social Links",
-    text: "Contact Sagnik Chandra:\n📍 Location: Kolkata, India\n📬 Email: sagnikchandra@gmail.com\n🐙 GitHub: github.com/csagnik1302\n💼 LinkedIn: linkedin.com/in/sagnik-chandra-52b0a111a/",
-  },
-  {
-    keywords: ["resume", "cv", "pdf", "download"],
-    title: "Official Resume & Experience PDF",
-    text: "You can view and download Sagnik's latest official Resume & Experience PDF directly from Google Drive:\nhttps://drive.google.com/file/d/1rhio97CGMhq9xvoXZJAp88HLMmLWJHsi/view?usp=sharing",
-  },
-];
 
 const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; title: string }> = {
   me: {
@@ -170,6 +109,77 @@ const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; 
   },
 };
 
+// Vector Space Embedding & Cosine Similarity Engine (No Hardcoding)
+function textToEmbeddingVector(text: string): Record<string, number> {
+  const cleanText = text.toLowerCase().replace(/[^\w\s]/g, "");
+  const words = cleanText.split(/\s+/).filter(Boolean);
+  const vec: Record<string, number> = {};
+
+  for (const w of words) {
+    vec[w] = (vec[w] || 0) + 1.5;
+    // Extract tri-gram character sub-features for subword semantics
+    for (let i = 0; i < w.length - 2; i++) {
+      const tri = w.substring(i, i + 3);
+      vec[tri] = (vec[tri] || 0) + 0.5;
+    }
+  }
+
+  // L2 Vector Normalization
+  let norm = 0;
+  for (const k in vec) {
+    norm += vec[k] * vec[k];
+  }
+  norm = Math.sqrt(norm);
+  if (norm > 0) {
+    for (const k in vec) {
+      vec[k] /= norm;
+    }
+  }
+  return vec;
+}
+
+function calculateCosineSimilarity(
+  vecA: Record<string, number>,
+  vecB: Record<string, number>
+): number {
+  let dotProduct = 0;
+  for (const k in vecA) {
+    if (vecB[k]) {
+      dotProduct += vecA[k] * vecB[k];
+    }
+  }
+  return dotProduct;
+}
+
+// Precompute Dense Vectors for all Default Pill Prompts
+const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
+  type: item.type,
+  title: item.title,
+  vector: textToEmbeddingVector(item.prompt + " " + key + " " + item.title),
+}));
+
+// Cosine Similarity Threshold for Pill Card Equivalence
+const COSINE_SIMILARITY_THRESHOLD = 0.42;
+
+// Conversational Small-Talk Vectors
+const SMALL_TALK_VECTORS = [
+  {
+    vector: textToEmbeddingVector("hello hi hey greetings good morning good afternoon hola"),
+    title: "Greeting",
+    text: "Hey there! 👋 Welcome to Sagnik Chandra's interactive portfolio. Feel free to ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack, or background!",
+  },
+  {
+    vector: textToEmbeddingVector("how are you doing whats up how is it going sup"),
+    title: "Checking In",
+    text: "Doing great! Thanks for visiting. How can I help you explore Sagnik's ML research, projects, or background today?",
+  },
+  {
+    vector: textToEmbeddingVector("thanks thank you awesome cool great nice excellent"),
+    title: "You're Welcome!",
+    text: "You're very welcome! 😊 Let me know if you'd like to check out Sagnik's research experience, projects, or download his resume.",
+  },
+];
+
 interface ChatViewProps {
   initialPrompt?: {
     type: keyof typeof CARD_PROMPTS | "custom";
@@ -185,15 +195,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // In-Memory & LocalStorage Client-Side Response Cache
-  const responseCacheRef = useRef<Record<string, { text: string; title: string }>>({});
+  const responseCacheRef = useRef<Record<string, { text?: string; title: string; type: ChatMessage["type"] }>>({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    // Load cached responses from sessionStorage if available
     try {
       const savedCache = sessionStorage.getItem("sagnik_chat_cache");
       if (savedCache) {
@@ -215,8 +223,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const saveToCache = (qKey: string, text: string, title: string) => {
-    responseCacheRef.current[qKey] = { text, title };
+  const saveToCache = (qKey: string, text: string | undefined, title: string, type: ChatMessage["type"]) => {
+    responseCacheRef.current[qKey] = { text, title, type };
     try {
       sessionStorage.setItem("sagnik_chat_cache", JSON.stringify(responseCacheRef.current));
     } catch {}
@@ -247,16 +255,38 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Multi-Provider Cascade: Local Cache -> Groq API -> Gemini API -> Local Engine
-  const fetchLLMResponseWithCascade = async (queryText: string): Promise<{ text: string; title: string }> => {
+  // Vector Space Embedding & Cosine Similarity Matching Engine
+  const fetchResponseWithVectorEmbedding = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.toLowerCase().trim();
 
-    // 1. Instant Local Cache Check (0ms, 0 Token Usage)
+    // 1. Instant Cache Check
     if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
 
-    // 2. Groq API Provider Check (Llama 3.3 70B — 30 RPM Free)
+    // Compute Embedding Vector for User Query
+    const queryVector = textToEmbeddingVector(queryText);
+
+    // 2. Cosine Similarity Match against Pill Card Vector Space
+    let maxSimilarity = 0;
+    let bestPillMatch: { type: ChatMessage["type"]; title: string } | null = null;
+
+    for (const pillObj of PILL_CARD_VECTORS) {
+      const sim = calculateCosineSimilarity(queryVector, pillObj.vector);
+      if (sim > maxSimilarity) {
+        maxSimilarity = sim;
+        bestPillMatch = pillObj;
+      }
+    }
+
+    // If Cosine Similarity >= Threshold (0.42), consider equivalent to Pill Card
+    if (bestPillMatch && maxSimilarity >= COSINE_SIMILARITY_THRESHOLD) {
+      const result = { title: bestPillMatch.title, type: bestPillMatch.type };
+      saveToCache(qKey, undefined, result.title, result.type);
+      return result;
+    }
+
+    // 3. Groq API Provider Check (Llama 3.3 70B)
     const groqApiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (groqApiKey) {
       try {
@@ -281,8 +311,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           const data = await res.json();
           const text = data?.choices?.[0]?.message?.content;
           if (text) {
-            const result = { text: text.trim(), title: `Response to "${queryText}"` };
-            saveToCache(qKey, result.text, result.title);
+            const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+            saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
         }
@@ -291,7 +321,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 3. Google Gemini API Provider Check (15 RPM Free)
+    // 4. Gemini API Provider Check
     const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
@@ -314,59 +344,40 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           const data = await res.json();
           const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (text) {
-            const result = { text: text.trim(), title: `Response to "${queryText}"` };
-            saveToCache(qKey, result.text, result.title);
+            const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
+            saveToCache(qKey, result.text, result.title, "custom");
             return result;
           }
         }
       } catch (err) {
-        console.warn("Gemini Provider failed, switching to Local Intent Engine:", err);
+        console.warn("Gemini Provider failed, switching to Local Vector Engine:", err);
       }
     }
 
-    // 4. Local Intent Engine Fallback (0ms, 100% Offline, Unlimited)
-    // Small Talk Match
-    for (const pattern of SMALL_TALK_PATTERNS) {
-      if (pattern.keywords.some((kw) => qKey === kw || qKey.startsWith(kw + " ") || qKey.endsWith(" " + kw))) {
-        const result = { text: pattern.text, title: pattern.title };
-        saveToCache(qKey, result.text, result.title);
-        return result;
+    // 5. Small Talk Vector Match
+    let maxSmallTalkSim = 0;
+    let bestSmallTalkMatch: { title: string; text: string } | null = null;
+
+    for (const stObj of SMALL_TALK_VECTORS) {
+      const sim = calculateCosineSimilarity(queryVector, stObj.vector);
+      if (sim > maxSmallTalkSim) {
+        maxSmallTalkSim = sim;
+        bestSmallTalkMatch = stObj;
       }
     }
 
-    // Knowledge Scoring
-    const queryTokens = qKey.split(/\s+/).filter((t) => t.length > 2);
-    let highestScore = 0;
-    let matchedTitle = `Answer for "${queryText}"`;
-    let matchedText = "";
-
-    for (const item of KNOWLEDGE_RESPONSES) {
-      let score = 0;
-      for (const kw of item.keywords) {
-        if (qKey.includes(kw)) score += 3;
-      }
-      for (const token of queryTokens) {
-        if (item.text.toLowerCase().includes(token) || item.title.toLowerCase().includes(token)) score += 1;
-      }
-
-      if (score > highestScore && score >= 2) {
-        highestScore = score;
-        matchedTitle = item.title;
-        matchedText = item.text;
-      }
-    }
-
-    if (matchedText) {
-      const result = { text: matchedText, title: matchedTitle };
-      saveToCache(qKey, result.text, result.title);
+    if (bestSmallTalkMatch && maxSmallTalkSim >= 0.25) {
+      const result = { text: bestSmallTalkMatch.text, title: bestSmallTalkMatch.title, type: "custom" as const };
+      saveToCache(qKey, result.text, result.title, "custom");
       return result;
     }
 
     const fallbackResult = {
       title: "Interactive Search",
       text: `I couldn't find a specific record for "${queryText}". You can ask about Sagnik's LLM research at ISI Kolkata, ML projects, technical stack (PyTorch, PySpark, Neo4j, MCP), or click any quick pill button below!`,
+      type: "custom" as const,
     };
-    saveToCache(qKey, fallbackResult.text, fallbackResult.title);
+    saveToCache(qKey, fallbackResult.text, fallbackResult.title, "custom");
     return fallbackResult;
   };
 
@@ -381,13 +392,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    const { text, title } = await fetchLLMResponseWithCascade(queryText);
+    const { text, title, type } = await fetchResponseWithVectorEmbedding(queryText);
 
     setIsTyping(false);
     const assistantMsg: ChatMessage = {
       id: Date.now().toString() + "-assistant",
       role: "assistant",
-      type: "custom",
+      type: type,
       content: text,
       title: title,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -400,7 +411,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     e.preventDefault();
     if (!inputQuery.trim() || isTyping || cooldown) return;
 
-    // Rate Limiting Cooldown (1 sec)
     setCooldown(true);
     setTimeout(() => setCooldown(false), 1000);
 

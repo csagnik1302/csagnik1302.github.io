@@ -1,0 +1,13 @@
+{
+  "category": "profile",
+  "items": [
+    {
+      "id": "sagnik_bio",
+      "title": "About Sagnik Chandra",
+      "role": "Machine Learning & AI Researcher",
+      "location": "Kolkata, India",
+      "summary": "Driven by deep learning and intelligent retrieval systems. Currently advancing LLM research at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI.",
+      "keywords": ["who are you", "about", "bio", "sagnik", "introduction", "who is sagnik", "background", "summary"]
+    }
+  ]
+}

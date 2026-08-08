@@ -1,0 +1,7 @@
+{
+  "category": "skills",
+  "languages": ["Python", "C", "Cypher", "R", "SQL"],
+  "frameworks": ["Scikit-learn", "PyTorch", "Pandas", "NumPy", "Matplotlib", "Seaborn", "PySpark", "LangChain"],
+  "tools": ["Neo4j", "Git", "GitHub", "Jupyter Notebook", "Docker", "Linux (Ubuntu)", "Model Context Protocol (MCP)"],
+  "keywords": ["skills", "skill", "technologies", "tech stack", "languages", "python", "pytorch", "pyspark", "tools", "mcp"]
+}
