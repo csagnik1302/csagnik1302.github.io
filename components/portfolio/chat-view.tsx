@@ -275,11 +275,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {/* Render Response Content Based on Type */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
-                      {/* Top Profile Block - Raphaël Giraud Layout Reference */}
+                      {/* Top Profile Block - Raphaël Giraud Layout Reference with 4:3 Aspect Ratio Container */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                        <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
+                        <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                           <Image
-                            src="/sagnik-profile.jpg"
+                            src="/sagnik-profile.jpeg"
                             alt="Sagnik Chandra"
                             fill
                             className="object-cover object-center"
