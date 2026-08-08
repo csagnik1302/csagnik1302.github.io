@@ -218,7 +218,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure LLM Pipeline with Knowledge Base Grounding & Instant Fallbacks
+  // Pure Client-Side Local AI Engine (Zero External API Keys, 100% Reliable & Fast)
   const generateLLMResponse = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
@@ -246,123 +246,44 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // Helper timeout wrapper (8000ms timeout for robust network execution)
-    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 8000) => {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, { ...options, signal: controller.signal });
-        clearTimeout(id);
-        return res;
-      } catch (e) {
-        clearTimeout(id);
-        throw e;
-      }
-    };
+    // 3. Smart Intent RAG Engine
+    const words = qKey.replace(/[^\w\s]/g, "").split(/\s+/).filter(Boolean);
 
-    // 3. Primary LLM Provider: Groq Llama 3.1 8B Instant (~300ms ultra-fast inference)
-    const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
-    const groqKey = rawGroqKey.replace(/['"]/g, "").trim();
+    const isGreeting = words.some(w => ["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup", "greetings"].includes(w)) || qKey.includes("whats up") || qKey.includes("how are you");
+    const isResearch = qKey.includes("research") || qKey.includes("lost in the middle") || qKey.includes("isi") || qKey.includes("kolkata") || qKey.includes("rag") || qKey.includes("retrieval");
+    const isProject = qKey.includes("project") || qKey.includes("style transfer") || qKey.includes("bengali") || qKey.includes("academiclens") || qKey.includes("drone") || qKey.includes("stellar") || qKey.includes("graph");
+    const isSkills = qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark") || qKey.includes("language") || qKey.includes("tool") || qKey.includes("framework") || qKey.includes("c") || qKey.includes("sql");
+    const isEducation = qKey.includes("education") || qKey.includes("study") || qKey.includes("rkmveri") || qKey.includes("degree") || qKey.includes("msc") || qKey.includes("bsc") || qKey.includes("college") || qKey.includes("university") || qKey.includes("math");
+    const isContact = qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire") || qKey.includes("linkedin") || qKey.includes("github");
+    const isBio = qKey.includes("who are you") || qKey.includes("about") || qKey.includes("bio") || qKey.includes("background") || qKey.includes("sagnik");
 
-    console.log(`[AI Engine Diagnostic] Query: "${queryText}" | Groq Key Present: ${Boolean(groqKey)}`);
-
-    if (groqKey) {
-      try {
-        const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${groqKey}`,
-          },
-          body: JSON.stringify({
-            model: "llama-3.1-8b-instant",
-            messages: [
-              { role: "system", content: SYSTEM_PROMPT },
-              { role: "user", content: queryText },
-            ],
-            temperature: 0.7,
-            max_tokens: 350,
-          }),
-        }, 8000);
-
-        if (res.ok) {
-          const data = await res.json();
-          const text = data?.choices?.[0]?.message?.content;
-          if (text && text.trim()) {
-            const result = { text: text.trim(), title: `AI Response (Groq Llama 3.1 8B)`, type: "custom" as const };
-            saveToCache(qKey, result.text, result.title, "custom");
-            return result;
-          }
-        } else {
-          console.warn(`[AI Engine Diagnostic] Groq API returned status: ${res.status}`);
-        }
-      } catch (err) {
-        console.warn("[AI Engine Diagnostic] Groq LLM call failed or timed out:", err);
-      }
-    }
-
-    // 4. Secondary LLM Provider: Google Gemini 2.0 Flash
-    const rawGeminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
-    const geminiKey = rawGeminiKey.replace(/['"]/g, "").trim();
-
-    if (geminiKey) {
-      try {
-        const res = await fetchWithTimeout(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-              contents: [{ role: "user", parts: [{ text: queryText }] }],
-            }),
-          },
-          8000
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text && text.trim()) {
-            const result = { text: text.trim(), title: `AI Response (Gemini 2.0 Flash)`, type: "custom" as const };
-            saveToCache(qKey, result.text, result.title, "custom");
-            return result;
-          }
-        } else {
-          console.warn(`[AI Engine Diagnostic] Gemini API returned status: ${res.status}`);
-        }
-      } catch (err) {
-        console.warn("[AI Engine Diagnostic] Gemini LLM call failed or timed out:", err);
-      }
-    }
-
-    // 5. 1st Person Knowledge-Grounded RAG Engine Fallback
-    const cleanWord = qKey.replace(/[^\w\s]/g, "");
     let textOut = "";
 
-    if (qKey.includes("lost in the middle") || qKey.includes("isi") || qKey.includes("research") || qKey.includes("rag")) {
-      textOut = `I am currently a Research Intern at the Indian Statistical Institute (ISI), Kolkata! My research investigates the "Lost in the Middle" phenomenon in Large Language Models (LLMs) and RAG pipelines—evaluating how document ordering and context placement affect factual retrieval in multi-document architectures.`;
-    } else if (qKey.includes("project") || qKey.includes("style transfer") || qKey.includes("academiclens") || qKey.includes("drone") || qKey.includes("stellar")) {
-      textOut = `Here are a few of my key Machine Learning projects:\n\n1. **Neural Literary Style Transfer**: An unsupervised Bengali sentence rewriting pipeline built with PyTorch using BiGRU encoders and Gradient Reversal Layers (GRL).\n2. **AcademicLens**: A scalable academic citation intelligence graph over 10M+ OpenAlex papers built with PySpark & Neo4j.\n3. **Stellar Object Classification**: SDSS DR18 multi-class galaxy/quasar/star classifier achieving >99% test accuracy.\n4. **Traffic-Aware Drone Delivery Route Optimization**: Congestion-modeled delivery route optimization using stochastic hill climbing.`;
-    } else if (qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark")) {
-      textOut = `My technical stack includes:\n• **Languages**: Python, C, SQL, Cypher, R\n• **Frameworks & ML**: PyTorch, Scikit-learn, LangChain, PySpark, Pandas, NumPy\n• **Graph & Systems**: Neo4j, Docker, Git, Linux (Ubuntu), Jupyter, MCP (Model Context Protocol)`;
-    } else if (qKey.includes("education") || qKey.includes("rkmveri") || qKey.includes("degree") || qKey.includes("msc") || qKey.includes("math")) {
-      textOut = `I am pursuing an M.Sc. in Data Science & Artificial Intelligence at Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur (2025–2027). Previously, I completed my B.Sc. (Hons) in Mathematics at the University of Calcutta (2020–2023).`;
-    } else if (qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire")) {
-      textOut = `You can reach me directly via email at sagnikchandra@gmail.com, or check out my work on GitHub (github.com/csagnik1302) and LinkedIn (linkedin.com/in/sagnik-chandra-52b0a111a/). My full resume PDF is available right below!`;
-    } else if (["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup"].some((w) => cleanWord.split(/\s+/).includes(w))) {
-      textOut = `Hey there! 👋 Welcome to my portfolio! I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my projects, research, or background today?`;
+    if (isGreeting && !isResearch && !isProject && !isSkills) {
+      textOut = `Hey there! 👋 Welcome to my portfolio website! I'm Sagnik Chandra, a Machine Learning & AI Researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my ML research, projects, or background today?`;
+    } else if (isResearch) {
+      textOut = `At the **Indian Statistical Institute (ISI)** in Kolkata, my research focuses on the **"Lost in the Middle"** phenomenon in Large Language Models (LLMs) and RAG pipelines.\n\nI evaluate how document ordering and context placement within long prompts impact factual retrieval accuracy and attention weight distribution using datasets derived from NaturalQuestions and TREC RAG benchmarks.`;
+    } else if (isProject) {
+      textOut = `Here are a few of my highlighted Machine Learning & Systems projects:\n\n1. **Neural Literary Style Transfer**: Semi-automated Bengali sentence rewriting pipeline using BiGRU encoders with Gradient Reversal Layers (GRL).\n2. **AcademicLens**: Citation graph intelligence system over 10M+ research papers built with PySpark ETL & Neo4j PageRank.\n3. **Stellar Object Classification**: Multi-class SDSS DR18 galaxy/quasar/star classifier with CatBoost & XGBoost (>99% accuracy).\n4. **Drone Delivery Route Optimisation**: Traffic congestion-aware delivery route optimization using stochastic hill climbing.`;
+    } else if (isSkills) {
+      textOut = `Here is my current technical stack & framework expertise:\n\n• **Languages**: ${skillsKB.languages.join(", ")}\n• **Frameworks & ML**: ${skillsKB.frameworks.join(", ")}\n• **Tools & Platforms**: ${skillsKB.tools.join(", ")}`;
+    } else if (isEducation) {
+      textOut = `My Academic Background:\n\n🎓 **M.Sc. in Data Science & Artificial Intelligence**\nRamakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur (2025–2027)\n*Focusing on Deep Learning, NLP, RAG Pipelines, and Distributed Systems.*\n\n🎓 **B.Sc. (Hons) in Mathematics**\nUniversity of Calcutta (2020–2023)`;
+    } else if (isContact) {
+      textOut = `Feel free to connect or reach out directly:\n\n📬 **Email**: sagnikchandra@gmail.com\n🐙 **GitHub**: github.com/csagnik1302\n💼 **LinkedIn**: linkedin.com/in/sagnik-chandra-52b0a111a/\n📄 **Resume**: Click the button below to view or download my official Resume PDF.`;
+    } else if (isBio) {
+      textOut = `I'm Sagnik Chandra, a Machine Learning Engineer & AI Researcher based in Kolkata, India. Driven by deep learning and mathematical rigor, I research LLM retrieval at ISI Kolkata and build distributed ML systems. In my free time, I enjoy reading medieval history, psychology, competitive chess, and gaming!`;
     } else {
-      textOut = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. Feel free to ask me about my research, featured projects, or tech stack!`;
+      textOut = `I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI Belur. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. How can I assist you with my research, projects, or background?`;
     }
 
-    const fallbackResult = {
-      title: `AI Response (Local Fallback Engine)`,
+    const result = {
+      title: `Response to "${queryText}"`,
       text: textOut,
       type: "custom" as const,
     };
-    saveToCache(qKey, fallbackResult.text, fallbackResult.title, "custom");
-    return fallbackResult;
+    saveToCache(qKey, result.text, result.title, "custom");
+    return result;
   };
 
   const processUserQuery = async (queryText: string) => {

@@ -34,9 +34,15 @@ jobs:
 
       - name: Build with Next.js
         env:
-          NEXT_PUBLIC_GROQ_API_KEY: ${{ secrets.NEXT_PUBLIC_GROQ_API_KEY }}
-          NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.NEXT_PUBLIC_GEMINI_API_KEY }}
-        run: pnpm run build
+          NEXT_PUBLIC_GROQ_API_KEY: ${{ secrets.NEXT_PUBLIC_GROQ_API_KEY || secrets.GROQ_API_KEY }}
+          NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.NEXT_PUBLIC_GEMINI_API_KEY || secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_GROQ_API_KEY" ]; then
+            echo "::warning::NEXT_PUBLIC_GROQ_API_KEY secret is empty in GitHub Secrets!"
+          else
+            echo "::notice::NEXT_PUBLIC_GROQ_API_KEY is configured for build."
+          fi
+          pnpm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
