@@ -50,7 +50,7 @@ You are Sagnik Chandra speaking directly to visitors on your personal portfolio 
 4. For technical or background questions, ground your answer strictly in my Knowledge Base below.
 
 [MY KNOWLEDGE BASE]
-• Profile: ${profileKB.items[0].name} | ${profileKB.items[0].role} | ${profileKB.items[0].location}
+• Profile: Sagnik Chandra | ${profileKB.items[0].role} | ${profileKB.items[0].location}
 • Education: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}
 • Research Internship 1: ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}) — ${experienceKB.items[0].description}
 • Internship 2: ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}) — ${experienceKB.items[1].description}
@@ -136,7 +136,7 @@ const PILL_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
   vector: textToVector(item.prompt + " " + key + " " + item.title),
 }));
 
-const PILL_MATCH_THRESHOLD = 0.42;
+const PILL_MATCH_THRESHOLD = 0.70;
 
 interface ChatViewProps {
   initialPrompt?: {
@@ -167,7 +167,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     try {
-      const savedCache = sessionStorage.getItem("sagnik_chat_cache");
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v2");
       if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
@@ -186,9 +186,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   }, [messages, isTyping]);
 
   const saveToCache = (qKey: string, text: string | undefined, title: string, type: ChatMessage["type"]) => {
+    if (type === "custom" && !text) return; // Do not cache empty custom responses
     responseCacheRef.current[qKey] = { text, title, type };
     try {
-      sessionStorage.setItem("sagnik_chat_cache", JSON.stringify(responseCacheRef.current));
+      sessionStorage.setItem("sagnik_chat_cache_v2", JSON.stringify(responseCacheRef.current));
     } catch {}
   };
 
@@ -222,11 +223,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     const qKey = queryText.trim().toLowerCase();
 
     // 1. Cache Check
-    if (responseCacheRef.current[qKey]) {
+    if (responseCacheRef.current[qKey] && responseCacheRef.current[qKey].text) {
       return responseCacheRef.current[qKey];
     }
 
-    // 2. Semantic Pill Card Matching (Aspect 2)
+    // 2. Semantic Pill Card Matching (Strict Threshold 0.70 for exact card triggers)
     const userVec = textToVector(queryText);
     let maxSim = 0;
     let pillMatch: { type: ChatMessage["type"]; title: string } | null = null;
@@ -245,8 +246,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       return result;
     }
 
-    // Helper timeout wrapper
-    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 3500) => {
+    // Helper timeout wrapper (8000ms timeout for robust network execution)
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -259,7 +260,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     };
 
-    // 3. Primary LLM Provider: Groq Llama 3.3 70B
+    // 3. Primary LLM Provider: Groq Llama 3.1 8B Instant (~300ms ultra-fast inference)
     const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
     const groqKey = rawGroqKey.replace(/['"]/g, "").trim();
 
@@ -272,20 +273,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             Authorization: `Bearer ${groqKey}`,
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "llama-3.1-8b-instant",
             messages: [
               { role: "system", content: SYSTEM_PROMPT },
               { role: "user", content: queryText },
             ],
             temperature: 0.7,
-            max_tokens: 300,
+            max_tokens: 350,
           }),
-        }, 3500);
+        }, 8000);
 
         if (res.ok) {
           const data = await res.json();
           const text = data?.choices?.[0]?.message?.content;
-          if (text) {
+          if (text && text.trim()) {
             const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
@@ -312,13 +313,13 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               contents: [{ role: "user", parts: [{ text: queryText }] }],
             }),
           },
-          3500
+          8000
         );
 
         if (res.ok) {
           const data = await res.json();
           const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
+          if (text && text.trim()) {
             const result = { text: text.trim(), title: `Response to "${queryText}"`, type: "custom" as const };
             saveToCache(qKey, result.text, result.title, "custom");
             return result;
@@ -329,16 +330,24 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       }
     }
 
-    // 5. 1st Person Knowledge-Grounded Generative Fallback
-    const cleanWord = qKey.replace(/[^\w]/g, "");
-    let textOut = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI. How can I help you explore my research, ML projects, or technical background today?`;
+    // 5. 1st Person Knowledge-Grounded RAG Engine Fallback
+    const cleanWord = qKey.replace(/[^\w\s]/g, "");
+    let textOut = "";
 
-    if (["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup"].includes(cleanWord)) {
-      textOut = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. What would you like to explore about my projects, research, or background today?`;
-    } else if (qKey.includes("good day") || qKey.includes("great day") || qKey.includes("nice day")) {
-      textOut = `It certainly is a wonderful day! 👋 Thanks for visiting my page. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How can I help you explore my work or background today?`;
-    } else if (cleanWord.includes("whatsup") || cleanWord.includes("howareyou")) {
-      textOut = `Not much! Just working on LLM retrieval research at ISI Kolkata and building distributed ML systems. How is your day going? Feel free to ask me anything about my projects or stack!`;
+    if (qKey.includes("lost in the middle") || qKey.includes("isi") || qKey.includes("research") || qKey.includes("rag")) {
+      textOut = `I am currently a Research Intern at the Indian Statistical Institute (ISI), Kolkata! My research investigates the "Lost in the Middle" phenomenon in Large Language Models (LLMs) and RAG pipelines—evaluating how document ordering and context placement affect factual retrieval in multi-document architectures.`;
+    } else if (qKey.includes("project") || qKey.includes("style transfer") || qKey.includes("academiclens") || qKey.includes("drone") || qKey.includes("stellar")) {
+      textOut = `Here are a few of my key Machine Learning projects:\n\n1. **Neural Literary Style Transfer**: An unsupervised Bengali sentence rewriting pipeline built with PyTorch using BiGRU encoders and Gradient Reversal Layers (GRL).\n2. **AcademicLens**: A scalable academic citation intelligence graph over 10M+ OpenAlex papers built with PySpark & Neo4j.\n3. **Stellar Object Classification**: SDSS DR18 multi-class galaxy/quasar/star classifier achieving >99% test accuracy.\n4. **Traffic-Aware Drone Delivery Route Optimization**: Congestion-modeled delivery route optimization using stochastic hill climbing.`;
+    } else if (qKey.includes("skill") || qKey.includes("stack") || qKey.includes("python") || qKey.includes("pytorch") || qKey.includes("pyspark")) {
+      textOut = `My technical stack includes:\n• **Languages**: Python, C, SQL, Cypher, R\n• **Frameworks & ML**: PyTorch, Scikit-learn, LangChain, PySpark, Pandas, NumPy\n• **Graph & Systems**: Neo4j, Docker, Git, Linux (Ubuntu), Jupyter, MCP (Model Context Protocol)`;
+    } else if (qKey.includes("education") || qKey.includes("rkmveri") || qKey.includes("degree") || qKey.includes("msc") || qKey.includes("math")) {
+      textOut = `I am pursuing an M.Sc. in Data Science & Artificial Intelligence at Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur (2025–2027). Previously, I completed my B.Sc. (Hons) in Mathematics at the University of Calcutta (2020–2023).`;
+    } else if (qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire")) {
+      textOut = `You can reach me directly via email at sagnikchandra@gmail.com, or check out my work on GitHub (github.com/csagnik1302) and LinkedIn (linkedin.com/in/sagnik-chandra-52b0a111a/). My full resume PDF is available right below!`;
+    } else if (["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup"].some((w) => cleanWord.split(/\s+/).includes(w))) {
+      textOut = `Hey there! 👋 Welcome to my portfolio! I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my projects, research, or background today?`;
+    } else {
+      textOut = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. Feel free to ask me about my research, featured projects, or tech stack!`;
     }
 
     const fallbackResult = {
