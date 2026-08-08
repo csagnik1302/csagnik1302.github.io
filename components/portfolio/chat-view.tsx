@@ -107,6 +107,7 @@ interface ChatViewProps {
 export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -117,18 +118,18 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     if (initialPrompt) {
       if (initialPrompt.type in CARD_PROMPTS) {
         const item = CARD_PROMPTS[initialPrompt.type];
-        sendPrompt(item.prompt, item.type, item.title);
+        triggerAnimatedStream(item.prompt, item.type, item.title);
       } else if (initialPrompt.query) {
-        handleCustomSearch(initialPrompt.query);
+        triggerAnimatedCustomSearch(initialPrompt.query);
       }
     }
   }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
-  const sendPrompt = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
+  const triggerAnimatedStream = (userPrompt: string, responseType: ChatMessage["type"], title?: string) => {
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -136,18 +137,23 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    const assistantMsg: ChatMessage = {
-      id: Date.now().toString() + "-assistant",
-      role: "assistant",
-      type: responseType,
-      title: title || "Response",
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
 
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setTimeout(() => {
+      setIsTyping(false);
+      const assistantMsg: ChatMessage = {
+        id: Date.now().toString() + "-assistant",
+        role: "assistant",
+        type: responseType,
+        title: title || "Response",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+    }, 450);
   };
 
-  const handleCustomSearch = (queryText: string) => {
+  const triggerAnimatedCustomSearch = (queryText: string) => {
     const q = queryText.toLowerCase();
     let matchedAnswer =
       "Sagnik Chandra is an Aspiring Machine Learning Engineer & AI Researcher pursuing an M.Sc. in Data Science & AI @ RKMVERI Belur and interning at ISI Kolkata. He focuses on LLM Retrieval ('Lost in the Middle' research), RAG pipelines, PyTorch, PySpark, and is currently learning LangChain, RAG, and MCP.";
@@ -166,35 +172,41 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    const assistantMsg: ChatMessage = {
-      id: Date.now().toString() + "-assistant",
-      role: "assistant",
-      type: "custom",
-      content: matchedAnswer,
-      title: `Answer for "${queryText}"`,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
 
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
+    setTimeout(() => {
+      setIsTyping(false);
+      const assistantMsg: ChatMessage = {
+        id: Date.now().toString() + "-assistant",
+        role: "assistant",
+        type: "custom",
+        content: matchedAnswer,
+        title: `Answer for "${queryText}"`,
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+    }, 450);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputQuery.trim()) return;
+    if (!inputQuery.trim() || isTyping) return;
 
-    handleCustomSearch(inputQuery);
+    triggerAnimatedCustomSearch(inputQuery);
     setInputQuery("");
   };
 
   const handlePillClick = (cardKey: keyof typeof CARD_PROMPTS) => {
+    if (isTyping) return;
     const item = CARD_PROMPTS[cardKey];
-    sendPrompt(item.prompt, item.type, item.title);
+    triggerAnimatedStream(item.prompt, item.type, item.title);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B0D12] text-slate-100 font-sans">
       {/* Top ChatGPT / Gemini Style Navigation Bar */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10">
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToHome}
@@ -222,7 +234,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
       {/* Main Conversation Stream */}
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36">
-        {messages.length === 0 && (
+        {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
             <h2 className="text-xl font-bold text-white">Ask Sagnik Chandra's AI Twin</h2>
@@ -233,19 +245,19 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className="space-y-2 animate-fade-in">
-            {/* User Message Bubble */}
+          <div key={msg.id} className="space-y-2">
+            {/* User Speech Bubble with Right Slide-in Animation */}
             {msg.role === "user" && (
-              <div className="flex justify-end">
+              <div className="flex justify-end animate-slide-in-right">
                 <div className="bg-[#0171E3] text-white px-5 py-3 rounded-3xl rounded-tr-sm text-sm max-w-[85%] sm:max-w-[75%] shadow-lg">
                   {msg.content}
                 </div>
               </div>
             )}
 
-            {/* Assistant Response Card (Gemini / ChatGPT Style) */}
+            {/* Assistant Response Card with Left Slide-in Animation */}
             {msg.role === "assistant" && (
-              <div className="flex justify-start">
+              <div className="flex justify-start animate-slide-in-left">
                 <div className="w-full bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
                   {/* Assistant Header Badge */}
                   <div className="flex items-center gap-2 text-xs font-mono text-blue-400 pb-2 border-b border-white/10">
@@ -256,7 +268,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {/* Render Response Content Based on Type */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
-                      {/* Top Profile Block - Reference Raphaël Giraud Layout */}
+                      {/* Top Profile Block - Raphaël Giraud Layout Reference */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                           <Image
@@ -578,6 +590,20 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             )}
           </div>
         ))}
+
+        {/* Animated AI Typing Indicator */}
+        {isTyping && (
+          <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] animate-fade-in pl-2 pt-2">
+            <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
+            <span>Sagnik AI is typing</span>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </main>
 
@@ -588,42 +614,48 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 no-scrollbar">
             <button
               onClick={() => handlePillClick("me")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Smile className="w-3.5 h-3.5 text-emerald-400" />
               <span>Me</span>
             </button>
             <button
               onClick={() => handlePillClick("projects")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Briefcase className="w-3.5 h-3.5 text-blue-400" />
               <span>Projects</span>
             </button>
             <button
               onClick={() => handlePillClick("experience")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Code2 className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>Experience</span>
             </button>
             <button
               onClick={() => handlePillClick("skills")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Layers className="w-3.5 h-3.5 text-purple-400" />
               <span>Skills</span>
             </button>
             <button
               onClick={() => handlePillClick("education")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
               <span>Education</span>
             </button>
             <button
               onClick={() => handlePillClick("contact")}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all"
+              disabled={isTyping}
+              className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shrink-0 transition-all active:scale-95 disabled:opacity-50"
             >
               <Mail className="w-3.5 h-3.5 text-pink-400" />
               <span>Contact</span>
@@ -642,7 +674,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               />
               <button
                 type="submit"
-                disabled={!inputQuery.trim()}
+                disabled={!inputQuery.trim() || isTyping}
                 aria-label="Submit question"
                 className="flex items-center justify-center rounded-full bg-[#0171E3] hover:bg-blue-600 p-2.5 text-white transition-all disabled:opacity-50 shrink-0"
               >
