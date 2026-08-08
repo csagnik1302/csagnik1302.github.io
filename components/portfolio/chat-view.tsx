@@ -223,10 +223,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             <ArrowLeft className="w-4 h-4" />
             <span>Home</span>
           </button>
-
-          <div className="flex items-center gap-2 pl-2 border-l border-white/10">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          </div>
         </div>
 
         <button
