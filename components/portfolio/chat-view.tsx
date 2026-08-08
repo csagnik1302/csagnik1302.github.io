@@ -24,14 +24,17 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-// 1. Load Knowledge Base JSON Files
-import profileKB from "@/knowledge-base/01_profile.json";
-import experienceKB from "@/knowledge-base/02_experience.json";
-import projectsKB from "@/knowledge-base/03_projects.json";
-import skillsKB from "@/knowledge-base/04_skills.json";
-import educationKB from "@/knowledge-base/05_education.json";
-import interestsKB from "@/knowledge-base/06_interests.json";
-import contactKB from "@/knowledge-base/07_contact.json";
+// 1. Load Knowledge Base Files & Dynamic Auto-Scanner
+import {
+  profileKB,
+  experienceKB,
+  projectsKB,
+  skillsKB,
+  educationKB,
+  interestsKB,
+  contactKB,
+  getDynamicKnowledgeBaseContext,
+} from "@/knowledge-base/index";
 
 const RESUME_URL = contactKB.resume;
 
@@ -52,25 +55,11 @@ You are Sagnik Chandra speaking directly to visitors on your personal portfolio 
 1. ALWAYS speak in FIRST PERSON ("I", "my", "me"). You ARE Sagnik Chandra. Never speak in 3rd person.
 2. Be humble, warm, natural, and conversational.
 3. For simple greetings or casual small-talk ("hi", "hello", "hey", "how are you", "what's up"), respond warmly and naturally like a friendly person (e.g. "Hey there! 👋 Welcome to my website. How's your day going?"). DO NOT forcibly dump your internship, resume, or background into simple greetings unless specifically asked.
-4. For technical, background, research, or project questions, ground your answers in my Knowledge Base below.
+4. For technical, background, research, or project questions, ground your answers strictly in my Knowledge Base below.
 5. CONCISE OUTPUT LENGTH: Keep all responses brief, crisp, and to-the-point (1 to 3 short paragraphs max). Avoid wordy or overly long walls of text unless the user explicitly asks for deep technical elaboration.
 
-[MY KNOWLEDGE BASE]
-• Profile: ${profileKB.items[0].name} | ${profileKB.items[0].greeting} | ${profileKB.items[0].location}
-• Current Activity: ${profileKB.items[0].current_activity}
-• Summary: ${profileKB.items[0].summary}
-• Education: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}
-• Research Internship 1: ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}) — ${experienceKB.items[0].description}
-• Internship 2: ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}) — ${experienceKB.items[1].description}
-• Featured ML Projects:
-  1. ${projectsKB.items[0].title}: ${projectsKB.items[0].description}
-  2. ${projectsKB.items[1].title}: ${projectsKB.items[1].description}
-  3. ${projectsKB.items[2].title}: ${projectsKB.items[2].description}
-  4. ${projectsKB.items[3].title}: ${projectsKB.items[3].description}
-• Technical Stack:
-  - Languages: ${skillsKB.languages.join(", ")}
-  - Frameworks: ${skillsKB.frameworks.join(", ")}
-• Personal Interests: ${interestsKB.items[0].description}
+[COMPLETE KNOWLEDGE BASE REPOSITORY]
+${getDynamicKnowledgeBaseContext()}
 `;
 
 // 3. Pill Card Prompts Mapping
