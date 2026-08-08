@@ -226,7 +226,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
           <div className="flex items-center gap-2 pl-2 border-l border-white/10">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm font-bold text-white tracking-tight">Sagnik Chandra</span>
           </div>
         </div>
 
@@ -248,7 +247,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
-            <h2 className="text-xl font-bold text-white">Explore Sagnik Chandra's Portfolio</h2>
+            <h2 className="text-2xl font-bold text-white">Ask Away !</h2>
             <p className="text-xs sm:text-sm text-[#9CA3AF] max-w-md">
               Select a quick prompt below or type your question in the chat bar to explore Sagnik's background, research, projects, and skills.
             </p>
@@ -267,10 +266,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               </div>
             )}
 
-            {/* SECOND: Page Output Card on the RIGHT side */}
+            {/* SECOND: Page Output Card Centered */}
             {msg.role === "assistant" && (
-              <div className="flex justify-end animate-slide-in-right">
-                <div className="w-full max-w-3xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
+              <div className="flex justify-center w-full animate-slide-in-right">
+                <div className="w-full max-w-4xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
                   {/* Assistant Header Badge */}
                   <div className="flex items-center gap-2 text-xs font-mono text-blue-400 pb-2 border-b border-white/10">
                     <Sparkles className="w-4 h-4" />
@@ -603,9 +602,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           </React.Fragment>
         ))}
 
-        {/* Animated Response Typing Indicator on the Right */}
+        {/* Animated Response Typing Indicator */}
         {isTyping && (
-          <div className="flex justify-end animate-fade-in pr-2 pt-2">
+          <div className="flex justify-center animate-fade-in pt-2">
             <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
               <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
               <span>Generating response...</span>
