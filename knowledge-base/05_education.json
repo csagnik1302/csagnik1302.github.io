@@ -6,7 +6,14 @@
       "institution": "Ramakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur",
       "period": "2025 — 2027",
       "focus": "Focusing on Deep Learning, NLP, LLM Retrieval, RAG Pipelines, and Distributed Data Processing.",
-      "keywords": ["education", "degree", "rkmveri", "university", "academic", "master", "msc", "college", "studies"]
+      "keywords": ["education", "degree", "rkmveri", "university", "academic", "master", "msc", "college", "studies", "postgraduate", "research"]
+    },
+    {
+      "degree": "B.Sc. (Hons.) in Mathematics",
+      "institution": "University of Calcutta",
+      "period": "2020 — 2023",
+      "focus": "Focusing on Linear Algebra, Mathematical Modelling, and Multivariate Calulus.",
+      "keywords": ["education", "degree", "cu", "university", "academic", "bachelors", "bsc", "college", "studies", "undergraduate"]
     }
   ]
 }
