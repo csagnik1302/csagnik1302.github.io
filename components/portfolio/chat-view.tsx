@@ -210,7 +210,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       className="flex flex-col min-h-screen bg-[#0B0D12] text-slate-100 font-sans cursor-pointer"
       onClick={onBackToHome}
     >
-      {/* Top ChatGPT / Gemini Style Navigation Bar */}
+      {/* Top Navigation Bar */}
       <header
         className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10 shadow-lg cursor-default"
         onClick={(e) => e.stopPropagation()}
@@ -226,7 +226,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
           <div className="flex items-center gap-2 pl-2 border-l border-white/10">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm font-bold text-white tracking-tight">Sagnik AI</span>
+            <span className="text-sm font-bold text-white tracking-tight">Sagnik Chandra</span>
           </div>
         </div>
 
@@ -248,7 +248,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-3">
             <Sparkles className="w-10 h-10 text-blue-400 animate-pulse" />
-            <h2 className="text-xl font-bold text-white">Ask Sagnik Chandra's AI Twin</h2>
+            <h2 className="text-xl font-bold text-white">Explore Sagnik Chandra's Portfolio</h2>
             <p className="text-xs sm:text-sm text-[#9CA3AF] max-w-md">
               Select a quick prompt below or type your question in the chat bar to explore Sagnik's background, research, projects, and skills.
             </p>
@@ -274,7 +274,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                   {/* Assistant Header Badge */}
                   <div className="flex items-center gap-2 text-xs font-mono text-blue-400 pb-2 border-b border-white/10">
                     <Sparkles className="w-4 h-4" />
-                    <span>{msg.title || "AI Response"}</span>
+                    <span>{msg.title || "Response"}</span>
                   </div>
 
                   {/* Render Response Content Based on Type */}
@@ -603,12 +603,12 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           </React.Fragment>
         ))}
 
-        {/* Animated AI Typing Indicator on the Right */}
+        {/* Animated Response Typing Indicator on the Right */}
         {isTyping && (
           <div className="flex justify-end animate-fade-in pr-2 pt-2">
             <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
               <Sparkles className="w-4 h-4 text-blue-400 animate-spin" />
-              <span>Generating page response...</span>
+              <span>Generating response...</span>
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "150ms" }} />
