@@ -19,7 +19,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-// Import Modular Knowledge Base JSON Files
+// 1. Load Knowledge Base JSON Files
 import profileKB from "@/knowledge-base/01_profile.json";
 import experienceKB from "@/knowledge-base/02_experience.json";
 import projectsKB from "@/knowledge-base/03_projects.json";
@@ -39,45 +39,34 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// System Instruction Knowledge Base for Pure LLM Generation (Strict 1st Person Narrative)
-const SAGNIK_PORTFOLIO_SYSTEM_PROMPT = `
+// 2. Build 1st-Person Knowledge Base System Instruction
+const SYSTEM_PROMPT = `
 You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
-ALWAYS speak in FIRST PERSON ("I", "my", "me"). NEVER speak about Sagnik in the third person.
 
-[MY BIOGRAPHY & ROLE]
-- Name: Sagnik Chandra
-- Role: ${profileKB.items[0].role}
-- Location: ${profileKB.items[0].location}
-- Degree: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}.
+[CRITICAL NARRATIVE RULES]
+1. ALWAYS speak in FIRST PERSON ("I", "my", "me"). You ARE Sagnik Chandra. Never speak in 3rd person.
+2. Be warm, natural, engaging, and conversational.
+3. Attend to idle small-talk queries ("hi", "hii", "it's a good day isn't it", "how are you", "what's up") warmly as Sagnik! (e.g., "Hey there! 👋 It's a great day! I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How's your day going?")
+4. For technical or background questions, ground your answer strictly in my Knowledge Base below.
 
-[MY EXPERIENCE & RESEARCH]
-1. ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}):
-   - ${experienceKB.items[0].description}
-2. ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}):
-   - ${experienceKB.items[1].description}
-
-[MY FEATURED ML PROJECTS]
-1. ${projectsKB.items[0].title}: ${projectsKB.items[0].description}
-2. ${projectsKB.items[1].title}: ${projectsKB.items[1].description}
-3. ${projectsKB.items[2].title}: ${projectsKB.items[2].description}
-4. ${projectsKB.items[3].title}: ${projectsKB.items[3].description}
-
-[MY SKILLS & TOOLING]
-- Languages: ${skillsKB.languages.join(", ")}
-- Frameworks & Libraries: ${skillsKB.frameworks.join(", ")}
-- Tools & Platforms: ${skillsKB.tools.join(", ")}
-
-[MY PERSONAL INTERESTS]
-- ${interestsKB.items[0].description}
-
-[CONVERSATIONAL & RESPONSE RULES]
-- Be warm, free-flowing, conversational, and natural.
-- Respond to ANY greeting or question ("hi", "hii", "hello", "what's up", "how are you") warmly as Sagnik! (e.g. "Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How can I help you explore my research or projects today?")
-- Speak strictly in FIRST PERSON ("I", "my", "me").
-- Keep answers engaging and concise (2-4 sentences max).
-- Do not use markdown headers or title prefixes.
+[MY KNOWLEDGE BASE]
+• Profile: ${profileKB.items[0].name} | ${profileKB.items[0].role} | ${profileKB.items[0].location}
+• Education: ${educationKB.items[0].degree} (${educationKB.items[0].period}) @ ${educationKB.items[0].institution}
+• Research Internship 1: ${experienceKB.items[0].role} @ ${experienceKB.items[0].company} (${experienceKB.items[0].period}) — ${experienceKB.items[0].description}
+• Internship 2: ${experienceKB.items[1].role} @ ${experienceKB.items[1].company} (${experienceKB.items[1].period}) — ${experienceKB.items[1].description}
+• Featured ML Projects:
+  1. ${projectsKB.items[0].title}: ${projectsKB.items[0].description}
+  2. ${projectsKB.items[1].title}: ${projectsKB.items[1].description}
+  3. ${projectsKB.items[2].title}: ${projectsKB.items[2].description}
+  4. ${projectsKB.items[3].title}: ${projectsKB.items[3].description}
+• Technical Stack:
+  - Languages: ${skillsKB.languages.join(", ")}
+  - Frameworks: ${skillsKB.frameworks.join(", ")}
+  - Tools: ${skillsKB.tools.join(", ")}
+• Personal Interests: ${interestsKB.items[0].description}
 `;
 
+// 3. Pill Card Prompts Mapping
 const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; title: string }> = {
   me: {
     prompt: "Who are you? I want to know more about you.",
@@ -111,14 +100,12 @@ const CARD_PROMPTS: Record<string, { prompt: string; type: ChatMessage["type"]; 
   },
 };
 
-// Pure Vector Space Embedding Engine for Pill Prompts
-function textToEmbeddingVector(text: string): Record<string, number> {
-  const cleanText = text.toLowerCase().replace(/[^\w\s]/g, "");
-  const words = cleanText.split(/\s+/).filter(Boolean);
+// 4. Vector Space Engine for Pill Card Similarity Detection
+function textToVector(text: string): Record<string, number> {
+  const words = text.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(Boolean);
   const vec: Record<string, number> = {};
-
   for (const w of words) {
-    vec[w] = (vec[w] || 0) + 3.0;
+    vec[w] = (vec[w] || 0) + 2.0;
     if (w.length >= 3) {
       for (let i = 0; i < w.length - 2; i++) {
         const tri = w.substring(i, i + 3);
@@ -126,41 +113,30 @@ function textToEmbeddingVector(text: string): Record<string, number> {
       }
     }
   }
-
   let norm = 0;
-  for (const k in vec) {
-    norm += vec[k] * vec[k];
-  }
+  for (const k in vec) norm += vec[k] * vec[k];
   norm = Math.sqrt(norm);
   if (norm > 0) {
-    for (const k in vec) {
-      vec[k] /= norm;
-    }
+    for (const k in vec) vec[k] /= norm;
   }
   return vec;
 }
 
-function calculateCosineSimilarity(
-  vecA: Record<string, number>,
-  vecB: Record<string, number>
-): number {
-  let dotProduct = 0;
+function cosineSimilarity(vecA: Record<string, number>, vecB: Record<string, number>): number {
+  let dot = 0;
   for (const k in vecA) {
-    if (vecB[k]) {
-      dotProduct += vecA[k] * vecB[k];
-    }
+    if (vecB[k]) dot += vecA[k] * vecB[k];
   }
-  return dotProduct;
+  return dot;
 }
 
-// Precompute Vectors for Default Pill Prompts
-const PILL_CARD_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
+const PILL_VECTORS = Object.entries(CARD_PROMPTS).map(([key, item]) => ({
   type: item.type,
   title: item.title,
-  vector: textToEmbeddingVector(item.prompt + " " + key + " " + item.title),
+  vector: textToVector(item.prompt + " " + key + " " + item.title),
 }));
 
-const PILL_VECTOR_THRESHOLD = 0.50;
+const PILL_MATCH_THRESHOLD = 0.42;
 
 interface ChatViewProps {
   initialPrompt?: {
@@ -178,7 +154,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  
   const responseCacheRef = useRef<Record<string, { text?: string; title: string; type: ChatMessage["type"] }>>({});
 
   const scrollToBottom = () => {
@@ -193,9 +168,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
     try {
       const savedCache = sessionStorage.getItem("sagnik_chat_cache");
-      if (savedCache) {
-        responseCacheRef.current = JSON.parse(savedCache);
-      }
+      if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
     if (initialPrompt) {
@@ -203,7 +176,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         const item = CARD_PROMPTS[initialPrompt.type];
         triggerAnimatedStream(item.prompt, item.type, item.title);
       } else if (initialPrompt.query) {
-        triggerAnimatedCustomSearch(initialPrompt.query);
+        processUserQuery(initialPrompt.query);
       }
     }
   }, []);
@@ -244,70 +217,70 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }, 450);
   };
 
-  // Pure LLM Processing Pipeline with Fallback Reliability
-  const fetchResponseWithLLM = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
+  // Pure LLM Pipeline with Knowledge Base Grounding & Instant Fallbacks
+  const generateLLMResponse = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
-    // 1. Instant Cache Check
+    // 1. Cache Check
     if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
 
-    // 2. Vector Cosine Similarity Check for Pill Prompts
-    const queryVector = textToEmbeddingVector(queryText);
-    let maxSimilarity = 0;
-    let bestPillMatch: { type: ChatMessage["type"]; title: string } | null = null;
+    // 2. Semantic Pill Card Matching (Aspect 2)
+    const userVec = textToVector(queryText);
+    let maxSim = 0;
+    let pillMatch: { type: ChatMessage["type"]; title: string } | null = null;
 
-    for (const pillObj of PILL_CARD_VECTORS) {
-      const sim = calculateCosineSimilarity(queryVector, pillObj.vector);
-      if (sim > maxSimilarity) {
-        maxSimilarity = sim;
-        bestPillMatch = pillObj;
+    for (const pill of PILL_VECTORS) {
+      const sim = cosineSimilarity(userVec, pill.vector);
+      if (sim > maxSim) {
+        maxSim = sim;
+        pillMatch = pill;
       }
     }
 
-    if (bestPillMatch && maxSimilarity >= PILL_VECTOR_THRESHOLD) {
-      const result = { title: bestPillMatch.title, type: bestPillMatch.type };
+    if (pillMatch && maxSim >= PILL_MATCH_THRESHOLD) {
+      const result = { title: pillMatch.title, type: pillMatch.type };
       saveToCache(qKey, undefined, result.title, result.type);
       return result;
     }
 
-    // Helper for fetch with 4-second timeout signal
-    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 4000) => {
+    // Helper timeout wrapper
+    const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 3500) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const response = await fetch(url, { ...options, signal: controller.signal });
+        const res = await fetch(url, { ...options, signal: controller.signal });
         clearTimeout(id);
-        return response;
+        return res;
       } catch (e) {
         clearTimeout(id);
         throw e;
       }
     };
 
-    // 3. Groq API LLM Call (Primary Provider - Llama 3.3 70B - Verified 200 OK)
+    // 3. Primary LLM Provider: Groq Llama 3.3 70B
     const rawGroqKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || "";
-    const groqApiKey = rawGroqKey.replace(/['"]/g, "").trim();
-    
-    if (groqApiKey) {
+    const groqKey = rawGroqKey.replace(/['"]/g, "").trim();
+
+    if (groqKey) {
       try {
         const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${groqApiKey}`,
+            Authorization: `Bearer ${groqKey}`,
           },
           body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
             messages: [
-              { role: "system", content: SAGNIK_PORTFOLIO_SYSTEM_PROMPT },
+              { role: "system", content: SYSTEM_PROMPT },
               { role: "user", content: queryText },
             ],
             temperature: 0.7,
             max_tokens: 300,
           }),
-        }, 4000);
+        }, 3500);
 
         if (res.ok) {
           const data = await res.json();
@@ -319,30 +292,27 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Groq Provider failed, switching to Gemini Provider:", err);
+        console.warn("Groq LLM call failed or timed out:", err);
       }
     }
 
-    // 4. Google Gemini API LLM Call (Secondary Provider - Gemini 2.0 Flash)
+    // 4. Secondary LLM Provider: Google Gemini 2.0 Flash
     const rawGeminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
-    const geminiApiKey = rawGeminiKey.replace(/['"]/g, "").trim();
+    const geminiKey = rawGeminiKey.replace(/['"]/g, "").trim();
 
-    if (geminiApiKey) {
+    if (geminiKey) {
       try {
         const res = await fetchWithTimeout(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              system_instruction: {
-                parts: [{ text: SAGNIK_PORTFOLIO_SYSTEM_PROMPT }],
-              },
+              system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
               contents: [{ role: "user", parts: [{ text: queryText }] }],
-              generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
             }),
           },
-          4000
+          3500
         );
 
         if (res.ok) {
@@ -355,30 +325,32 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           }
         }
       } catch (err) {
-        console.warn("Gemini Provider failed:", err);
+        console.warn("Gemini LLM call failed or timed out:", err);
       }
     }
 
-    // 5. 1st Person Generative Engine (Guaranteed Instant Response)
-    let fallbackText = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. How can I help you explore my LLM retrieval research, ML projects, technical stack, or background today?`;
-
+    // 5. 1st Person Knowledge-Grounded Generative Fallback
     const cleanWord = qKey.replace(/[^\w]/g, "");
+    let textOut = `Hey there! 👋 I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI. How can I help you explore my research, ML projects, or technical background today?`;
+
     if (["hi", "hii", "hiii", "hey", "heyy", "hello", "yo", "sup"].includes(cleanWord)) {
-      fallbackText = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. What would you like to explore about my projects, research, or background today?`;
+      textOut = `Hey there! 👋 Welcome to my portfolio. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and studying at RKMVERI. What would you like to explore about my projects, research, or background today?`;
+    } else if (qKey.includes("good day") || qKey.includes("great day") || qKey.includes("nice day")) {
+      textOut = `It certainly is a wonderful day! 👋 Thanks for visiting my page. I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata. How can I help you explore my work or background today?`;
     } else if (cleanWord.includes("whatsup") || cleanWord.includes("howareyou")) {
-      fallbackText = `Not much! Just researching LLM retrieval systems at ISI Kolkata and building AI projects. How is your day going? Feel free to ask me anything about my work or stack!`;
+      textOut = `Not much! Just working on LLM retrieval research at ISI Kolkata and building distributed ML systems. How is your day going? Feel free to ask me anything about my projects or stack!`;
     }
 
     const fallbackResult = {
       title: `Response to "${queryText}"`,
-      text: fallbackText,
+      text: textOut,
       type: "custom" as const,
     };
     saveToCache(qKey, fallbackResult.text, fallbackResult.title, "custom");
     return fallbackResult;
   };
 
-  const triggerAnimatedCustomSearch = async (queryText: string) => {
+  const processUserQuery = async (queryText: string) => {
     const userMsg: ChatMessage = {
       id: Date.now().toString() + "-user",
       role: "user",
@@ -387,11 +359,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setIsTyping(true);
+    setIsTyping(true); // Aspect 4: Processing symbol active
 
-    const { text, title, type } = await fetchResponseWithLLM(queryText);
+    const { text, title, type } = await generateLLMResponse(queryText);
 
-    setIsTyping(false);
+    setIsTyping(false); // Aspect 4: Processing symbol complete
     const assistantMsg: ChatMessage = {
       id: Date.now().toString() + "-assistant",
       role: "assistant",
@@ -412,7 +384,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setCooldown(true);
     setTimeout(() => setCooldown(false), 1000);
 
-    triggerAnimatedCustomSearch(queryToSubmit);
+    processUserQuery(queryToSubmit);
     
     setInputQuery("");
     if (inputRef.current) {
@@ -518,7 +490,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
               </div>
             )}
 
-            {/* SECOND: Page Output Card Centered */}
+            {/* SECOND: Assistant Output Card Centered */}
             {msg.role === "assistant" && (
               <div className="flex justify-center w-full animate-slide-in-right">
                 <div className="w-full max-w-4xl bg-[#12151E] border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 text-slate-200">
@@ -528,10 +500,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                     <span>{msg.title || "Response"}</span>
                   </div>
 
-                  {/* Render Response Content Based on Type */}
+                  {/* Aspect 3: Render 1st-Person Card Views or Text Responses */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
-                      {/* Top Profile Block - Curtain Raiser */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                         <div className="relative w-full max-w-[220px] sm:max-w-[260px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 border border-white/15 shadow-2xl">
                           <Image
@@ -553,12 +524,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                             </p>
                           </div>
 
-                          {/* Curtain Raiser Intro Paragraph */}
                           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
                             Driven by deep learning and intelligent retrieval systems. Currently advancing LLM research at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI.
                           </p>
 
-                          {/* Structured Single-Word & Acronym Badges */}
                           <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 pt-1">
                             <span className="px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 text-xs font-mono border border-blue-500/30">
                               Kolkata
@@ -597,7 +566,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                         </div>
                       </div>
 
-                      {/* Bottom Space - Deep Narrative Story */}
                       <div className="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed pt-5 border-t border-white/10">
                         <p>
                           My focus in Artificial Intelligence stems from a deep curiosity about how neural networks process context and attention. At the <strong className="text-white font-semibold">Indian Statistical Institute (ISI)</strong>, I investigate the <strong className="text-white font-semibold font-mono text-blue-300">"Lost in the Middle"</strong> phenomenon in Large Language Models — evaluating how document order and context placement affect factual retrieval in multi-document RAG architectures using NaturalQuestions and TREC RAG benchmarks.
@@ -612,7 +580,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                         </p>
                       </div>
 
-                      {/* Action CTAs */}
                       <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
                         <a
                           href={RESUME_URL}
@@ -636,7 +603,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
                   {msg.type === "experience" && (
                     <div className="space-y-5">
-                      {/* ISI */}
                       <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                           <div>
@@ -658,7 +624,6 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                         </ul>
                       </div>
 
-                      {/* DeepThought */}
                       <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                           <div>
@@ -874,7 +839,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
           </React.Fragment>
         ))}
 
-        {/* Animated Response Typing Indicator */}
+        {/* Aspect 4: Animated Processing Symbol (Typing dots) */}
         {isTyping && (
           <div className="flex justify-center animate-fade-in pt-2">
             <div className="flex items-center gap-3 text-xs font-mono text-[#9CA3AF] bg-white/5 border border-white/10 px-4 py-2 rounded-2xl">
@@ -892,7 +857,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Floating Bottom ChatGPT / Gemini Input Dock */}
+      {/* Floating Bottom Input Dock */}
       <footer
         className="fixed bottom-0 inset-x-0 z-30 p-4 bg-gradient-to-t from-[#0B0D12] via-[#0B0D12]/95 to-transparent backdrop-blur-xl cursor-default"
         onClick={(e) => e.stopPropagation()}
