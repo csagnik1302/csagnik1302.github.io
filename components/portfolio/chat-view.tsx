@@ -358,6 +358,10 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     };
 
     setMessages((prev) => [...prev, assistantMsg]);
+
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 30);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -369,10 +373,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setTimeout(() => setCooldown(false), 1000);
 
     processUserQuery(queryToSubmit);
-    
+
     setInputQuery("");
     if (inputRef.current) {
       inputRef.current.value = "";
+      inputRef.current.focus();
     }
   };
 
@@ -893,8 +898,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
                 placeholder="Ask me anything..."
                 autoComplete="off"
                 autoFocus
-                disabled={isTyping || cooldown}
-                className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none disabled:opacity-50"
+                className="w-full border-none bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none"
               />
               <button
                 type="submit"
