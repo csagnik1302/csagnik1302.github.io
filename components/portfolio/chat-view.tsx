@@ -52,12 +52,14 @@ export interface ChatMessage {
 const SYSTEM_PROMPT = `
 You are Sagnik Chandra speaking directly to visitors on your personal portfolio website.
 
-[CRITICAL NARRATIVE RULES]
+[CRITICAL PERSONA & NARRATIVE RULES]
 1. ALWAYS speak in FIRST PERSON ("I", "my", "me"). You ARE Sagnik Chandra. Never speak in 3rd person.
-2. Be humble, warm, natural, and conversational.
-3. For simple greetings or casual small-talk ("hi", "hello", "hey", "how are you", "what's up"), respond warmly and naturally like a friendly person (e.g. "Hey there! 👋 Welcome to my website. How's your day going?"). DO NOT forcibly dump your internship, resume, or background into simple greetings unless specifically asked.
+2. PERSONA: You are a chill, relaxed, authentic, and friendly guy. Keep tone natural, warm, and conversational.
+3. NO FORCED SELF-PROMOTION OR INFO DUMPING: Never pitch, sell, or forcibly dump your resume, education, internships, projects, or technical background into casual greetings or idle chit-chat (like "hi", "hey", "what's up", "how's it going").
+   - For idle/casual greetings ("what's up", "hey", "how are you", "yo"), respond casually and warmly like a chill friend (e.g. "Hey! Not much, just hanging out and working on some cool stuff. How's your day going?").
+   - ONLY mention education, research, projects, or technical background if the visitor explicitly asks about them or if directly relevant to their prompt.
 4. For technical, background, research, or project questions, ground your answers strictly in my Knowledge Base below.
-5. CONCISE OUTPUT LENGTH: Keep all responses brief, crisp, and to-the-point (1 to 3 short paragraphs max). Avoid wordy or overly long walls of text unless the user explicitly asks for deep technical elaboration.
+5. CONCISE OUTPUT LENGTH: Keep responses brief, crisp, and to-the-point (1 to 2 short paragraphs max).
 
 [COMPLETE KNOWLEDGE BASE REPOSITORY]
 ${getDynamicKnowledgeBaseContext()}
@@ -182,7 +184,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     try {
-      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v5");
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v6");
       if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
@@ -209,7 +211,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     if (type === "custom" && !text) return; // Do not cache empty custom responses
     responseCacheRef.current[qKey] = { text, title, type, intentCategory };
     try {
-      sessionStorage.setItem("sagnik_chat_cache_v5", JSON.stringify(responseCacheRef.current));
+      sessionStorage.setItem("sagnik_chat_cache_v6", JSON.stringify(responseCacheRef.current));
     } catch {}
   };
 
@@ -345,7 +347,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     let cat: ChatMessage["intentCategory"] = "me";
 
     if (isGreeting && !isResearch && !isProject && !isSkills) {
-      textOut = `Hey there! 👋 Welcome to my portfolio website. How's your day going? Feel free to ask me about my research, projects, or background!`;
+      textOut = `Hey! 👋 Not much, just chilling and working on some cool stuff. How's your day going?`;
       cat = "me";
     } else if (isResearch) {
       textOut = `At the **Indian Statistical Institute (ISI)** in Kolkata, my research focuses on the **"Lost in the Middle"** phenomenon in Large Language Models (LLMs) and RAG pipelines.\n\nI evaluate how document ordering and context placement within long prompts impact factual retrieval accuracy and attention weight distribution using datasets derived from NaturalQuestions and TREC RAG benchmarks.`;
@@ -363,7 +365,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       textOut = `Feel free to connect or reach out directly:\n\n📬 **Email**: sagnikchandra@gmail.com\n🐙 **GitHub**: github.com/csagnik1302\n💼 **LinkedIn**: linkedin.com/in/sagnik-chandra-52b0a111a/\n📄 **Resume**: Click the button below to view or download my official Resume PDF.`;
       cat = "contact";
     } else {
-      textOut = `I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI Belur. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. How can I assist you with my research, projects, or background?`;
+      textOut = `Hey there! 👋 I'm Sagnik. What's on your mind today?`;
       cat = "me";
     }
 
