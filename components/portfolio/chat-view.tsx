@@ -894,22 +894,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
                   {msg.type === "custom" && (
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                        <span className={`px-3 py-1 rounded-full border text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5 ${
-                          activeTheme === "me" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300/90" :
-                          activeTheme === "experience" ? "bg-sky-500/10 border-sky-500/30 text-sky-300/90" :
-                          activeTheme === "education" ? "bg-amber-500/10 border-amber-500/30 text-amber-300/90" :
-                          activeTheme === "projects" ? "bg-blue-500/10 border-blue-500/30 text-blue-300/90" :
-                          activeTheme === "skills" ? "bg-purple-500/10 border-purple-500/30 text-purple-300/90" :
-                          activeTheme === "contact" ? "bg-pink-500/10 border-pink-500/30 text-pink-300/90" :
-                          "bg-white/10 border-white/20 text-slate-300"
-                        }`}>
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>AI Response</span>
-                        </span>
-                        <span className="text-[11px] font-mono text-slate-400">{msg.timestamp}</span>
-                      </div>
-                      <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap pt-1">
+                      <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap">
                         {msg.content}
                       </p>
                     </div>
