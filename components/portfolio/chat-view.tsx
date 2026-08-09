@@ -469,9 +469,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       className="flex flex-col min-h-screen bg-[#0B0D12] text-slate-100 font-sans cursor-pointer"
       onClick={onBackToHome}
     >
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar - Fixed Pinned to Top */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 bg-[#12151E]/90 backdrop-blur-xl border-b border-white/10 shadow-lg cursor-default"
+        className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 sm:px-8 py-3.5 bg-[#12151E]/95 backdrop-blur-2xl border-b border-white/10 shadow-xl cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3">
@@ -500,7 +500,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
       {/* Main Conversation Stream */}
       <main
-        className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-36 cursor-default"
+        className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 pt-24 py-6 space-y-6 pb-44 cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {messages.length === 0 && !isTyping && (
