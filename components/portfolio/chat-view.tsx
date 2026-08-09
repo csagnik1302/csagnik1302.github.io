@@ -43,6 +43,7 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content?: string;
   type?: "me" | "projects" | "experience" | "skills" | "education" | "contact" | "custom";
+  intentCategory?: "me" | "projects" | "experience" | "skills" | "education" | "contact";
   title?: string;
   timestamp: string;
 }
@@ -168,7 +169,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const responseCacheRef = useRef<Record<string, { text?: string; title: string; type: ChatMessage["type"] }>>({});
+  const responseCacheRef = useRef<Record<string, { text?: string; title: string; type: ChatMessage["type"]; intentCategory?: ChatMessage["intentCategory"] }>>({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -181,7 +182,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     try {
-      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v4");
+      const savedCache = sessionStorage.getItem("sagnik_chat_cache_v5");
       if (savedCache) responseCacheRef.current = JSON.parse(savedCache);
     } catch {}
 
@@ -204,11 +205,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
   }, [messages, isTyping]);
 
-  const saveToCache = (qKey: string, text: string | undefined, title: string, type: ChatMessage["type"]) => {
+  const saveToCache = (qKey: string, text: string | undefined, title: string, type: ChatMessage["type"], intentCategory?: ChatMessage["intentCategory"]) => {
     if (type === "custom" && !text) return; // Do not cache empty custom responses
-    responseCacheRef.current[qKey] = { text, title, type };
+    responseCacheRef.current[qKey] = { text, title, type, intentCategory };
     try {
-      sessionStorage.setItem("sagnik_chat_cache_v4", JSON.stringify(responseCacheRef.current));
+      sessionStorage.setItem("sagnik_chat_cache_v5", JSON.stringify(responseCacheRef.current));
     } catch {}
   };
 
@@ -238,11 +239,11 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
   };
 
   // Secure Cloudflare Worker Proxy LLM Engine (Zero Key Exposure, Blazing Fast ~300ms)
-  const generateLLMResponse = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"] }> => {
+  const generateLLMResponse = async (queryText: string): Promise<{ text?: string; title: string; type: ChatMessage["type"]; intentCategory?: ChatMessage["intentCategory"] }> => {
     const qKey = queryText.trim().toLowerCase();
 
     // 1. Cache Check
-    if (responseCacheRef.current[qKey] && responseCacheRef.current[qKey].text) {
+    if (responseCacheRef.current[qKey]) {
       return responseCacheRef.current[qKey];
     }
 
@@ -260,8 +261,8 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     }
 
     if (pillMatch && maxSim >= PILL_MATCH_THRESHOLD) {
-      const result = { title: pillMatch.title, type: pillMatch.type };
-      saveToCache(qKey, undefined, result.title, result.type);
+      const result = { title: pillMatch.title, type: pillMatch.type, intentCategory: pillMatch.type as ChatMessage["intentCategory"] };
+      saveToCache(qKey, undefined, result.title, result.type, result.intentCategory);
       return result;
     }
 
@@ -283,7 +284,7 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     const WORKER_URL = "https://sagnik-portfolio-ai.sagnikchandra.workers.dev/";
 
     // Helper to detect query intent and match color theme
-    const detectIntentType = (qStr: string): ChatMessage["type"] => {
+    const detectIntentCategory = (qStr: string): ChatMessage["intentCategory"] => {
       const q = qStr.toLowerCase();
       if (q.includes("research") || q.includes("lost in the middle") || q.includes("isi") || q.includes("experience") || q.includes("work") || q.includes("intern")) {
         return "experience";
@@ -320,9 +321,9 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
       if (res.ok) {
         const data = await res.json();
         if (data && data.text && data.text.trim()) {
-          const detectedType = detectIntentType(queryText);
-          const result = { text: data.text.trim(), title: "AI Response", type: detectedType };
-          saveToCache(qKey, result.text, result.title, detectedType);
+          const cat = detectIntentCategory(queryText);
+          const result = { text: data.text.trim(), title: "AI Response", type: "custom" as const, intentCategory: cat };
+          saveToCache(qKey, result.text, result.title, "custom", cat);
           return result;
         }
       }
@@ -341,37 +342,38 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     const isContact = qKey.includes("contact") || qKey.includes("email") || qKey.includes("resume") || qKey.includes("reach") || qKey.includes("hire") || qKey.includes("linkedin") || qKey.includes("github");
 
     let textOut = "";
-    let detectedType: ChatMessage["type"] = "me";
+    let cat: ChatMessage["intentCategory"] = "me";
 
     if (isGreeting && !isResearch && !isProject && !isSkills) {
       textOut = `Hey there! 👋 Welcome to my portfolio website. How's your day going? Feel free to ask me about my research, projects, or background!`;
-      detectedType = "me";
+      cat = "me";
     } else if (isResearch) {
       textOut = `At the **Indian Statistical Institute (ISI)** in Kolkata, my research focuses on the **"Lost in the Middle"** phenomenon in Large Language Models (LLMs) and RAG pipelines.\n\nI evaluate how document ordering and context placement within long prompts impact factual retrieval accuracy and attention weight distribution using datasets derived from NaturalQuestions and TREC RAG benchmarks.`;
-      detectedType = "experience";
+      cat = "experience";
     } else if (isProject) {
       textOut = `Here are a few of my highlighted Machine Learning & Systems projects:\n\n1. **Neural Literary Style Transfer**: Semi-automated Bengali sentence rewriting pipeline using BiGRU encoders with Gradient Reversal Layers (GRL).\n2. **AcademicLens**: Citation graph intelligence system over 10M+ research papers built with PySpark ETL & Neo4j PageRank.\n3. **Stellar Object Classification**: Multi-class SDSS DR18 galaxy/quasar/star classifier with CatBoost & XGBoost (>99% accuracy).\n4. **Drone Delivery Route Optimisation**: Traffic congestion-aware delivery route optimization using stochastic hill climbing.`;
-      detectedType = "projects";
+      cat = "projects";
     } else if (isSkills) {
       textOut = `Here is my current technical stack & framework expertise:\n\n• **Languages**: ${skillsKB.languages.join(", ")}\n• **Frameworks & ML**: ${skillsKB.frameworks.join(", ")}\n• **Tools & Platforms**: ${skillsKB.tools.join(", ")}`;
-      detectedType = "skills";
+      cat = "skills";
     } else if (isEducation) {
       textOut = `My Academic Background:\n\n🎓 **M.Sc. in Data Science & Artificial Intelligence**\nRamakrishna Mission Vivekananda Educational and Research Institute (RKMVERI), Belur (2025–2027)\n*Focusing on Deep Learning, NLP, RAG Pipelines, and Distributed Systems.*\n\n🎓 **B.Sc. (Hons) in Mathematics**\nUniversity of Calcutta (2020–2023)`;
-      detectedType = "education";
+      cat = "education";
     } else if (isContact) {
       textOut = `Feel free to connect or reach out directly:\n\n📬 **Email**: sagnikchandra@gmail.com\n🐙 **GitHub**: github.com/csagnik1302\n💼 **LinkedIn**: linkedin.com/in/sagnik-chandra-52b0a111a/\n📄 **Resume**: Click the button below to view or download my official Resume PDF.`;
-      detectedType = "contact";
+      cat = "contact";
     } else {
       textOut = `I'm Sagnik Chandra, an AI researcher interning at ISI Kolkata and pursuing an M.Sc. in Data Science & AI at RKMVERI Belur. I specialize in LLM retrieval, PyTorch/PySpark engineering, and graph mining. How can I assist you with my research, projects, or background?`;
-      detectedType = "me";
+      cat = "me";
     }
 
     const result = {
       title: `Response to "${queryText}"`,
       text: textOut,
-      type: detectedType,
+      type: "custom" as const,
+      intentCategory: cat,
     };
-    saveToCache(qKey, result.text, result.title, detectedType);
+    saveToCache(qKey, result.text, result.title, "custom", cat);
     return result;
   };
 
@@ -386,13 +388,14 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true); // Aspect 4: Processing symbol active
 
-    const { text, title, type } = await generateLLMResponse(queryText);
+    const { text, title, type, intentCategory } = await generateLLMResponse(queryText);
 
     setIsTyping(false); // Aspect 4: Processing symbol complete
     const assistantMsg: ChatMessage = {
       id: Date.now().toString() + "-assistant",
       role: "assistant",
       type: type,
+      intentCategory: intentCategory,
       content: text,
       title: title,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -523,59 +526,62 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
             {/* SECOND: Assistant Output Card Centered */}
             {msg.role === "assistant" && (
               <div className="flex justify-center w-full animate-slide-in-right">
-                <div className={`w-full max-w-4xl rounded-3xl p-5 sm:p-7 shadow-xl space-y-5 text-slate-200 transition-all border ${
-                  msg.type === "me" ? "bg-gradient-to-b from-emerald-950/25 via-[#12151E] to-[#12151E] border-emerald-500/35 shadow-[0_4px_25px_rgba(16,185,129,0.08)]" :
-                  msg.type === "experience" ? "bg-gradient-to-b from-sky-950/25 via-[#12151E] to-[#12151E] border-sky-500/35 shadow-[0_4px_25px_rgba(56,189,248,0.08)]" :
-                  msg.type === "education" ? "bg-gradient-to-b from-amber-950/25 via-[#12151E] to-[#12151E] border-amber-500/35 shadow-[0_4px_25px_rgba(245,158,11,0.08)]" :
-                  msg.type === "projects" ? "bg-gradient-to-b from-blue-950/25 via-[#12151E] to-[#12151E] border-blue-500/35 shadow-[0_4px_25px_rgba(59,130,246,0.08)]" :
-                  msg.type === "skills" ? "bg-gradient-to-b from-purple-950/25 via-[#12151E] to-[#12151E] border-purple-500/35 shadow-[0_4px_25px_rgba(168,85,247,0.08)]" :
-                  msg.type === "contact" ? "bg-gradient-to-b from-pink-950/25 via-[#12151E] to-[#12151E] border-pink-500/35 shadow-[0_4px_25px_rgba(236,72,153,0.08)]" :
-                  "bg-[#12151E] border-white/10"
-                }`}>
-                  {/* Visual Header Pill Badge */}
-                  {msg.type !== "custom" && (
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                      <div className="flex items-center gap-2">
-                        {msg.type === "me" && (
-                          <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <Smile className="w-3.5 h-3.5 text-emerald-400/80" />
-                            <span>Me / Profile</span>
-                          </span>
-                        )}
-                        {msg.type === "experience" && (
-                          <span className="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <Code2 className="w-3.5 h-3.5 text-[#38BDF8]/80" />
-                            <span>Work & Research Experience</span>
-                          </span>
-                        )}
-                        {msg.type === "education" && (
-                          <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <GraduationCap className="w-3.5 h-3.5 text-amber-400/80" />
-                            <span>Academic Education</span>
-                          </span>
-                        )}
-                        {msg.type === "projects" && (
-                          <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <Briefcase className="w-3.5 h-3.5 text-blue-400/80" />
-                            <span>Featured AI Projects</span>
-                          </span>
-                        )}
-                        {msg.type === "skills" && (
-                          <span className="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <Layers className="w-3.5 h-3.5 text-purple-400/80" />
-                            <span>Technical Stack & Skills</span>
-                          </span>
-                        )}
-                        {msg.type === "contact" && (
-                          <span className="px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
-                            <Mail className="w-3.5 h-3.5 text-pink-400/80" />
-                            <span>Contact & Direct Reach-Out</span>
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] font-mono text-slate-400">{msg.timestamp}</span>
-                    </div>
-                  )}
+                {(() => {
+                  const activeTheme = msg.intentCategory || (msg.type !== "custom" ? msg.type : "me");
+                  return (
+                    <div className={`w-full max-w-4xl rounded-3xl p-5 sm:p-7 shadow-xl space-y-5 text-slate-200 transition-all border ${
+                      activeTheme === "me" ? "bg-gradient-to-b from-emerald-950/25 via-[#12151E] to-[#12151E] border-emerald-500/35 shadow-[0_4px_25px_rgba(16,185,129,0.08)]" :
+                      activeTheme === "experience" ? "bg-gradient-to-b from-sky-950/25 via-[#12151E] to-[#12151E] border-sky-500/35 shadow-[0_4px_25px_rgba(56,189,248,0.08)]" :
+                      activeTheme === "education" ? "bg-gradient-to-b from-amber-950/25 via-[#12151E] to-[#12151E] border-amber-500/35 shadow-[0_4px_25px_rgba(245,158,11,0.08)]" :
+                      activeTheme === "projects" ? "bg-gradient-to-b from-blue-950/25 via-[#12151E] to-[#12151E] border-blue-500/35 shadow-[0_4px_25px_rgba(59,130,246,0.08)]" :
+                      activeTheme === "skills" ? "bg-gradient-to-b from-purple-950/25 via-[#12151E] to-[#12151E] border-purple-500/35 shadow-[0_4px_25px_rgba(168,85,247,0.08)]" :
+                      activeTheme === "contact" ? "bg-gradient-to-b from-pink-950/25 via-[#12151E] to-[#12151E] border-pink-500/35 shadow-[0_4px_25px_rgba(236,72,153,0.08)]" :
+                      "bg-[#12151E] border-white/10"
+                    }`}>
+                      {/* Visual Header Pill Badge */}
+                      {msg.type !== "custom" && (
+                        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                          <div className="flex items-center gap-2">
+                            {msg.type === "me" && (
+                              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <Smile className="w-3.5 h-3.5 text-emerald-400/80" />
+                                <span>Me / Profile</span>
+                              </span>
+                            )}
+                            {msg.type === "experience" && (
+                              <span className="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <Code2 className="w-3.5 h-3.5 text-[#38BDF8]/80" />
+                                <span>Work & Research Experience</span>
+                              </span>
+                            )}
+                            {msg.type === "education" && (
+                              <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <GraduationCap className="w-3.5 h-3.5 text-amber-400/80" />
+                                <span>Academic Education</span>
+                              </span>
+                            )}
+                            {msg.type === "projects" && (
+                              <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <Briefcase className="w-3.5 h-3.5 text-blue-400/80" />
+                                <span>Featured AI Projects</span>
+                              </span>
+                            )}
+                            {msg.type === "skills" && (
+                              <span className="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <Layers className="w-3.5 h-3.5 text-purple-400/80" />
+                                <span>Technical Stack & Skills</span>
+                              </span>
+                            )}
+                            {msg.type === "contact" && (
+                              <span className="px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/30 text-pink-300/90 text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5">
+                                <Mail className="w-3.5 h-3.5 text-pink-400/80" />
+                                <span>Contact & Direct Reach-Out</span>
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] font-mono text-slate-400">{msg.timestamp}</span>
+                        </div>
+                      )}
                   {/* Aspect 3: Render 1st-Person Card Views or Text Responses */}
                   {msg.type === "me" && (
                     <div className="space-y-6">
@@ -888,14 +894,31 @@ export function ChatView({ initialPrompt, onBackToHome }: ChatViewProps) {
 
                   {msg.type === "custom" && (
                     <div className="space-y-4">
-                      <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                        <span className={`px-3 py-1 rounded-full border text-xs font-mono font-medium uppercase tracking-wider flex items-center gap-1.5 ${
+                          activeTheme === "me" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300/90" :
+                          activeTheme === "experience" ? "bg-sky-500/10 border-sky-500/30 text-sky-300/90" :
+                          activeTheme === "education" ? "bg-amber-500/10 border-amber-500/30 text-amber-300/90" :
+                          activeTheme === "projects" ? "bg-blue-500/10 border-blue-500/30 text-blue-300/90" :
+                          activeTheme === "skills" ? "bg-purple-500/10 border-purple-500/30 text-purple-300/90" :
+                          activeTheme === "contact" ? "bg-pink-500/10 border-pink-500/30 text-pink-300/90" :
+                          "bg-white/10 border-white/20 text-slate-300"
+                        }`}>
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>AI Response</span>
+                        </span>
+                        <span className="text-[11px] font-mono text-slate-400">{msg.timestamp}</span>
+                      </div>
+                      <p className="text-sm text-[#F3F4F6] leading-relaxed whitespace-pre-wrap pt-1">
                         {msg.content}
                       </p>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
+          </div>
+        )}
           </React.Fragment>
         ))}
 
